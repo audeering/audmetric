@@ -7,6 +7,15 @@ audmetric
 **audmetric** includes several equations
 to estimate the performance of a machine learning prediction algorithm.
 
+Some of the metrics are also available in sklearn_,
+but we wanted to have a package
+which depends only on :mod:`numpy`.
+For those metrics
+we included tests that the results are identical to sklearn_.
+
+
+.. _sklearn: https://scikit-learn.org/stable/
+
 
 .. badges images and links:
 .. |tests| image:: https://github.com/audeering/audmetric/workflows/Test/badge.svg
