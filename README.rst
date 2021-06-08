@@ -9,11 +9,12 @@ to estimate the performance of a machine learning prediction algorithm.
 
 Some of the metrics are also available in sklearn_,
 but we wanted to have a package
-which depends only on :mod:`numpy`.
+which depends only on numpy_.
 For those metrics
 we included tests that the results are identical to sklearn_.
 
 
+.. _numpy: https://numpy.org/
 .. _sklearn: https://scikit-learn.org/stable/
 
 
