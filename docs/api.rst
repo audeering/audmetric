@@ -1,5 +1,5 @@
-audbenchmark.metric
-===================
+audmetric
+=========
 
 .. automodule:: audmetric
 
