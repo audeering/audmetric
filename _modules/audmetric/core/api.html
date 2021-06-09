@@ -1,0 +1,1143 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>audmetric.core.api &mdash; audmetric Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    
+  
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../../../index.html">
+          
+            <img src="../../../_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audmetric</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">audmetric</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">audmetric</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>audmetric.core.api</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for audmetric.core.api</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">audeer</span>
+
+<span class="kn">from</span> <span class="nn">audmetric.core.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">assert_equal_length</span><span class="p">,</span>
+    <span class="n">infer_labels</span><span class="p">,</span>
+    <span class="n">scores_per_subgroup_and_class</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="accuracy"><a class="viewcode-back" href="../../../api.html#audmetric.accuracy">[docs]</a><span class="k">def</span> <span class="nf">accuracy</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Classification accuracy.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{accuracy} = \frac{\text{number of correct predictions}}</span>
+<span class="sd">                               {\text{number of incorrect predictions}}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            Sample is considered in computation if either prediction or</span>
+<span class="sd">            ground truth (logical OR) is contained in labels.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        accuracy of prediction :math:`\in [0, 1]`</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; accuracy([0, 0], [0, 1])</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+
+    <span class="c1"># keep where both prediction and truth contained in `labels`</span>
+    <span class="n">label_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">labels</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">truth</span><span class="p">[</span><span class="n">label_mask</span><span class="p">]</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="n">label_mask</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">prediction</span> <span class="o">==</span> <span class="n">truth</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="concordance_cc"><a class="viewcode-back" href="../../../api.html#audmetric.concordance_cc">[docs]</a><span class="k">def</span> <span class="nf">concordance_cc</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concordance correlation coefficient.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \rho_c = \frac{2\rho\sigma_\text{prediction}\sigma_\text{truth}}</span>
+<span class="sd">                      {\sigma_\text{prediction}^2 + \sigma_\text{truth}^2 + (</span>
+<span class="sd">                      \mu_\text{prediction}-\mu_\text{truth})^2}</span>
+
+<span class="sd">    where :math:`\rho` is the Pearson correlation coefficient,</span>
+<span class="sd">    :math:`\mu` the mean and :math:`\sigma^2` the variance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values</span>
+<span class="sd">        prediction: predicted values</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        concordance correlation coefficient :math:`\in [-1, 1]`</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; concordance_cc([0, 1, 2], [0, 1, 1])</span>
+<span class="sd">        0.6666666666666666</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">pearson_cc</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">truth</span><span class="p">)</span>
+    <span class="n">x_mean</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">y_mean</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">x_std</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+    <span class="n">y_std</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">x_std</span> <span class="o">*</span> <span class="n">x_std</span>
+        <span class="o">+</span> <span class="n">y_std</span> <span class="o">*</span> <span class="n">y_std</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">x_mean</span> <span class="o">-</span> <span class="n">y_mean</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_mean</span> <span class="o">-</span> <span class="n">y_mean</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">denominator</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ccc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ccc</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">x_std</span> <span class="o">*</span> <span class="n">y_std</span> <span class="o">/</span> <span class="n">denominator</span>
+
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">ccc</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="confusion_matrix"><a class="viewcode-back" href="../../../api.html#audmetric.confusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">confusion_matrix</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confusion matrix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        normalize: normalize confusion matrix over the rows</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        confusion matrix</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; truth = [0, 1, 2]</span>
+<span class="sd">        &gt;&gt;&gt; prediction = [0, 2, 0]</span>
+<span class="sd">        &gt;&gt;&gt; confusion_matrix(truth, prediction)</span>
+<span class="sd">        [[1, 0, 0], [0, 0, 1], [1, 0, 0]]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+        <span class="n">row_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">truth</span> <span class="o">==</span> <span class="n">row</span><span class="p">)</span>
+        <span class="n">y_row</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="n">row_indices</span><span class="p">]</span>
+        <span class="n">row_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">row_matrix</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_row</span> <span class="o">==</span> <span class="n">column</span><span class="p">)[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="n">matrix</span> <span class="o">+=</span> <span class="p">[</span><span class="n">row_matrix</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">matrix</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">row_sum</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                <span class="n">matrix</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">/</span> <span class="n">row_sum</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">matrix</span></div>
+
+
+<div class="viewcode-block" id="edit_distance"><a class="viewcode-back" href="../../../api.html#audmetric.edit_distance">[docs]</a><span class="k">def</span> <span class="nf">edit_distance</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Edit distance between two strings of characters or sequences of ints.</span>
+
+<span class="sd">    The implementation follows the `Wagner-Fischer algorithm`_.</span>
+
+<span class="sd">    .. _Wagner-Fischer algorithm:</span>
+<span class="sd">        https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth sequence</span>
+<span class="sd">        prediction: predicted sequence</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        edit distance</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; truth = &#39;lorem&#39;</span>
+<span class="sd">        &gt;&gt;&gt; prediction = &#39;lorm&#39;</span>
+<span class="sd">        &gt;&gt;&gt; edit_distance(truth, prediction)</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; truth = [0, 1, 2]</span>
+<span class="sd">        &gt;&gt;&gt; prediction = [0, 1]</span>
+<span class="sd">        &gt;&gt;&gt; edit_distance(truth, prediction)</span>
+<span class="sd">        1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">truth</span> <span class="o">==</span> <span class="n">prediction</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">m0</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">m1</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m0</span><span class="p">)):</span>
+        <span class="n">m0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)):</span>
+        <span class="n">m1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)):</span>
+            <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">prediction</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">truth</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">m1</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">m1</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>       <span class="c1"># deletion</span>
+                            <span class="n">m0</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>   <span class="c1"># insertion</span>
+                            <span class="n">m0</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">cost</span><span class="p">)</span>    <span class="c1"># substitution</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m0</span><span class="p">)):</span>
+            <span class="n">m0</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">m1</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">m1</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="event_error_rate"><a class="viewcode-back" href="../../../api.html#audmetric.event_error_rate">[docs]</a><span class="k">def</span> <span class="nf">event_error_rate</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span>
+    <span class="p">],</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span>
+    <span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Event error rate based on edit distance.</span>
+
+<span class="sd">    The event error rate is computed by aggregating the mean edit</span>
+<span class="sd">    distances of each (truth, prediction)-pair and averaging the</span>
+<span class="sd">    aggregated score by the number of pairs.</span>
+
+<span class="sd">    The mean edit distance of each (truth, prediction)-pair is computed</span>
+<span class="sd">    as an average of the edit distance over the length of the longer sequence</span>
+<span class="sd">    of the corresponding pair. By normalizing over the longer sequence the</span>
+<span class="sd">    normalized distance is bound to [0, 1].</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth classes</span>
+<span class="sd">        prediction: predicted classes</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        event error rate</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; event_error_rate([[0, 1]], [[0]])</span>
+<span class="sd">        0.5</span>
+<span class="sd">        &gt;&gt;&gt; event_error_rate([[0, 1], [2]], [[0], [2]])</span>
+<span class="sd">        0.25</span>
+<span class="sd">        &gt;&gt;&gt; event_error_rate([&#39;lorem&#39;], [&#39;lorm&#39;])</span>
+<span class="sd">        0.2</span>
+<span class="sd">        &gt;&gt;&gt; event_error_rate([&#39;lorem&#39;, &#39;ipsum&#39;], [&#39;lorm&#39;, &#39;ipsum&#39;])</span>
+<span class="sd">        0.1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">eer</span> <span class="o">=</span> <span class="mf">0.</span>
+
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">eer</span> <span class="o">+=</span> <span class="n">edit_distance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+
+    <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">eer</span> <span class="o">/</span> <span class="n">num_samples</span></div>
+
+
+<div class="viewcode-block" id="fscore_per_class"><a class="viewcode-back" href="../../../api.html#audmetric.fscore_per_class">[docs]</a><span class="k">def</span> <span class="nf">fscore_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;F-score per class.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{fscore}_k = \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \frac{1}{2}</span>
+<span class="sd">                 (\text{false positive}_k + \text{false negative}_k)}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dictionary with label as key and F-score as value</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; fscore_per_class([0, 0], [0, 1])</span>
+<span class="sd">        {0: 0.6666666666666666, 1: 0.0}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">precision_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">zero_division</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">recall_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">zero_division</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fscore</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">precision</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">recall</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fscore</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+            <span class="n">fscore</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fscore</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fscore</span></div>
+
+
+<div class="viewcode-block" id="mean_absolute_error"><a class="viewcode-back" href="../../../api.html#audmetric.mean_absolute_error">[docs]</a><span class="k">def</span> <span class="nf">mean_absolute_error</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mean absolute error.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{MSE} = \frac{1}{n} \sum^n_{i=1}</span>
+<span class="sd">            |\text{prediction} - \text{truth}|</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values</span>
+<span class="sd">        prediction: predicted values</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        mean absolute error</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; mean_absolute_error([0, 0], [0, 1])</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">truth</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="mean_squared_error"><a class="viewcode-back" href="../../../api.html#audmetric.mean_squared_error">[docs]</a><span class="k">def</span> <span class="nf">mean_squared_error</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mean squared error.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{MSE} = \frac{1}{n} \sum^n_{i=1}</span>
+<span class="sd">            (\text{prediction} - \text{truth})^2</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values</span>
+<span class="sd">        prediction: predicted values</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        mean squared error</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; mean_squared_error([0, 0], [0, 1])</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">truth</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="pearson_cc"><a class="viewcode-back" href="../../../api.html#audmetric.pearson_cc">[docs]</a><span class="k">def</span> <span class="nf">pearson_cc</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pearson correlation coefficient.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \rho = \frac{\text{cov}(\text{prediction}, \text{truth})}{</span>
+<span class="sd">        \sigma_\text{prediction}\sigma_\text{truth}}</span>
+
+<span class="sd">    where :math:`\sigma` is the standard deviation,</span>
+<span class="sd">    and :math:`\text{cov}` is the covariance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values</span>
+<span class="sd">        prediction: predicted values</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pearson correlation coefficient :math:`\in [-1, 1]`</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; pearson_cc([0, 1, 2], [0, 1, 1])</span>
+<span class="sd">        0.8660254037844385</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">prediction</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">truth</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="precision_per_class"><a class="viewcode-back" href="../../../api.html#audmetric.precision_per_class">[docs]</a><span class="k">def</span> <span class="nf">precision_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Precision per class.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{precision}_k = \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \text{false positive}_k}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dictionary with label as key and precision as value</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; precision_per_class([0, 0], [0, 1])</span>
+<span class="sd">        {0: 1.0, 1: 0.0}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">old_settings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span> <span class="o">/</span> <span class="n">total</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="o">**</span><span class="n">old_settings</span><span class="p">)</span>
+    <span class="n">recall</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">recall</span><span class="p">)]</span> <span class="o">=</span> <span class="n">zero_division</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">recall</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="recall_per_class"><a class="viewcode-back" href="../../../api.html#audmetric.recall_per_class">[docs]</a><span class="k">def</span> <span class="nf">recall_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recall per class.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{recall}_k = \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \text{false negative}_k}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dictionary with label as key and recall as value</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; recall_per_class([0, 0], [0, 1])</span>
+<span class="sd">        {0: 0.5, 1: 0.0}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">old_settings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span> <span class="o">/</span> <span class="n">total</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="o">**</span><span class="n">old_settings</span><span class="p">)</span>
+    <span class="n">recall</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">recall</span><span class="p">)]</span> <span class="o">=</span> <span class="n">zero_division</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">recall</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="unweighted_average_bias"><a class="viewcode-back" href="../../../api.html#audmetric.unweighted_average_bias">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_bias</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">protected_variable</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">subgroups</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[</span>
+            <span class="p">[</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+            <span class="p">],</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">fscore_per_class</span><span class="p">,</span>
+        <span class="n">reduction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[</span>
+            <span class="p">[</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="nb">float</span><span class="p">,</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute unweighted average bias with respect to a protected variable.</span>
+
+<span class="sd">    The bias is measured in terms of *equalized odds* which requires</span>
+<span class="sd">    the classifier to have identical performance for all classes independent</span>
+<span class="sd">    of a protected variable such as race. The performance of the classifier</span>
+<span class="sd">    for its different classes can be assessed with standard metrics</span>
+<span class="sd">    such as *recall* or *precision*. The difference in performance, denoted</span>
+<span class="sd">    as score divergence, can be computed in different ways, as well.</span>
+<span class="sd">    For two subgroups the (absolute) difference serves as a standard choice.</span>
+<span class="sd">    For more than two subgroups the score divergence could be estimated by</span>
+<span class="sd">    the standard deviation of the scores.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        If for a class less than two subgroups exhibit a performance score,</span>
+<span class="sd">        the corresponding class is ignored in the bias computation.</span>
+<span class="sd">        This occurs if there is no class sample for a subgroup,</span>
+<span class="sd">        e.g. no negative (class label) female (subgroup of sex).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth classes</span>
+<span class="sd">        prediction: predicted classes</span>
+<span class="sd">        protected_variable: manifestations of protected variable such as</span>
+<span class="sd">            subgroups &quot;male&quot; and &quot;female&quot; of variable &quot;sex&quot;</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            The bias is computed only on the specified labels.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        subgroups: included subgroups in preferred ordering.</span>
+<span class="sd">            The direction of the bias is determined by the ordering of the</span>
+<span class="sd">            subgroups.</span>
+<span class="sd">            Besides, the bias is computed only on the specified subgroups.</span>
+<span class="sd">            If no subgroups are supplied, they will be inferred from</span>
+<span class="sd">            :math:`\text{protected\_variable}` and ordered alphanumerically.</span>
+<span class="sd">        metric: metric which equalized odds are measured with.</span>
+<span class="sd">            Typical choices are: :func:`audmetric.recall_per_class`,</span>
+<span class="sd">            :func:`audmetric.precision_per_class` or</span>
+<span class="sd">            :func:`audmetric.fscore_per_class`</span>
+<span class="sd">        reduction: specifies the reduction operation to measure the divergence</span>
+<span class="sd">            between the scores of the subgroups of the protected variable</span>
+<span class="sd">            for each class. Typical choices are:</span>
+<span class="sd">            difference or absolute difference between scores for two subgroups</span>
+<span class="sd">            and standard deviation of scores for more than two subgroups.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        unweighted average bias</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth``, ``prediction`` and ``protected_variable``</span>
+<span class="sd">            have different lengths</span>
+<span class="sd">        ValueError: if ``subgroups`` contains values not contained in</span>
+<span class="sd">            ``protected_variable``</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; unweighted_average_bias([1, 1], [1, 0], [&#39;male&#39;, &#39;female&#39;])</span>
+<span class="sd">        0.5</span>
+<span class="sd">        &gt;&gt;&gt; unweighted_average_bias(</span>
+<span class="sd">        ...     [1, 1], [1, 0], [&#39;male&#39;, &#39;female&#39;],</span>
+<span class="sd">        ...     subgroups=[&#39;female&#39;, &#39;male&#39;],</span>
+<span class="sd">        ...     reduction=lambda x: x[0] - x[1],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        -1.0</span>
+<span class="sd">        &gt;&gt;&gt; unweighted_average_bias(</span>
+<span class="sd">        ...     [0, 1], [1, 0], [&#39;male&#39;, &#39;female&#39;],</span>
+<span class="sd">        ...     metric=recall_per_class</span>
+<span class="sd">        ... )</span>
+<span class="sd">        nan</span>
+<span class="sd">        &gt;&gt;&gt; unweighted_average_bias(</span>
+<span class="sd">        ...     [0, 0, 0, 0], [1, 1, 0, 0], [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;],</span>
+<span class="sd">        ...     metric=recall_per_class,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">protected_variable</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&#39;truth&#39;, &#39;prediction&#39; and &#39;protected_variable&#39; should have &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;same lengths, but received &#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;, &#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;and &#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">protected_variable</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">subgroups</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subgroups</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">protected_variable</span><span class="p">))</span>
+
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">scores_per_subgroup_and_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="o">=</span><span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="o">=</span><span class="n">prediction</span><span class="p">,</span>
+        <span class="n">protected_variable</span><span class="o">=</span><span class="n">protected_variable</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+        <span class="n">subgroups</span><span class="o">=</span><span class="n">subgroups</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">bias</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+        <span class="n">scores_subgroup</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">scores</span><span class="p">[</span><span class="n">subgroup</span><span class="p">][</span><span class="n">label</span><span class="p">]</span> <span class="k">for</span> <span class="n">subgroup</span> <span class="ow">in</span> <span class="n">subgroups</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">[</span><span class="n">subgroup</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="n">subgroup</span><span class="p">][</span><span class="n">label</span><span class="p">])</span>
+        <span class="p">]</span>
+        <span class="c1"># compute score divergence only where more than 1 score per class</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores_subgroup</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">bias</span> <span class="o">+=</span> <span class="n">reduction</span><span class="p">(</span><span class="n">scores_subgroup</span><span class="p">)</span>
+            <span class="n">denominator</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">denominator</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="k">return</span> <span class="n">bias</span> <span class="o">/</span> <span class="n">denominator</span></div>
+
+
+<div class="viewcode-block" id="unweighted_average_fscore"><a class="viewcode-back" href="../../../api.html#audmetric.unweighted_average_fscore">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_fscore</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average F-score.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{UAF} = \frac{1}{K} \sum^K_{k=1}</span>
+<span class="sd">            \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \frac{1}{2}</span>
+<span class="sd">                 (\text{false positive}_k + \text{false negative}_k)}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        unweighted average precision</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; unweighted_average_fscore([0, 0], [0, 1])</span>
+<span class="sd">        0.3333333333333333</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fscore</span> <span class="o">=</span> <span class="n">fscore_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">zero_division</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fscore</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fscore</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">fscore</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="unweighted_average_precision"><a class="viewcode-back" href="../../../api.html#audmetric.unweighted_average_precision">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_precision</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average precision.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{UAP} = \frac{1}{K} \sum^K_{k=1}</span>
+<span class="sd">            \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \text{false positive}_k}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        unweighted average precision</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; unweighted_average_precision([0, 0], [0, 1])</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">precision_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">zero_division</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">precision</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">precision</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="unweighted_average_recall"><a class="viewcode-back" href="../../../api.html#audmetric.unweighted_average_recall">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_recall</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average recall.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{UAR} = \frac{1}{K} \sum^K_{k=1}</span>
+<span class="sd">            \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \text{false negative}_k}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        unweighted average recall</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; unweighted_average_recall([0, 0], [0, 1])</span>
+<span class="sd">        0.25</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">recall_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">zero_division</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">recall</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">recall</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="weighted_confusion_error"><a class="viewcode-back" href="../../../api.html#audmetric.weighted_confusion_error">[docs]</a><span class="k">def</span> <span class="nf">weighted_confusion_error</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+    <span class="n">weights</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Weighted confusion error.</span>
+
+<span class="sd">    Computes the normalized confusion matrix, applies given weights to each</span>
+<span class="sd">    cell and sums them up. Weights are expected as positive numbers and</span>
+<span class="sd">    will be normalized by the sum of all weights. The higher the weight,</span>
+<span class="sd">    the more costly will be the error. A weight of 0 means that the cell</span>
+<span class="sd">    is not taken into account for the error, this is usually the case for the</span>
+<span class="sd">    diagonal as it holds correctly classified samples.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        weights: weights applied to the confusion matrix.</span>
+<span class="sd">            Expected as a list of lists in the following form</span>
+<span class="sd">            (r=row, c=column):</span>
+<span class="sd">            ``[[w_r0_c0, ..., w_r0_cN], ..., [w_rN_c0, ..., w_rN_cN]]``</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        weighted confusion error</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">        &gt;&gt;&gt; truth = [0, 1, 2]</span>
+<span class="sd">        &gt;&gt;&gt; prediction = [0, 2, 0]</span>
+<span class="sd">        &gt;&gt;&gt; # penalize only errors &gt; 1</span>
+<span class="sd">        &gt;&gt;&gt; weights = [[0, 0 , 1], [0, 0, 0], [1, 0, 0]]</span>
+<span class="sd">        &gt;&gt;&gt; weighted_confusion_error(truth, prediction, weights)</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cm</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Shape of weights &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> &#39;</span>
+            <span class="s1">&#39;does not match shape of confusion matrix &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">.&#39;</span>
+        <span class="p">)</span>
+
+    <span class="n">weighted_cm</span> <span class="o">=</span> <span class="n">cm</span> <span class="o">*</span> <span class="n">weights</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weighted_cm</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="word_error_rate"><a class="viewcode-back" href="../../../api.html#audmetric.word_error_rate">[docs]</a><span class="k">def</span> <span class="nf">word_error_rate</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Word error rate based on edit distance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth strings</span>
+<span class="sd">        prediction: predicted strings</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        word error rate</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; truth = [[&#39;lorem&#39;, &#39;ipsum&#39;], [&#39;north&#39;, &#39;wind&#39;, &#39;and&#39;, &#39;sun&#39;]]</span>
+<span class="sd">        &gt;&gt;&gt; prediction = [[&#39;lorm&#39;, &#39;ipsum&#39;], [&#39;north&#39;, &#39;wind&#39;]]</span>
+<span class="sd">        &gt;&gt;&gt; word_error_rate(truth, prediction)</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+
+    <span class="n">wer</span> <span class="o">=</span> <span class="mf">0.</span>
+
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">):</span>
+        <span class="c1"># map words to ints</span>
+        <span class="n">unique_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="nb">map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">unique_words</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_words</span><span class="p">)))}</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="nb">map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="nb">map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">p</span><span class="p">]</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">wer</span> <span class="o">+=</span> <span class="n">edit_distance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+
+    <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">wer</span> <span class="o">/</span> <span class="n">num_samples</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/06/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2019-2021 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
