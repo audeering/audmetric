@@ -40,12 +40,12 @@ jobs:
       run: |
         python -m pytest
 
-    #- name: Upload coverage to Codecov
-    #  uses: codecov/codecov-action@v1
-    #  with:
-    #    token: ${{ secrets.CODECOV_TOKEN }}
-    #    file: ./coverage.xml
-    #  if: matrix.os == 'ubuntu-18.04'
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+      if: matrix.os == 'ubuntu-18.04'
 
     - name: Test building documentation
       run: |
