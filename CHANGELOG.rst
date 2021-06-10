@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.1 (2021/06/10)
+--------------------------
+
+* Fixed: broken package due to missing ``__init_.py`` file
+
+
 Version 1.0.0 (2021/06/09)
 --------------------------
 
