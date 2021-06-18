@@ -20,10 +20,24 @@ def infer_labels(
         prediction: typing.Sequence[typing.Any],
         labels: typing.Optional[typing.Sequence[typing.Any]],
 ) -> typing.Sequence[typing.Any]:
-    r"""Infer labels from truth and prediction."""
+    r"""Infer labels from truth and prediction.
+
+    It gathers all labels that are present in the truth and prediction values.
+
+    Args:
+        truth: ground truth labels
+        prediction: predicted labels
+        labels: if labels are provided,
+            they will not be infered
+            but simply returned as a sorted list
+
+    Returns:
+        labels
+
+    """
     if labels is None:
-        labels = sorted(list(set(truth) | set(prediction)))
-    return labels
+        labels = set(truth) | set(prediction)
+    return sorted(list(labels))
 
 
 def scores_per_subgroup_and_class(
