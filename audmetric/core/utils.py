@@ -18,26 +18,21 @@ def assert_equal_length(
 def infer_labels(
         truth: typing.Sequence[typing.Any],
         prediction: typing.Sequence[typing.Any],
-        labels: typing.Optional[typing.Sequence[typing.Any]],
-) -> typing.Sequence[typing.Any]:
+) -> typing.List[typing.Any]:
     r"""Infer labels from truth and prediction.
 
-    It gathers all labels that are present in the truth and prediction values.
+    It gathers all labels that are present
+    in the truth and prediction values.
 
     Args:
         truth: ground truth labels
         prediction: predicted labels
-        labels: if labels are provided,
-            they will not be infered
-            but simply returned as a sorted list
 
     Returns:
-        labels
+        labels in sorted order
 
     """
-    if labels is None:
-        labels = set(truth) | set(prediction)
-    return sorted(list(labels))
+    return sorted(list(set(truth) | set(prediction)))
 
 
 def scores_per_subgroup_and_class(
