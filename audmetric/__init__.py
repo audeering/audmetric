@@ -1,3 +1,4 @@
+from audmetric import utils
 from audmetric.core.api import (
     accuracy,
     concordance_cc,

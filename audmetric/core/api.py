@@ -45,7 +45,8 @@ def accuracy(
 
     """
     assert_equal_length(truth, prediction)
-    labels = infer_labels(truth, prediction, labels)
+    if labels is None:
+        labels = infer_labels(truth, prediction)
 
     prediction = np.array(prediction)
     truth = np.array(truth)
@@ -154,7 +155,8 @@ def confusion_matrix(
 
     """
     assert_equal_length(truth, prediction)
-    labels = infer_labels(truth, prediction, labels)
+    if labels is None:
+        labels = infer_labels(truth, prediction)
 
     truth = np.array(truth)
     prediction = np.array(prediction)
@@ -323,7 +325,8 @@ def fscore_per_class(
         {0: 0.6666666666666666, 1: 0.0}
 
     """
-    labels = infer_labels(truth, prediction, labels)
+    if labels is None:
+        labels = infer_labels(truth, prediction)
 
     precision = precision_per_class(
         truth,
@@ -487,7 +490,8 @@ def precision_per_class(
         {0: 1.0, 1: 0.0}
 
     """
-    labels = infer_labels(truth, prediction, labels)
+    if labels is None:
+        labels = infer_labels(truth, prediction)
 
     matrix = np.array(confusion_matrix(truth, prediction, labels))
     total = matrix.sum(axis=0)
@@ -530,7 +534,8 @@ def recall_per_class(
         {0: 0.5, 1: 0.0}
 
     """
-    labels = infer_labels(truth, prediction, labels)
+    if labels is None:
+        labels = infer_labels(truth, prediction)
 
     matrix = np.array(confusion_matrix(truth, prediction, labels))
     total = matrix.sum(axis=1)
@@ -638,7 +643,8 @@ def unweighted_average_bias(
         0.5
 
     """
-    labels = infer_labels(truth, prediction, labels)
+    if labels is None:
+        labels = infer_labels(truth, prediction)
 
     if not len(truth) == len(prediction) == len(protected_variable):
         raise ValueError(

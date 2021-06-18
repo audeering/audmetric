@@ -16,6 +16,7 @@
     :hidden:
 
     api
+    api-utils
     genindex
 
 .. toctree::
