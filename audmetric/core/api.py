@@ -170,9 +170,7 @@ def confusion_matrix(
 
     if normalize:
         for idx, row in enumerate(matrix):
-            if np.sum(row) == 0:
-                matrix[idx] = [0.] * len(labels)
-            else:
+            if np.sum(row) != 0:
                 row_sum = float(np.sum(row))
                 matrix[idx] = [x / row_sum for x in row]
 
