@@ -117,7 +117,7 @@ def test_accuracy(truth, prediction, labels, to_string):
     ]
 )
 def test_equal_error_rate(truth, prediction):
-    threshold, eer = audmetric.equal_error_rate(truth, prediction)
+    eer, threshold = audmetric.equal_error_rate(truth, prediction)
     truth = np.array(truth)
     prediction = np.array(prediction)
     stats = pyeer.eer_info.get_eer_stats(
@@ -135,7 +135,7 @@ def test_equal_error_rate_warnings():
     prediction = np.array([1, 1])
     warning = 'invalid value encountered in true_divide'
     with pytest.warns(RuntimeWarning, match=warning):
-        threshold, eer = audmetric.equal_error_rate(truth, prediction)
+        eer, threshold = audmetric.equal_error_rate(truth, prediction)
         stats = pyeer.eer_info.get_eer_stats(
             prediction[truth],
             prediction[~truth],
@@ -146,9 +146,12 @@ def test_equal_error_rate_warnings():
     # Curves to not overlap
     truth = np.array([1, 1, 0])
     prediction = np.array([.5, .5, .5])
-    warning = r'FMR and FNMR curves do not intersect each other'
+    warning = (
+        r'false match rate and false non-match rate curves '
+        r'do not intersect each other'
+    )
     with pytest.warns(RuntimeWarning, match=warning):
-        threshold, eer = audmetric.equal_error_rate(truth, prediction)
+        eer, threshold = audmetric.equal_error_rate(truth, prediction)
         stats = pyeer.eer_info.get_eer_stats(
             prediction[truth],
             prediction[~truth],

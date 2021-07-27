@@ -251,7 +251,7 @@ def detection_error_tradeoff(
     fnmr = fnm / gscores_number
     fmr = fm / iscores_number
 
-    return thresholds, fmr, fnmr
+    return fmr, fnmr, thresholds
 
 
 def edit_distance(
@@ -321,7 +321,7 @@ def equal_error_rate(
         typing.Union[int, float],
         typing.Sequence[typing.Union[int, float]]
     ],
-) -> float:
+) -> typing.Tuple[float, float]:
     r"""Equal error rate for verification tasks.
 
     The equal error rate (EER) is the point
@@ -349,17 +349,17 @@ def equal_error_rate(
         prediction: predicted classes
 
     Returns:
-        verification threshold at which equal error rate is achieved
         equal error rate
+        verification threshold at which equal error rate is achieved
 
     Example:
         >>> truth = [0, 1, 0, 1, 0]
         >>> prediction = [0.2, 0.8, 0.4, 0.5, 0.5]
         >>> equal_error_rate(truth, prediction)
-        (0.5, 0.16666666666666666)
+        (0.16666666666666666, 0.5)
 
     """
-    thresholds, fmr, fnmr = detection_error_tradeoff(truth, prediction)
+    fmr, fnmr, thresholds = detection_error_tradeoff(truth, prediction)
     diff = fmr - fnmr
     # t1 and t2 are our time indices
     t2 = np.where(diff <= 0)[0]
@@ -367,17 +367,18 @@ def equal_error_rate(
         t2 = t2[0]
     else:
         warnings.warn(
-            'It seems that the FMR and FNMR curves '
+            'The false match rate '
+            'and false non-match rate curves '
             'do not intersect each other.',
             RuntimeWarning,
         )
-        return thresholds[0], 1
+        return 1.0, thresholds[0]
 
     t1 = t2 - 1 if diff[t2] != 0 and t2 != 0 else t2
     if fmr[t1] + fnmr[t1] <= fmr[t2] + fnmr[t2]:
-        return thresholds[t1], (fnmr[t1] + fmr[t1]) / 2
+        return (fnmr[t1] + fmr[t1]) / 2.0, thresholds[t1]
     else:  # pragma: nocover
-        return thresholds[t2], (fnmr[t2] + fmr[t2]) / 2
+        return (fnmr[t2] + fmr[t2]) / 2.0, thresholds[t2]
 
 
 def event_error_rate(
