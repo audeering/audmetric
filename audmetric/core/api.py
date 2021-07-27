@@ -1,4 +1,6 @@
+import operator
 import typing
+import warnings
 
 import numpy as np
 
@@ -179,6 +181,79 @@ def confusion_matrix(
     return matrix
 
 
+def detection_error_tradeoff(
+    truth: typing.Union[
+        typing.Union[int, float],
+        typing.Sequence[typing.Union[int, float]]
+    ],
+    prediction: typing.Union[
+        typing.Union[int, float],
+        typing.Sequence[typing.Union[int, float]]
+    ],
+) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    r"""Detection error tradeoff for verification experiments.
+
+    The `detection error tradeoff (DET)`_
+    is a graph showing
+    the false non-match rate (fnmr)
+    against the false match rate (fmr).
+
+    The false non-match rate
+    is also named
+    false negative rate,
+    false rejection rate,
+    or misses.
+    The false match rate
+    is also named
+    false positive rate,
+    false acceptance rate,
+    or impostors.
+
+    .. _detection error tradeoff (DET): https://en.wikipedia.org/wiki/Detection_error_tradeoff
+
+    Args:
+        truth: ground truth classes
+        prediction: predicted classes
+
+    Returns:
+        verification thresholds
+        false match rate
+        false non-match rate
+
+    """  # noqa: E501
+    truth = np.array(truth).astype(bool)
+    prediction = np.array(prediction).astype(np.float64)
+
+    # Genuine matching scores
+    gscores = prediction[truth]
+    # Impostor matching scores
+    iscores = prediction[~truth]
+
+    gscores_number = len(gscores)
+    iscores_number = len(iscores)
+
+    # Labeling genuine scores as 1 and impostor scores as 0
+    gscores = list(zip(gscores, [1] * gscores_number))
+    iscores = list(zip(iscores, [0] * iscores_number))
+
+    # Stacking scores
+    scores = np.array(sorted(gscores + iscores, key=operator.itemgetter(0)))
+    cumul = np.cumsum(scores[:, 1])
+
+    # Grouping scores
+    thresholds, u_indices = np.unique(scores[:, 0], return_index=True)
+
+    # Calculating FNM and FM distributions
+    fnm = cumul[u_indices] - scores[u_indices][:, 1]  # rejecting s < t
+    fm = iscores_number - (u_indices - fnm)
+
+    # Calculating FMR and FNMR
+    fnmr = fnm / gscores_number
+    fmr = fm / iscores_number
+
+    return thresholds, fmr, fnmr
+
+
 def edit_distance(
     truth: typing.Union[str, typing.Sequence[int]],
     prediction: typing.Union[str, typing.Sequence[int]]
@@ -235,6 +310,74 @@ def edit_distance(
             m0[j] = m1[j]
 
     return m1[len(truth)]
+
+
+def equal_error_rate(
+    truth: typing.Union[
+        typing.Union[int, float],
+        typing.Sequence[typing.Union[int, float]]
+    ],
+    prediction: typing.Union[
+        typing.Union[int, float],
+        typing.Sequence[typing.Union[int, float]]
+    ],
+) -> float:
+    r"""Equal error rate for verification tasks.
+
+    The equal error rate (EER) is the point
+    where the misses or false non-match rate (fnmr)
+    and the impostors or false match rate (fmr)
+    are identical.
+    In practice the score distribution is not continuous
+    and an interval is returned instead.
+    The EER value will be set as the midpoint
+    of this interval::footcite:`Maio2002`
+
+    .. math::
+
+        \text{EER} = \frac{
+            \min(\text{fnmr}[t], \text{fmr}[t])
+            + \max(\text{fnmr}[t], \text{fmr}[t])
+        }{2}
+
+    with :math:`t = \text{argmin}(|\text{fnmr} - \text{fmr}|)`
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth classes
+        prediction: predicted classes
+
+    Returns:
+        verification threshold at which equal error rate is achieved
+        equal error rate
+
+    Example:
+        >>> truth = [0, 1, 0, 1, 0]
+        >>> prediction = [0.2, 0.8, 0.4, 0.5, 0.5]
+        >>> equal_error_rate(truth, prediction)
+        (0.5, 0.16666666666666666)
+
+    """
+    thresholds, fmr, fnmr = detection_error_tradeoff(truth, prediction)
+    diff = fmr - fnmr
+    # t1 and t2 are our time indices
+    t2 = np.where(diff <= 0)[0]
+    if len(t2) > 0:
+        t2 = t2[0]
+    else:
+        warnings.warn(
+            'It seems that the FMR and FNMR curves '
+            'do not intersect each other.',
+            RuntimeWarning,
+        )
+        return thresholds[0], 1
+
+    t1 = t2 - 1 if diff[t2] != 0 and t2 != 0 else t2
+    if fmr[t1] + fnmr[t1] <= fmr[t2] + fnmr[t2]:
+        return thresholds[t1], (fnmr[t1] + fmr[t1]) / 2
+    else:  # pragma: nocover
+        return thresholds[t2], (fnmr[t2] + fmr[t2]) / 2
 
 
 def event_error_rate(
