@@ -216,9 +216,15 @@ def detection_error_tradeoff(
         prediction: predicted classes
 
     Returns:
-        verification thresholds
         false match rate
         false non-match rate
+        verification thresholds
+
+    Example:
+        >>> truth = [1, 0]
+        >>> prediction = [0.9, 0.1]
+        >>> detection_error_tradeoff(truth, prediction)
+        (array([1., 0.]), array([0., 0.]), array([0.1, 0.9]))
 
     """  # noqa: E501
     truth = np.array(truth).astype(bool)
