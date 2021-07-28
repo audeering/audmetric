@@ -88,44 +88,76 @@ def test_accuracy(truth, prediction, labels, to_string):
 
 
 @pytest.mark.parametrize(
-    'truth, prediction',
+    'truth, prediction, expected_eer, expected_threshold',
     [
         (
             [1, 1, 0, 0],
             [1, 1, 0, 0],
+            0,
+            1,
         ),
         (
             [True, True, False, False],
             [1, 1, 0, 0],
+            0,
+            1,
+        ),
+        (
+            [True, True, False, False],
+            [True, True, False, False],
+            0,
+            1,
         ),
         (
             [1, 1, 0, 0],
             [0.9, 0.9, 0.1, 0.1],
+            0,
+            0.9,
         ),
         (
             [1, 1, 0, 0],
             [1, 0.1, 0.1, 0],
+            0.25,
+            0.1,
         ),
         (
             [1, 1, 0, 0],
             [0.8, 0.7, 0.4, 0.1],
+            0,
+            0.7,
         ),
         (
             [1, 1, 0, 0, 0],
             [0.8, 0.7, 0.4, 0.1, 0.1],
+            0,
+            0.7,
+        ),
+        # Non integer truth not allowed
+        pytest.param(
+            [0.9, 0.9, 0.1, 0.1],
+            [0.9, 0.9, 0.1, 0.1],
+            0,
+            1,
+            marks=pytest.mark.xfail(raises=ValueError),
         ),
     ]
 )
-def test_equal_error_rate(truth, prediction):
-    eer, threshold = audmetric.equal_error_rate(truth, prediction)
+def test_equal_error_rate(truth, prediction, expected_eer, expected_threshold):
+    eer, stats = audmetric.equal_error_rate(truth, prediction)
+    # Check expected results
+    assert type(eer) == float
+    assert type(stats.threshold) == float
+    assert eer == expected_eer
+    assert stats.threshold == expected_threshold
+    # Compare to pyeer package
     truth = np.array(truth)
     prediction = np.array(prediction)
-    stats = pyeer.eer_info.get_eer_stats(
+    pyeer_stats = pyeer.eer_info.get_eer_stats(
         prediction[truth],
         prediction[~truth],
     )
-    assert eer == stats.eer
-    assert threshold == stats.eer_th
+    assert eer == pyeer_stats.eer
+    assert stats.threshold == pyeer_stats.eer_th
 
 
 def test_equal_error_rate_warnings():
@@ -135,13 +167,13 @@ def test_equal_error_rate_warnings():
     prediction = np.array([1, 1])
     warning = 'invalid value encountered in true_divide'
     with pytest.warns(RuntimeWarning, match=warning):
-        eer, threshold = audmetric.equal_error_rate(truth, prediction)
-        stats = pyeer.eer_info.get_eer_stats(
+        eer, stats = audmetric.equal_error_rate(truth, prediction)
+        pyeer_stats = pyeer.eer_info.get_eer_stats(
             prediction[truth],
             prediction[~truth],
         )
-        assert eer == stats.eer
-        assert threshold == stats.eer_th
+        assert eer == pyeer_stats.eer
+        assert stats.threshold == pyeer_stats.eer_th
 
     # Curves to not overlap
     truth = np.array([1, 1, 0])
@@ -151,13 +183,13 @@ def test_equal_error_rate_warnings():
         r'do not intersect each other'
     )
     with pytest.warns(RuntimeWarning, match=warning):
-        eer, threshold = audmetric.equal_error_rate(truth, prediction)
-        stats = pyeer.eer_info.get_eer_stats(
+        eer, stats = audmetric.equal_error_rate(truth, prediction)
+        pyeer_stats = pyeer.eer_info.get_eer_stats(
             prediction[truth],
             prediction[~truth],
         )
-        assert eer == stats.eer
-        assert threshold == stats.eer_th
+        assert eer == pyeer_stats.eer
+        assert stats.threshold == pyeer_stats.eer_th
 
 
 @pytest.mark.parametrize(
