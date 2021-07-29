@@ -8,7 +8,7 @@ def assert_equal_length(
         prediction: typing.Sequence[typing.Any],
 ):
     r"""Assert truth and prediction have equal length."""
-    if len(truth) != len(prediction):  # pragma: nocover
+    if len(truth) != len(prediction):
         raise ValueError(
             f'Truth and prediction differ in length: '
             f'{len(truth)} != {len(prediction)}.'
