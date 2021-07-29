@@ -184,7 +184,7 @@ def confusion_matrix(
 
 def detection_error_tradeoff(
     truth: typing.Union[
-        typing.Union[int, float],
+        typing.Union[bool, int],
         typing.Sequence[typing.Union[int, float]]
     ],
     prediction: typing.Union[
