@@ -69,6 +69,11 @@ recall_per_class
 
 .. autofunction:: recall_per_class
 
+unweighted_average_bias
+-----------------------
+
+.. autofunction:: unweighted_average_bias
+
 unweighted_average_fscore
 -------------------------
 

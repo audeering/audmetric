@@ -472,6 +472,248 @@ def test_recall_precision_fscore(truth, prediction, labels, zero_division):
         )
 
 
+@pytest.mark.parametrize(
+    'truth,prediction,protected_variable,metric,labels,subgroups,'
+    'zero_division,expected',
+    [
+        pytest.param(
+            [], [], [], None, [], [0], None, {},
+            marks=pytest.mark.xfail(raises=ValueError)
+        ),
+        (
+            [], [], [], audmetric.recall_per_class, [], [], 0., {}
+        ),
+        (
+            [1], [0], [0], audmetric.recall_per_class, [0, 1],
+            [0], 0., {0: {0: 0.0, 1: 0.0}}
+        ),
+        (
+            [1], [0], [0], audmetric.precision_per_class, [0, 1],
+            [0], 0., {0: {0: 0.0, 1: 0.0}}
+        ),
+        (
+            [1, 1], [0, 1], [0, 1], audmetric.recall_per_class, [0, 1],
+            [0, 1], np.nan, {0: {0: np.nan, 1: 0.0}, 1: {0: np.nan, 1: 1.0}}
+        ),
+        (
+            [1, 1], [0, 1], [0, 1], audmetric.recall_per_class, [1],
+            [0, 1], np.nan, {0: {1: np.nan}, 1: {1: 1.0}}
+        ),
+        (
+            [1, 1], [0, 1], [0, 1], audmetric.precision_per_class, [0, 1],
+            [0, 1], np.nan, {0: {0: 0.0, 1: np.nan}, 1: {0: np.nan, 1: 1.0}}
+        )
+    ]
+)
+def test_scores_per_subgroup_and_class(
+        truth, prediction, protected_variable, metric, labels, subgroups,
+        zero_division, expected):
+    np.testing.assert_equal(
+        audmetric.core.utils.scores_per_subgroup_and_class(
+            truth, prediction, protected_variable, metric,
+            labels=labels,
+            subgroups=subgroups,
+            zero_division=zero_division
+        ), expected
+    )
+
+
+@pytest.mark.parametrize(
+    'truth,prediction,protected_variable,labels,subgroups,metric,reduction,'
+    'expected',
+    [
+        (
+            [],
+            [],
+            [],
+            None,
+            None,
+            audmetric.fscore_per_class,
+            lambda x: abs(x[0] - x[1]),
+            np.nan,
+        ),
+        (
+            [0],
+            [0],
+            [0],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            np.nan,
+        ),
+        pytest.param(
+            [0, 0],
+            [0],
+            [0],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            None,
+            marks=pytest.mark.xfail(raises=ValueError)
+        ),
+        pytest.param(
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            None,
+            [0, 1],
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            None,
+            marks=pytest.mark.xfail(raises=ValueError)
+        ),
+        (
+            [0, 0],
+            [0, 0],
+            [0, 1],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            0.0
+        ),
+        (
+            [0, 1],
+            [0, 0],
+            [0, 1],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            np.nan
+        ),
+        (
+            [0, 1],
+            [0, 0],
+            [0, 1],
+            None,
+            None,
+            audmetric.precision_per_class,
+            lambda x: abs(x[0] - x[1]),
+            1.0
+        ),
+        (
+            [0, 1],
+            [0, 0],
+            [0, 1],
+            [0, 1, 2, 3],
+            None,
+            audmetric.precision_per_class,
+            lambda x: abs(x[0] - x[1]),
+            1.0
+        ),
+        (
+            [1, 1],
+            [0, 1],
+            [0, 1],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            1.0
+        ),
+        (
+            [1, 1],
+            [0, 1],
+            [0, 1],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: x[0] - x[1],
+            -1.0
+        ),
+        (
+            [1, 1],
+            [0, 1],
+            [0, 1],
+            None,
+            [1, 0],
+            audmetric.recall_per_class,
+            lambda x: x[0] - x[1],
+            1.0
+        ),
+        (
+            [1, 1],
+            [0, 1],
+            [0, 1],
+            None,
+            [1, 0],
+            audmetric.fscore_per_class,
+            lambda x: abs(x[0] - x[1]),
+            1.0
+        ),
+        (
+            [1, 1],
+            [0, 1],
+            [0, 1],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            1.0
+        ),
+        (
+            [1, 1, 2],
+            [0, 1, 2],
+            [0, 1, 1],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            1.0
+        ),
+        (
+            [1, 1, 2, 2],
+            [0, 1, 2, 2],
+            [0, 1, 1, 0],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: abs(x[0] - x[1]),
+            0.5
+        ),
+        (
+            [1, 1, 2, 2],
+            [0, 1, 2, 2],
+            [0, 1, 1, 0],
+            None,
+            None,
+            audmetric.recall_per_class,
+            lambda x: x[0] - x[1],
+            -0.5
+        ),
+        (
+            [0, 0, 0, 0],
+            [1, 1, 0, 0],
+            [0, 1, 2, 3],
+            None,
+            None,
+            audmetric.recall_per_class,
+            np.std,
+            0.5
+        )
+    ]
+)
+def test_unweighted_average_bias(
+        truth, prediction, protected_variable, labels, subgroups, metric,
+        reduction, expected
+):
+    np.testing.assert_equal(
+        audmetric.unweighted_average_bias(
+            truth,
+            prediction,
+            protected_variable,
+            labels=labels,
+            subgroups=subgroups,
+            metric=metric,
+            reduction=reduction
+        ),
+        expected
+    )
+
+
 def test_recall_precision_fscore_nan():
 
     truth = ['a', 'b']
