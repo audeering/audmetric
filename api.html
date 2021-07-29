@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>audmetric &mdash; audmetric Documentation</title>
@@ -36,7 +35,7 @@
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Index" href="genindex.html" />
+    <link rel="next" title="audmetric.utils" href="api-utils.html" />
     <link rel="prev" title="Installation" href="install.html" />
     
   
@@ -70,7 +69,7 @@
             
             
               <div class="version">
-                v1.0.1
+                v1.1.0
               </div>
             
           
@@ -94,17 +93,19 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">audmetric</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#accuracy">accuracy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#concordance-cc">concordance_cc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#confusion-matrix">confusion_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#detection-error-tradeoff">detection_error_tradeoff</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#edit-distance">edit_distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#equal-error-rate">equal_error_rate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#event-error-rate">event_error_rate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mean-absolute-error">mean_absolute_error</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mean-squared-error">mean_squared_error</a></li>
@@ -120,9 +121,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#word-error-rate">word_error_rate</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="api-utils.html">audmetric.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Development</span></p>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -178,7 +180,7 @@
         
             
             
-              <a href="https://github.com/audeering/audmetric/blob/v1.0.1/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audmetric/blob/v1.1.0/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -192,9 +194,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="module-audmetric">
+  <div class="section" id="module-audmetric">
 <span id="audmetric"></span><h1>audmetric<a class="headerlink" href="#module-audmetric" title="Permalink to this headline">¶</a></h1>
-<section id="accuracy">
+<div class="section" id="accuracy">
 <h2>accuracy<a class="headerlink" href="#accuracy" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.accuracy">
@@ -233,8 +235,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="concordance-cc">
+</div>
+<div class="section" id="concordance-cc">
 <h2>concordance_cc<a class="headerlink" href="#concordance-cc" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.concordance_cc">
@@ -270,8 +272,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="confusion-matrix">
+</div>
+<div class="section" id="confusion-matrix">
 <h2>confusion_matrix<a class="headerlink" href="#confusion-matrix" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.confusion_matrix">
@@ -308,8 +310,65 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="edit-distance">
+</div>
+<div class="section" id="detection-error-tradeoff">
+<h2>detection_error_tradeoff<a class="headerlink" href="#detection-error-tradeoff" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="audmetric.detection_error_tradeoff">
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">detection_error_tradeoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#detection_error_tradeoff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.detection_error_tradeoff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detection error tradeoff for verification experiments.</p>
+<p>The <a class="reference external" href="https://en.wikipedia.org/wiki/Detection_error_tradeoff">detection error tradeoff (DET)</a>
+is a graph showing
+the false non-match rate (FNMR)
+against the false match rate (FMR).
+The FNMR indicates
+how often an enrolled speaker was missed.
+The FMR indicates
+how often an impostor was verified as the enrolled speaker.</p>
+<p>This function does not return a figure,
+but the FMR and FNMR,
+together with the corresponding verification thresholds
+at which a similarity value
+was regarded to belong to the enrolled speaker.</p>
+<p><code class="docutils literal notranslate"><span class="pre">truth</span></code> may only contain entries like <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">True,</span> <span class="pre">False...]</span></code>,
+whereas prediction values
+can also contain similarity scores, e.g. <code class="docutils literal notranslate"><span class="pre">[0.8,</span> <span class="pre">0.1,</span> <span class="pre">...]</span></code>.</p>
+<p>The implementation is identical with the one provided
+by the <a class="reference external" href="https://github.com/manuelaguadomtz/pyeer">pyeer</a> package.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>truth</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]) – ground truth classes</p></li>
+<li><p><strong>prediction</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]]) – predicted classes or similarity scores</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>false match rate (FMR)</p></li>
+<li><p>false non-match rate (FNMR)</p></li>
+<li><p>verification thresholds</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">truth</span></code> contains values
+    different from <code class="docutils literal notranslate"><span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">True,</span> <span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">truth</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detection_error_tradeoff</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+<span class="go">(array([1., 0.]), array([0., 0.]), array([0.1, 0.9]))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="edit-distance">
 <h2>edit_distance<a class="headerlink" href="#edit-distance" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.edit_distance">
@@ -343,8 +402,84 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="event-error-rate">
+</div>
+<div class="section" id="equal-error-rate">
+<h2>equal_error_rate<a class="headerlink" href="#equal-error-rate" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="audmetric.equal_error_rate">
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">equal_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#equal_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.equal_error_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equal error rate for verification tasks.</p>
+<p>The equal error rate (EER) is the point
+where false non-match rate (FNMR)
+and the impostors or false match rate (FMR)
+are identical.
+The FNMR indicates
+how often an enrolled speaker was missed.
+The FMR indicates
+how often an impostor was verified as the enrolled speaker.</p>
+<p>In practice the score distribution is not continuous
+and an interval is returned instead.
+The EER value will be set as the midpoint
+of this interval:<a class="footnote-reference brackets" href="#maio2002" id="id1">1</a></p>
+<div class="math notranslate nohighlight">
+\[\text{EER} = \frac{
+    \min(\text{FNMR}[t], \text{FMR}[t])
+    + \max(\text{FNMR}[t], \text{FMR}[t])
+}{2}\]</div>
+<p>with <span class="math notranslate nohighlight">\(t = \text{argmin}(|\text{FNMR} - \text{FMR}|)\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">truth</span></code> may only contain entries like <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">True,</span> <span class="pre">False...]</span></code>,
+whereas prediction values
+can also contain similarity scores, e.g. <code class="docutils literal notranslate"><span class="pre">[0.8,</span> <span class="pre">0.1,</span> <span class="pre">...]</span></code>.</p>
+<p>The implementation is identical with the one provided
+by the <a class="reference external" href="https://github.com/manuelaguadomtz/pyeer">pyeer</a> package.</p>
+<p><dl class="footnote brackets">
+<dt class="label" id="maio2002"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>D. Maio, D. Maltoni, R. Cappelli, J. L. Wayman, and A. K. Jain. Fvc2000: fingerprint verification competition. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 24:402–412, 2002. <a class="reference external" href="https://doi.org/10.1109/34.990140">doi:10.1109/34.990140</a>.</p>
+</dd>
+</dl>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>truth</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]) – ground truth classes</p></li>
+<li><p><strong>prediction</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]]) – predicted classes or similarity scores</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">namedtuple</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>equal error rate (EER)</p></li>
+<li><p>namedtuple containing
+<code class="docutils literal notranslate"><span class="pre">fmr</span></code>,
+<code class="docutils literal notranslate"><span class="pre">fnmr</span></code>,
+<code class="docutils literal notranslate"><span class="pre">thresholds</span></code>,
+<code class="docutils literal notranslate"><span class="pre">threshold</span></code>
+whereas the last one corresponds to the threshold
+corresponding to the returned EER</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">truth</span></code> contains values
+    different from <code class="docutils literal notranslate"><span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">True,</span> <span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">truth</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eer</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">equal_error_rate</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eer</span>
+<span class="go">0.16666666666666666</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stats</span><span class="o">.</span><span class="n">threshold</span>
+<span class="go">0.5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="event-error-rate">
 <h2>event_error_rate<a class="headerlink" href="#event-error-rate" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.event_error_rate">
@@ -387,8 +522,8 @@ normalized distance is bound to [0, 1].</p>
 </div>
 </dd></dl>
 
-</section>
-<section id="mean-absolute-error">
+</div>
+<div class="section" id="mean-absolute-error">
 <h2>mean_absolute_error<a class="headerlink" href="#mean-absolute-error" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.mean_absolute_error">
@@ -421,8 +556,8 @@ normalized distance is bound to [0, 1].</p>
 </div>
 </dd></dl>
 
-</section>
-<section id="mean-squared-error">
+</div>
+<div class="section" id="mean-squared-error">
 <h2>mean_squared_error<a class="headerlink" href="#mean-squared-error" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.mean_squared_error">
@@ -455,8 +590,8 @@ normalized distance is bound to [0, 1].</p>
 </div>
 </dd></dl>
 
-</section>
-<section id="pearson-cc">
+</div>
+<div class="section" id="pearson-cc">
 <h2>pearson_cc<a class="headerlink" href="#pearson-cc" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.pearson_cc">
@@ -491,8 +626,8 @@ and <span class="math notranslate nohighlight">\(\text{cov}\)</span> is the cova
 </div>
 </dd></dl>
 
-</section>
-<section id="fscore-per-class">
+</div>
+<div class="section" id="fscore-per-class">
 <h2>fscore_per_class<a class="headerlink" href="#fscore-per-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.fscore_per_class">
@@ -528,8 +663,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="precision-per-class">
+</div>
+<div class="section" id="precision-per-class">
 <h2>precision_per_class<a class="headerlink" href="#precision-per-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.precision_per_class">
@@ -564,8 +699,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="recall-per-class">
+</div>
+<div class="section" id="recall-per-class">
 <h2>recall_per_class<a class="headerlink" href="#recall-per-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.recall_per_class">
@@ -600,8 +735,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="unweighted-average-bias">
+</div>
+<div class="section" id="unweighted-average-bias">
 <h2>unweighted_average_bias<a class="headerlink" href="#unweighted-average-bias" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_bias">
@@ -690,8 +825,8 @@ and standard deviation of scores for more than two subgroups.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="unweighted-average-fscore">
+</div>
+<div class="section" id="unweighted-average-fscore">
 <h2>unweighted_average_fscore<a class="headerlink" href="#unweighted-average-fscore" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_fscore">
@@ -728,8 +863,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="unweighted-average-precision">
+</div>
+<div class="section" id="unweighted-average-precision">
 <h2>unweighted_average_precision<a class="headerlink" href="#unweighted-average-precision" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_precision">
@@ -765,8 +900,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="unweighted-average-recall">
+</div>
+<div class="section" id="unweighted-average-recall">
 <h2>unweighted_average_recall<a class="headerlink" href="#unweighted-average-recall" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_recall">
@@ -802,8 +937,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="weighted-confusion-error">
+</div>
+<div class="section" id="weighted-confusion-error">
 <h2>weighted_confusion_error<a class="headerlink" href="#weighted-confusion-error" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.weighted_confusion_error">
@@ -848,8 +983,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-<section id="word-error-rate">
+</div>
+<div class="section" id="word-error-rate">
 <h2>word_error_rate<a class="headerlink" href="#word-error-rate" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.word_error_rate">
@@ -881,8 +1016,8 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
@@ -892,7 +1027,7 @@ and ordered alphabetically.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="genindex.html" class="btn btn-neutral float-right" title="Index" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="api-utils.html" class="btn btn-neutral float-right" title="audmetric.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -907,7 +1042,7 @@ and ordered alphabetically.</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/06/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

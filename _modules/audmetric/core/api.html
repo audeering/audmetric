@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.0.1
+                v1.1.0
               </div>
             
           
@@ -91,16 +91,17 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">audmetric</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api-utils.html">audmetric.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Development</span></p>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
@@ -167,7 +168,10 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audmetric.core.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">typing</span>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -214,7 +218,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
 
     <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
     <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
@@ -323,7 +328,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">assert_equal_length</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
 
     <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
     <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
@@ -339,13 +345,112 @@
 
     <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">matrix</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">row_sum</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
                 <span class="n">matrix</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">/</span> <span class="n">row_sum</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">matrix</span></div>
+
+
+<div class="viewcode-block" id="detection_error_tradeoff"><a class="viewcode-back" href="../../../api.html#audmetric.detection_error_tradeoff">[docs]</a><span class="k">def</span> <span class="nf">detection_error_tradeoff</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
+    <span class="p">],</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
+    <span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Detection error tradeoff for verification experiments.</span>
+
+<span class="sd">    The `detection error tradeoff (DET)`_</span>
+<span class="sd">    is a graph showing</span>
+<span class="sd">    the false non-match rate (FNMR)</span>
+<span class="sd">    against the false match rate (FMR).</span>
+<span class="sd">    The FNMR indicates</span>
+<span class="sd">    how often an enrolled speaker was missed.</span>
+<span class="sd">    The FMR indicates</span>
+<span class="sd">    how often an impostor was verified as the enrolled speaker.</span>
+
+<span class="sd">    This function does not return a figure,</span>
+<span class="sd">    but the FMR and FNMR,</span>
+<span class="sd">    together with the corresponding verification thresholds</span>
+<span class="sd">    at which a similarity value</span>
+<span class="sd">    was regarded to belong to the enrolled speaker.</span>
+
+<span class="sd">    ``truth`` may only contain entries like ``[1, 0, True, False...]``,</span>
+<span class="sd">    whereas prediction values</span>
+<span class="sd">    can also contain similarity scores, e.g. ``[0.8, 0.1, ...]``.</span>
+
+<span class="sd">    The implementation is identical with the one provided</span>
+<span class="sd">    by the pyeer_ package.</span>
+
+<span class="sd">    .. _detection error tradeoff (DET): https://en.wikipedia.org/wiki/Detection_error_tradeoff</span>
+<span class="sd">    .. _pyeer: https://github.com/manuelaguadomtz/pyeer</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth classes</span>
+<span class="sd">        prediction: predicted classes or similarity scores</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        * false match rate (FMR)</span>
+<span class="sd">        * false non-match rate (FNMR)</span>
+<span class="sd">        * verification thresholds</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` contains values</span>
+<span class="sd">            different from ``1, 0, True, False``</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; truth = [1, 0]</span>
+<span class="sd">        &gt;&gt;&gt; prediction = [0.9, 0.1]</span>
+<span class="sd">        &gt;&gt;&gt; detection_error_tradeoff(truth, prediction)</span>
+<span class="sd">        (array([1., 0.]), array([0., 0.]), array([0.1, 0.9]))</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+
+    <span class="n">allowed_truth_values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">allowed_truth_values</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;&#39;truth&#39; is only allowed to contain &quot;</span>
+            <span class="s2">&quot;[1, 0, True, False], &quot;</span>
+            <span class="s1">&#39;yours contains:</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">truth</span><span class="p">)])</span><span class="si">}</span><span class="s2">]&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="c1"># Genuine matching scores</span>
+    <span class="n">gscores</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="n">truth</span><span class="p">]</span>
+    <span class="c1"># Impostor matching scores</span>
+    <span class="n">iscores</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="o">~</span><span class="n">truth</span><span class="p">]</span>
+
+    <span class="n">gscores_number</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gscores</span><span class="p">)</span>
+    <span class="n">iscores_number</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iscores</span><span class="p">)</span>
+
+    <span class="c1"># Labeling genuine scores as 1 and impostor scores as 0</span>
+    <span class="n">gscores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gscores</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">gscores_number</span><span class="p">))</span>
+    <span class="n">iscores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">iscores</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">iscores_number</span><span class="p">))</span>
+
+    <span class="c1"># Stacking scores</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">gscores</span> <span class="o">+</span> <span class="n">iscores</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
+    <span class="n">cumul</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">scores</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Grouping scores</span>
+    <span class="n">thresholds</span><span class="p">,</span> <span class="n">u_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">scores</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Calculating FNM and FM distributions</span>
+    <span class="n">fnm</span> <span class="o">=</span> <span class="n">cumul</span><span class="p">[</span><span class="n">u_indices</span><span class="p">]</span> <span class="o">-</span> <span class="n">scores</span><span class="p">[</span><span class="n">u_indices</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># rejecting s &lt; t</span>
+    <span class="n">fm</span> <span class="o">=</span> <span class="n">iscores_number</span> <span class="o">-</span> <span class="p">(</span><span class="n">u_indices</span> <span class="o">-</span> <span class="n">fnm</span><span class="p">)</span>
+
+    <span class="c1"># Calculating FMR and FNMR</span>
+    <span class="n">fnmr</span> <span class="o">=</span> <span class="n">fnm</span> <span class="o">/</span> <span class="n">gscores_number</span>
+    <span class="n">fmr</span> <span class="o">=</span> <span class="n">fm</span> <span class="o">/</span> <span class="n">iscores_number</span>
+
+    <span class="k">return</span> <span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span></div>
 
 
 <div class="viewcode-block" id="edit_distance"><a class="viewcode-back" href="../../../api.html#audmetric.edit_distance">[docs]</a><span class="k">def</span> <span class="nf">edit_distance</span><span class="p">(</span>
@@ -404,6 +509,118 @@
             <span class="n">m0</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">m1</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">m1</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="equal_error_rate"><a class="viewcode-back" href="../../../api.html#audmetric.equal_error_rate">[docs]</a><span class="k">def</span> <span class="nf">equal_error_rate</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
+    <span class="p">],</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
+    <span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">namedtuple</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Equal error rate for verification tasks.</span>
+
+<span class="sd">    The equal error rate (EER) is the point</span>
+<span class="sd">    where false non-match rate (FNMR)</span>
+<span class="sd">    and the impostors or false match rate (FMR)</span>
+<span class="sd">    are identical.</span>
+<span class="sd">    The FNMR indicates</span>
+<span class="sd">    how often an enrolled speaker was missed.</span>
+<span class="sd">    The FMR indicates</span>
+<span class="sd">    how often an impostor was verified as the enrolled speaker.</span>
+
+<span class="sd">    In practice the score distribution is not continuous</span>
+<span class="sd">    and an interval is returned instead.</span>
+<span class="sd">    The EER value will be set as the midpoint</span>
+<span class="sd">    of this interval::footcite:`Maio2002`</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{EER} = \frac{</span>
+<span class="sd">            \min(\text{FNMR}[t], \text{FMR}[t])</span>
+<span class="sd">            + \max(\text{FNMR}[t], \text{FMR}[t])</span>
+<span class="sd">        }{2}</span>
+
+<span class="sd">    with :math:`t = \text{argmin}(|\text{FNMR} - \text{FMR}|)`.</span>
+
+<span class="sd">    ``truth`` may only contain entries like ``[1, 0, True, False...]``,</span>
+<span class="sd">    whereas prediction values</span>
+<span class="sd">    can also contain similarity scores, e.g. ``[0.8, 0.1, ...]``.</span>
+
+<span class="sd">    The implementation is identical with the one provided</span>
+<span class="sd">    by the pyeer_ package.</span>
+
+<span class="sd">    .. footbibliography::</span>
+
+<span class="sd">    .. _pyeer: https://github.com/manuelaguadomtz/pyeer</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth classes</span>
+<span class="sd">        prediction: predicted classes or similarity scores</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        * equal error rate (EER)</span>
+<span class="sd">        * namedtuple containing</span>
+<span class="sd">          ``fmr``,</span>
+<span class="sd">          ``fnmr``,</span>
+<span class="sd">          ``thresholds``,</span>
+<span class="sd">          ``threshold``</span>
+<span class="sd">          whereas the last one corresponds to the threshold</span>
+<span class="sd">          corresponding to the returned EER</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` contains values</span>
+<span class="sd">            different from ``1, 0, True, False``</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; truth = [0, 1, 0, 1, 0]</span>
+<span class="sd">        &gt;&gt;&gt; prediction = [0.2, 0.8, 0.4, 0.5, 0.5]</span>
+<span class="sd">        &gt;&gt;&gt; eer, stats = equal_error_rate(truth, prediction)</span>
+<span class="sd">        &gt;&gt;&gt; eer</span>
+<span class="sd">        0.16666666666666666</span>
+<span class="sd">        &gt;&gt;&gt; stats.threshold</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Stats</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+        <span class="s1">&#39;stats&#39;</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="s1">&#39;fmr&#39;</span><span class="p">,</span>  <span class="c1"># False match rates (FMR)</span>
+            <span class="s1">&#39;fnmr&#39;</span><span class="p">,</span>  <span class="c1"># False non-match rates (FNMR)</span>
+            <span class="s1">&#39;thresholds&#39;</span><span class="p">,</span>  <span class="c1"># Thresholds</span>
+            <span class="s1">&#39;threshold&#39;</span><span class="p">,</span>  <span class="c1"># verification threshold for EER</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">detection_error_tradeoff</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">fmr</span> <span class="o">-</span> <span class="n">fnmr</span>
+    <span class="c1"># t1 and t2 are our time indices</span>
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">t2</span> <span class="o">=</span> <span class="n">t2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;The false match rate &#39;</span>
+            <span class="s1">&#39;and false non-match rate curves &#39;</span>
+            <span class="s1">&#39;do not intersect each other.&#39;</span><span class="p">,</span>
+            <span class="ne">RuntimeWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">eer</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">eer</span><span class="p">,</span> <span class="n">Stats</span><span class="p">(</span><span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">t2</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">diff</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">t2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">t2</span>
+    <span class="k">if</span> <span class="n">fmr</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span> <span class="o">+</span> <span class="n">fnmr</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">fmr</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span> <span class="o">+</span> <span class="n">fnmr</span><span class="p">[</span><span class="n">t2</span><span class="p">]:</span>
+        <span class="n">eer</span> <span class="o">=</span> <span class="p">(</span><span class="n">fnmr</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span> <span class="o">+</span> <span class="n">fmr</span><span class="p">[</span><span class="n">t1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: nocover (couldn&#39;t find a test to trigger this)</span>
+        <span class="n">eer</span> <span class="o">=</span> <span class="p">(</span><span class="n">fnmr</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span> <span class="o">+</span> <span class="n">fmr</span><span class="p">[</span><span class="n">t2</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span>
+    <span class="n">eer</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">eer</span><span class="p">)</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">eer</span><span class="p">,</span> <span class="n">Stats</span><span class="p">(</span><span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="event_error_rate"><a class="viewcode-back" href="../../../api.html#audmetric.event_error_rate">[docs]</a><span class="k">def</span> <span class="nf">event_error_rate</span><span class="p">(</span>
@@ -494,7 +711,8 @@
 <span class="sd">        {0: 0.6666666666666666, 1: 0.0}</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
 
     <span class="n">precision</span> <span class="o">=</span> <span class="n">precision_per_class</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">,</span>
@@ -658,7 +876,8 @@
 <span class="sd">        {0: 1.0, 1: 0.0}</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
 
     <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>
     <span class="n">total</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -701,7 +920,8 @@
 <span class="sd">        {0: 0.5, 1: 0.0}</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
 
     <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>
     <span class="n">total</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -809,7 +1029,8 @@
 <span class="sd">        0.5</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">protected_variable</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1089,7 +1310,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/06/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
