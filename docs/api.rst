@@ -24,20 +24,10 @@ detection_error_tradeoff
 
 .. autofunction:: detection_error_tradeoff
 
-edit_distance
--------------
-
-.. autofunction:: edit_distance
-
 equal_error_rate
 ----------------
 
 .. autofunction:: equal_error_rate
-
-event_error_rate
-----------------
-
-.. autofunction:: event_error_rate
 
 mean_absolute_error
 -------------------
@@ -93,8 +83,3 @@ weighted_confusion_error
 ------------------------
 
 .. autofunction:: weighted_confusion_error
-
-word_error_rate
----------------
-
-.. autofunction:: word_error_rate

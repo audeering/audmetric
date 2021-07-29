@@ -4,9 +4,7 @@ from audmetric.core.api import (
     concordance_cc,
     confusion_matrix,
     detection_error_tradeoff,
-    edit_distance,
     equal_error_rate,
-    event_error_rate,
     fscore_per_class,
     mean_absolute_error,
     mean_squared_error,
@@ -18,7 +16,6 @@ from audmetric.core.api import (
     unweighted_average_recall,
     unweighted_average_precision,
     weighted_confusion_error,
-    word_error_rate
 )
 
 

@@ -192,37 +192,6 @@ def test_equal_error_rate_warnings():
         assert stats.threshold == pyeer_stats.eer_th
 
 
-@pytest.mark.parametrize(
-    'truth,prediction,eer', [
-        ([], [], 0),
-        ([[]], [[]], 0),
-        ([[None]], [[]], 1.),
-        ([[None]], [[1]], 1.),
-        ([[None]], [[1, 2]], 1.),
-        ([[0], []], [[1], []], 0.5),
-        ([[0, 1]], [[0]], 0.5),
-        ([[0]], [[0, 1]], 0.5),
-        ([[0, 1], [2]], [[0], [2]], 0.25),
-        pytest.param(
-            [[0, 1]], [[0], [2]], 0.,
-            marks=pytest.mark.xfail(raises=ValueError)
-        ),
-        ('lorem', 'lorm', 0.2),
-        (['lorem'], ['lorm'], 0.2),
-        (['lorem', 'ipsum'], ['lorm', 'ipsum'], 0.1),
-        pytest.param(
-            ['lorem', 'ipsum'], ['lorm'], 0.,
-            marks=pytest.mark.xfail(raises=ValueError),
-        )
-    ]
-)
-def test_event_error_rate(truth, prediction, eer):
-    np.testing.assert_equal(
-        audmetric.event_error_rate(truth, prediction),
-        eer
-    )
-
-
 @pytest.mark.parametrize('truth,prediction', [
     (
         np.random.randint(0, 10, size=5),
@@ -295,31 +264,6 @@ def test_confusion_matrix(class_range, num_elements, to_string, percentage):
         cm_sklearn = sklearn.metrics.confusion_matrix(t, p)
 
     np.testing.assert_almost_equal(cm, cm_sklearn)
-
-
-@pytest.mark.parametrize(
-    'truth,prediction,edit_distance', [
-        ('lorem', 'lorem', 0),
-        ('lorem', '', 5),
-        ('', 'lorem', 5),
-        ('lorem', 'lorm', 1),
-        ('lorem', 'lorrem', 1),
-        ('lorem', 'lorom', 1),
-        ('lorem', 'morel', 2),
-        ([], [0], 1),
-        ([0], [], 1),
-        ([0, 1, 2], [0, 1], 1),
-        ([0, 1, 2], [0, 1, 1], 1),
-        ([None], [], 1),
-        ([None], [1], 1),
-        ([None], [1, 2], 2)
-    ]
-)
-def test_edit_distance(truth, prediction, edit_distance):
-    np.testing.assert_equal(
-        audmetric.edit_distance(truth, prediction),
-        edit_distance
-    )
 
 
 @pytest.mark.parametrize('value_range,num_elements', [
@@ -847,34 +791,4 @@ def test_weighted_confusion_error(weights, num_elements, to_string):
     np.testing.assert_equal(
         wce,
         float(np.sum(cm * weights)),
-    )
-
-
-@pytest.mark.parametrize(
-    'truth,prediction,wer', [
-        ([[]], [[]], 0),
-        ([[None]], [[]], 1.),
-        ([[None]], [['lorem']], 1.),
-        ([[None]], [['lorem', 'ipsum']], 1.),
-        ([['lorem']], [[]], 1),
-        ([[]], [['lorem']], 1),
-        ([['lorem', 'ipsum']], [['lorem']], 0.5),
-        ([['lorem']], [['lorem', 'ipsum']], 0.5),
-        ([['lorem']], [['lorem']], 0),
-        ([['lorem', 'ipsum']], [['lorm', 'ipsum']], 0.5),
-        (
-            [['lorem', 'ipsum'], ['north', 'wind', 'and', 'sun']],
-            [['lorm', 'ipsum'], ['north', 'wind']],
-            0.5
-        ),
-        pytest.param(
-            [['lorem'], []], [[]], 0.,
-            marks=pytest.mark.xfail(raises=ValueError),
-        )
-    ]
-)
-def test_word_error_rate(truth, prediction, wer):
-    np.testing.assert_equal(
-        audmetric.word_error_rate(truth, prediction),
-        wer
     )
