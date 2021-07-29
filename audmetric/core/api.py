@@ -445,7 +445,7 @@ def equal_error_rate(
     if fmr[t1] + fnmr[t1] <= fmr[t2] + fnmr[t2]:
         eer = (fnmr[t1] + fmr[t1]) / 2.0
         threshold = thresholds[t1]
-    else:  # pragma: nocover
+    else:  # pragma: nocover (couldn't find a test to trigger this)
         eer = (fnmr[t2] + fmr[t2]) / 2.0
         threshold = thresholds[t2]
     eer = float(eer)
