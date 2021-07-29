@@ -188,8 +188,8 @@ def detection_error_tradeoff(
         typing.Sequence[typing.Union[bool, int]]
     ],
     prediction: typing.Union[
-        typing.Union[int, float],
-        typing.Sequence[typing.Union[int, float]]
+        typing.Union[bool, int, float],
+        typing.Sequence[typing.Union[bool, int, float]]
     ],
 ) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""Detection error tradeoff for verification experiments.
