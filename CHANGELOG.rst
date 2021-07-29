@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.0 (2021/07/29)
+--------------------------
+
+* Added: ``audmetric.utils.infer_labels()``
+* Added: ``audmetric.equal_error_rate()``
+* Added: ``audmetric.detection_error_tradeoff()``
+
+
 Version 1.0.1 (2021/06/10)
 --------------------------
 
