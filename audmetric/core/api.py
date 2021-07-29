@@ -10,6 +10,7 @@ import audeer
 from audmetric.core.utils import (
     assert_equal_length,
     infer_labels,
+    scores_per_subgroup_and_class,
 )
 
 
@@ -760,6 +761,145 @@ def recall_per_class(
     recall[np.isnan(recall)] = zero_division
 
     return {label: float(r) for label, r in zip(labels, recall)}
+
+
+def unweighted_average_bias(
+        truth: typing.Sequence[typing.Any],
+        prediction: typing.Sequence[typing.Any],
+        protected_variable: typing.Sequence[typing.Any],
+        labels: typing.Sequence[typing.Any] = None,
+        *,
+        subgroups: typing.Sequence[typing.Any] = None,
+        metric: typing.Callable[
+            [
+                typing.Sequence[typing.Any],
+                typing.Sequence[typing.Any],
+                typing.Optional[typing.Sequence[str]],
+            ],
+            typing.Dict[str, float]
+        ] = fscore_per_class,
+        reduction: typing.Callable[
+            [
+                typing.Sequence[float],
+            ],
+            float,
+        ] = np.std,
+) -> float:
+    r"""Compute unweighted average bias with respect to a protected variable.
+
+    The bias is measured in terms of *equalized odds* which requires
+    the classifier to have identical performance for all classes independent
+    of a protected variable such as race. The performance of the classifier
+    for its different classes can be assessed with standard metrics
+    such as *recall* or *precision*. The difference in performance, denoted
+    as score divergence, can be computed in different ways, as well.
+    For two subgroups the (absolute) difference serves as a standard choice.
+    For more than two subgroups the score divergence could be estimated by
+    the standard deviation of the scores.
+
+    Note:
+        If for a class less than two subgroups exhibit a performance score,
+        the corresponding class is ignored in the bias computation.
+        This occurs if there is no class sample for a subgroup,
+        e.g. no negative (class label) female (subgroup of sex).
+
+    Args:
+        truth: ground truth classes
+        prediction: predicted classes
+        protected_variable: manifestations of protected variable such as
+            subgroups "male" and "female" of variable "sex"
+        labels: included labels in preferred ordering.
+            The bias is computed only on the specified labels.
+            If no labels are supplied,
+            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            and ordered alphabetically.
+        subgroups: included subgroups in preferred ordering.
+            The direction of the bias is determined by the ordering of the
+            subgroups.
+            Besides, the bias is computed only on the specified subgroups.
+            If no subgroups are supplied, they will be inferred from
+            :math:`\text{protected\_variable}` and ordered alphanumerically.
+        metric: metric which equalized odds are measured with.
+            Typical choices are: :func:`audmetric.recall_per_class`,
+            :func:`audmetric.precision_per_class` or
+            :func:`audmetric.fscore_per_class`
+        reduction: specifies the reduction operation to measure the divergence
+            between the scores of the subgroups of the protected variable
+            for each class. Typical choices are:
+            difference or absolute difference between scores for two subgroups
+            and standard deviation of scores for more than two subgroups.
+
+    Returns:
+        unweighted average bias
+
+    Raises:
+        ValueError: if ``truth``, ``prediction`` and ``protected_variable``
+            have different lengths
+        ValueError: if ``subgroups`` contains values not contained in
+            ``protected_variable``
+
+    Example:
+        >>> unweighted_average_bias([1, 1], [1, 0], ['male', 'female'])
+        0.5
+        >>> unweighted_average_bias(
+        ...     [1, 1], [1, 0], ['male', 'female'],
+        ...     subgroups=['female', 'male'],
+        ...     reduction=lambda x: x[0] - x[1],
+        ... )
+        -1.0
+        >>> unweighted_average_bias(
+        ...     [0, 1], [1, 0], ['male', 'female'],
+        ...     metric=recall_per_class
+        ... )
+        nan
+        >>> unweighted_average_bias(
+        ...     [0, 0, 0, 0], [1, 1, 0, 0], ['a', 'b', 'c', 'd'],
+        ...     metric=recall_per_class,
+        ... )
+        0.5
+
+    """
+    if labels is None:
+        labels = infer_labels(truth, prediction)
+
+    if not len(truth) == len(prediction) == len(protected_variable):
+        raise ValueError(
+            f"'truth', 'prediction' and 'protected_variable' should have "
+            f"same lengths, but received '{len(truth)}', '{len(prediction)}' "
+            f"and '{len(protected_variable)}'"
+        )
+
+    if subgroups is None:
+        subgroups = sorted(set(protected_variable))
+
+    scores = scores_per_subgroup_and_class(
+        truth=truth,
+        prediction=prediction,
+        protected_variable=protected_variable,
+        labels=labels,
+        subgroups=subgroups,
+        metric=metric,
+        zero_division=np.nan,
+    )
+
+    bias = 0.
+    denominator = 0
+
+    for label in labels:
+        scores_subgroup = [
+            scores[subgroup][label] for subgroup in subgroups
+            if label in scores[subgroup]
+            and not np.isnan(scores[subgroup][label])
+        ]
+        # compute score divergence only where more than 1 score per class
+        if len(scores_subgroup) > 1:
+            bias += reduction(scores_subgroup)
+            denominator += 1
+
+    if denominator == 0:
+        return np.nan
+
+    return bias / denominator
 
 
 def unweighted_average_fscore(

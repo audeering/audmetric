@@ -13,6 +13,7 @@ from audmetric.core.api import (
     pearson_cc,
     precision_per_class,
     recall_per_class,
+    unweighted_average_bias,
     unweighted_average_fscore,
     unweighted_average_recall,
     unweighted_average_precision,
