@@ -19,10 +19,20 @@ confusion_matrix
 
 .. autofunction:: confusion_matrix
 
+detection_error_tradeoff
+------------------------
+
+.. autofunction:: detection_error_tradeoff
+
 edit_distance
 -------------
 
 .. autofunction:: edit_distance
+
+equal_error_rate
+----------------
+
+.. autofunction:: equal_error_rate
 
 event_error_rate
 ----------------

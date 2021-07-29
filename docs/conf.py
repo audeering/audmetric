@@ -29,6 +29,7 @@ source_suffix = '.rst'
 exclude_patterns = ['build', 'Thumbs.db', '.DS_Store']
 pygments_style = None
 extensions = [
+    'sphinxcontrib.bibtex',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',  # support for Google-style docstrings
     'sphinx_autodoc_typehints',
@@ -38,6 +39,7 @@ extensions = [
 
 napoleon_use_ivar = True  # List of class attributes
 autodoc_inherit_docstrings = False  # disable docstring inheritance
+bibtex_bibfiles = ['refs.bib']
 
 # HTML --------------------------------------------------------------------
 html_theme = 'sphinx_audeering_theme'

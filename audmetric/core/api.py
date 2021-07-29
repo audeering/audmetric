@@ -1,4 +1,7 @@
+from collections import namedtuple
+import operator
 import typing
+import warnings
 
 import numpy as np
 
@@ -179,6 +182,107 @@ def confusion_matrix(
     return matrix
 
 
+def detection_error_tradeoff(
+    truth: typing.Union[
+        typing.Union[bool, int],
+        typing.Sequence[typing.Union[bool, int]]
+    ],
+    prediction: typing.Union[
+        typing.Union[bool, int, float],
+        typing.Sequence[typing.Union[bool, int, float]]
+    ],
+) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    r"""Detection error tradeoff for verification experiments.
+
+    The `detection error tradeoff (DET)`_
+    is a graph showing
+    the false non-match rate (FNMR)
+    against the false match rate (FMR).
+    The FNMR indicates
+    how often an enrolled speaker was missed.
+    The FMR indicates
+    how often an impostor was verified as the enrolled speaker.
+
+    This function does not return a figure,
+    but the FMR and FNMR,
+    together with the corresponding verification thresholds
+    at which a similarity value
+    was regarded to belong to the enrolled speaker.
+
+    ``truth`` may only contain entries like ``[1, 0, True, False...]``,
+    whereas prediction values
+    can also contain similarity scores, e.g. ``[0.8, 0.1, ...]``.
+
+    The implementation is identical with the one provided
+    by the pyeer_ package.
+
+    .. _detection error tradeoff (DET): https://en.wikipedia.org/wiki/Detection_error_tradeoff
+    .. _pyeer: https://github.com/manuelaguadomtz/pyeer
+
+    Args:
+        truth: ground truth classes
+        prediction: predicted classes or similarity scores
+
+    Returns:
+        * false match rate (FMR)
+        * false non-match rate (FNMR)
+        * verification thresholds
+
+    Raises:
+        ValueError: if ``truth`` contains values
+            different from ``1, 0, True, False``
+
+    Example:
+        >>> truth = [1, 0]
+        >>> prediction = [0.9, 0.1]
+        >>> detection_error_tradeoff(truth, prediction)
+        (array([1., 0.]), array([0., 0.]), array([0.1, 0.9]))
+
+    """  # noqa: E501
+    truth = np.array(truth)
+
+    allowed_truth_values = set([1, 0, True, False])
+    if not set(truth).issubset(allowed_truth_values):
+        raise ValueError(
+            "'truth' is only allowed to contain "
+            "[1, 0, True, False], "
+            'yours contains:\n'
+            f"[{', '.join([str(t) for t in set(truth)])}]"
+        )
+
+    truth = truth.astype(bool)
+    prediction = np.array(prediction).astype(np.float64)
+
+    # Genuine matching scores
+    gscores = prediction[truth]
+    # Impostor matching scores
+    iscores = prediction[~truth]
+
+    gscores_number = len(gscores)
+    iscores_number = len(iscores)
+
+    # Labeling genuine scores as 1 and impostor scores as 0
+    gscores = list(zip(gscores, [1] * gscores_number))
+    iscores = list(zip(iscores, [0] * iscores_number))
+
+    # Stacking scores
+    scores = np.array(sorted(gscores + iscores, key=operator.itemgetter(0)))
+    cumul = np.cumsum(scores[:, 1])
+
+    # Grouping scores
+    thresholds, u_indices = np.unique(scores[:, 0], return_index=True)
+
+    # Calculating FNM and FM distributions
+    fnm = cumul[u_indices] - scores[u_indices][:, 1]  # rejecting s < t
+    fm = iscores_number - (u_indices - fnm)
+
+    # Calculating FMR and FNMR
+    fnmr = fnm / gscores_number
+    fmr = fm / iscores_number
+
+    return fmr, fnmr, thresholds
+
+
 def edit_distance(
     truth: typing.Union[str, typing.Sequence[int]],
     prediction: typing.Union[str, typing.Sequence[int]]
@@ -235,6 +339,118 @@ def edit_distance(
             m0[j] = m1[j]
 
     return m1[len(truth)]
+
+
+def equal_error_rate(
+    truth: typing.Union[
+        typing.Union[bool, int],
+        typing.Sequence[typing.Union[bool, int]]
+    ],
+    prediction: typing.Union[
+        typing.Union[bool, int, float],
+        typing.Sequence[typing.Union[bool, int, float]]
+    ],
+) -> typing.Tuple[float, namedtuple]:
+    r"""Equal error rate for verification tasks.
+
+    The equal error rate (EER) is the point
+    where false non-match rate (FNMR)
+    and the impostors or false match rate (FMR)
+    are identical.
+    The FNMR indicates
+    how often an enrolled speaker was missed.
+    The FMR indicates
+    how often an impostor was verified as the enrolled speaker.
+
+    In practice the score distribution is not continuous
+    and an interval is returned instead.
+    The EER value will be set as the midpoint
+    of this interval::footcite:`Maio2002`
+
+    .. math::
+
+        \text{EER} = \frac{
+            \min(\text{FNMR}[t], \text{FMR}[t])
+            + \max(\text{FNMR}[t], \text{FMR}[t])
+        }{2}
+
+    with :math:`t = \text{argmin}(|\text{FNMR} - \text{FMR}|)`.
+
+    ``truth`` may only contain entries like ``[1, 0, True, False...]``,
+    whereas prediction values
+    can also contain similarity scores, e.g. ``[0.8, 0.1, ...]``.
+
+    The implementation is identical with the one provided
+    by the pyeer_ package.
+
+    .. footbibliography::
+
+    .. _pyeer: https://github.com/manuelaguadomtz/pyeer
+
+    Args:
+        truth: ground truth classes
+        prediction: predicted classes or similarity scores
+
+    Returns:
+        * equal error rate (EER)
+        * namedtuple containing
+          ``fmr``,
+          ``fnmr``,
+          ``thresholds``,
+          ``threshold``
+          whereas the last one corresponds to the threshold
+          corresponding to the returned EER
+
+    Raises:
+        ValueError: if ``truth`` contains values
+            different from ``1, 0, True, False``
+
+    Example:
+        >>> truth = [0, 1, 0, 1, 0]
+        >>> prediction = [0.2, 0.8, 0.4, 0.5, 0.5]
+        >>> eer, stats = equal_error_rate(truth, prediction)
+        >>> eer
+        0.16666666666666666
+        >>> stats.threshold
+        0.5
+
+    """
+    Stats = namedtuple(
+        'stats',
+        [
+            'fmr',  # False match rates (FMR)
+            'fnmr',  # False non-match rates (FNMR)
+            'thresholds',  # Thresholds
+            'threshold',  # verification threshold for EER
+        ],
+    )
+    fmr, fnmr, thresholds = detection_error_tradeoff(truth, prediction)
+    diff = fmr - fnmr
+    # t1 and t2 are our time indices
+    t2 = np.where(diff <= 0)[0]
+    if len(t2) > 0:
+        t2 = t2[0]
+    else:
+        warnings.warn(
+            'The false match rate '
+            'and false non-match rate curves '
+            'do not intersect each other.',
+            RuntimeWarning,
+        )
+        eer = 1.0
+        threshold = float(thresholds[0])
+        return eer, Stats(fmr, fnmr, thresholds, threshold)
+
+    t1 = t2 - 1 if diff[t2] != 0 and t2 != 0 else t2
+    if fmr[t1] + fnmr[t1] <= fmr[t2] + fnmr[t2]:
+        eer = (fnmr[t1] + fmr[t1]) / 2.0
+        threshold = thresholds[t1]
+    else:  # pragma: nocover (couldn't find a test to trigger this)
+        eer = (fnmr[t2] + fmr[t2]) / 2.0
+        threshold = thresholds[t2]
+    eer = float(eer)
+    threshold = float(threshold)
+    return eer, Stats(fmr, fnmr, thresholds, threshold)
 
 
 def event_error_rate(
