@@ -344,7 +344,7 @@ def edit_distance(
 def equal_error_rate(
     truth: typing.Union[
         typing.Union[bool, int],
-        typing.Sequence[typing.Union[bool, int, float]]
+        typing.Sequence[typing.Union[bool, int]]
     ],
     prediction: typing.Union[
         typing.Union[bool, int, float],
