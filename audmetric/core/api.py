@@ -221,7 +221,7 @@ def detection_error_tradeoff(
 
     Args:
         truth: ground truth classes
-        prediction: predicted classes
+        prediction: predicted classes or similarity scores
 
     Returns:
         * false match rate (FMR)
@@ -389,7 +389,7 @@ def equal_error_rate(
 
     Args:
         truth: ground truth classes
-        prediction: predicted classes
+        prediction: predicted classes or similarity scores
 
     Returns:
         * equal error rate (EER)
