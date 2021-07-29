@@ -283,6 +283,64 @@ def detection_error_tradeoff(
     return fmr, fnmr, thresholds
 
 
+def edit_distance(
+    truth: typing.Union[str, typing.Sequence[int]],
+    prediction: typing.Union[str, typing.Sequence[int]]
+) -> int:
+    r"""Edit distance between two strings of characters or sequences of ints.
+
+    The implementation follows the `Wagner-Fischer algorithm`_.
+
+    .. _Wagner-Fischer algorithm:
+        https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
+
+    Args:
+        truth: ground truth sequence
+        prediction: predicted sequence
+
+    Returns:
+        edit distance
+
+    Example:
+        >>> truth = 'lorem'
+        >>> prediction = 'lorm'
+        >>> edit_distance(truth, prediction)
+        1
+        >>> truth = [0, 1, 2]
+        >>> prediction = [0, 1]
+        >>> edit_distance(truth, prediction)
+        1
+
+    """
+    if truth == prediction:
+        return 0
+
+    elif len(prediction) == 0:
+        return len(truth)
+
+    elif len(truth) == 0:
+        return len(prediction)
+
+    m0 = [None] * (len(truth) + 1)
+    m1 = [None] * (len(truth) + 1)
+
+    for i in range(len(m0)):
+        m0[i] = i
+
+    for i in range(len(prediction)):
+        m1[0] = i + 1
+        for j in range(len(truth)):
+            cost = 0 if prediction[i] == truth[j] else 1
+            m1[j + 1] = min(m1[j] + 1,       # deletion
+                            m0[j + 1] + 1,   # insertion
+                            m0[j] + cost)    # substitution
+
+        for j in range(len(m0)):
+            m0[j] = m1[j]
+
+    return m1[len(truth)]
+
+
 def equal_error_rate(
     truth: typing.Union[
         typing.Union[bool, int],
@@ -393,6 +451,62 @@ def equal_error_rate(
     eer = float(eer)
     threshold = float(threshold)
     return eer, Stats(fmr, fnmr, thresholds, threshold)
+
+
+def event_error_rate(
+    truth: typing.Union[
+        str, typing.Sequence[typing.Union[str, typing.Sequence[int]]]
+    ],
+    prediction: typing.Union[
+        str, typing.Sequence[typing.Union[str, typing.Sequence[int]]]
+    ],
+) -> float:
+    r"""Event error rate based on edit distance.
+
+    The event error rate is computed by aggregating the mean edit
+    distances of each (truth, prediction)-pair and averaging the
+    aggregated score by the number of pairs.
+
+    The mean edit distance of each (truth, prediction)-pair is computed
+    as an average of the edit distance over the length of the longer sequence
+    of the corresponding pair. By normalizing over the longer sequence the
+    normalized distance is bound to [0, 1].
+
+    Args:
+        truth: ground truth classes
+        prediction: predicted classes
+
+    Returns:
+        event error rate
+
+    Raises:
+        ValueError: if ``truth`` and ``prediction`` differ in length
+
+    Example:
+        >>> event_error_rate([[0, 1]], [[0]])
+        0.5
+        >>> event_error_rate([[0, 1], [2]], [[0], [2]])
+        0.25
+        >>> event_error_rate(['lorem'], ['lorm'])
+        0.2
+        >>> event_error_rate(['lorem', 'ipsum'], ['lorm', 'ipsum'])
+        0.1
+
+    """
+    truth = audeer.to_list(truth)
+    prediction = audeer.to_list(prediction)
+
+    assert_equal_length(truth, prediction)
+
+    eer = 0.
+
+    for t, p in zip(truth, prediction):
+        n = max(len(t), len(p))
+        n = n if n > 1 else 1
+        eer += edit_distance(t, p) / n
+
+    num_samples = len(truth) if len(truth) > 1 else 1
+    return eer / num_samples
 
 
 def fscore_per_class(
@@ -969,3 +1083,45 @@ def weighted_confusion_error(
 
     weighted_cm = cm * weights
     return float(np.sum(weighted_cm))
+
+
+def word_error_rate(
+    truth: typing.Sequence[typing.Sequence[str]],
+    prediction: typing.Sequence[typing.Sequence[str]]
+) -> float:
+    r"""Word error rate based on edit distance.
+
+    Args:
+        truth: ground truth strings
+        prediction: predicted strings
+
+    Returns:
+        word error rate
+
+    Raises:
+        ValueError: if ``truth`` and ``prediction`` differ in length
+
+    Example:
+        >>> truth = [['lorem', 'ipsum'], ['north', 'wind', 'and', 'sun']]
+        >>> prediction = [['lorm', 'ipsum'], ['north', 'wind']]
+        >>> word_error_rate(truth, prediction)
+        0.5
+
+    """
+    assert_equal_length(truth, prediction)
+
+    wer = 0.
+
+    for t, p in zip(truth, prediction):
+        # map words to ints
+        unique_words = set(t).union(set(p))
+        map = {k: v for k, v in zip(unique_words, range(len(unique_words)))}
+        t = [map[i] for i in t]
+        p = [map[i] for i in p]
+
+        n = max(len(t), len(p))
+        n = n if n > 1 else 1
+        wer += edit_distance(t, p) / n
+
+    num_samples = len(truth) if len(truth) > 1 else 1
+    return wer / num_samples
