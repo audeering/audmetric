@@ -5,6 +5,46 @@ import audmetric
 
 
 @pytest.mark.parametrize(
+    'truth, prediction, expected_labels',
+    [
+        (
+            ['a', 'b'],
+            ['c', 'd'],
+            ['a', 'b', 'c', 'd'],
+        ),
+        (
+            ['d', 'c'],
+            ['b', 'a'],
+            ['a', 'b', 'c', 'd'],
+        ),
+        (
+            ['a', 'a'],
+            ['a', 'a'],
+            ['a'],
+        ),
+        (
+            [0, 1, 2],
+            [2, 2, 2],
+            [0, 1, 2],
+        ),
+        (
+            [0, 1],
+            [np.NaN, 1],
+            [0, 1],
+        ),
+        (
+            ['a', 'b'],
+            [np.NaN, 'c'],
+            ['a', 'b', 'c'],
+        ),
+    ]
+)
+def test_infer_labels(truth, prediction, expected_labels):
+    labels = audmetric.utils.infer_labels(truth, prediction)
+    assert expected_labels == labels
+
+
+@pytest.mark.parametrize(
     'truth,prediction,protected_variable,metric,labels,subgroups,'
     'zero_division,expected',
     [
