@@ -34,7 +34,7 @@ def infer_labels(
     """
     truth = _remove_nan(truth)
     prediction = _remove_nan(prediction)
-    return sorted(list(set(truth) | set(prediction)))
+    return sorted(list(set(truth) | set(prediction)), key=str)
 
 
 def scores_per_subgroup_and_class(
