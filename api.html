@@ -58,7 +58,7 @@
 
           <a href="index.html">
           
-            <img src="_static/images/audeering.svg" class="logo" alt="audEERING"/>
+            <img src="_static/images/audeering.png" class="logo" alt="audEERING"/>
           
           
             <span> audmetric</span>
@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.1.0
+                v1.1.1
               </div>
             
           
@@ -151,44 +151,14 @@
         
         <div class="rst-content">
         
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
       <li>audmetric</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
-            
-              <a href="https://github.com/audeering/audmetric/blob/v1.1.0/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
+              <a href="https://github.com/audeering/audmetric/" class="fa fa-github"> GitHub</a>
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -420,7 +390,7 @@ how often an impostor was verified as the enrolled speaker.</p>
 <p>In practice the score distribution is not continuous
 and an interval is returned instead.
 The EER value will be set as the midpoint
-of this interval:<a class="footnote-reference brackets" href="#maio2002" id="id1">1</a></p>
+of this interval:<a class="footnote-reference brackets" href="#footcite-maio2002" id="id1">1</a></p>
 <div class="math notranslate nohighlight">
 \[\text{EER} = \frac{
     \min(\text{FNMR}[t], \text{FMR}[t])
@@ -432,8 +402,8 @@ whereas prediction values
 can also contain similarity scores, e.g. <code class="docutils literal notranslate"><span class="pre">[0.8,</span> <span class="pre">0.1,</span> <span class="pre">...]</span></code>.</p>
 <p>The implementation is identical with the one provided
 by the <a class="reference external" href="https://github.com/manuelaguadomtz/pyeer">pyeer</a> package.</p>
-<p><dl class="footnote brackets">
-<dt class="label" id="maio2002"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<p id="id2"><dl class="footnote brackets">
+<dt class="label" id="footcite-maio2002"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>D. Maio, D. Maltoni, R. Cappelli, J. L. Wayman, and A. K. Jain. Fvc2000: fingerprint verification competition. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 24:402–412, 2002. <a class="reference external" href="https://doi.org/10.1109/34.990140">doi:10.1109/34.990140</a>.</p>
 </dd>
 </dl>
@@ -740,7 +710,7 @@ and ordered alphabetically.</p></li>
 <h2>unweighted_average_bias<a class="headerlink" href="#unweighted-average-bias" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_bias">
-<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">unweighted_average_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">truth</span></em>, <em class="sig-param"><span class="pre">prediction</span></em>, <em class="sig-param"><span class="pre">protected_variable</span></em>, <em class="sig-param"><span class="pre">labels=None</span></em>, <em class="sig-param"><span class="pre">*</span></em>, <em class="sig-param"><span class="pre">subgroups=None</span></em>, <em class="sig-param"><span class="pre">metric=&lt;function</span> <span class="pre">fscore_per_class&gt;</span></em>, <em class="sig-param"><span class="pre">reduction=&lt;function</span> <span class="pre">std&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#unweighted_average_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.unweighted_average_bias" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">unweighted_average_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protected_variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroups=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric=&lt;function</span> <span class="pre">fscore_per_class&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">std&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#unweighted_average_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.unweighted_average_bias" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute unweighted average bias with respect to a protected variable.</p>
 <p>The bias is measured in terms of <em>equalized odds</em> which requires
 the classifier to have identical performance for all classes independent
@@ -1042,7 +1012,7 @@ and ordered alphabetically.</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1050,7 +1020,7 @@ and ordered alphabetically.</p></li>
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2021 audEERING GmbH
+      &copy; 2019-2022 audEERING GmbH
     </p>
   </div> 
 
