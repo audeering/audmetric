@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.2 (2022/01/11)
+--------------------------
+
+* Fixed: typo in docstring of ``audmetric.mean_absolute_error()``
+
+
 Version 1.1.1 (2022/01/03)
 --------------------------
 
