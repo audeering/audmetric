@@ -575,7 +575,7 @@ def mean_absolute_error(
 
     .. math::
 
-        \text{MSE} = \frac{1}{n} \sum^n_{i=1}
+        \text{MAE} = \frac{1}{n} \sum^n_{i=1}
             |\text{prediction} - \text{truth}|
 
     Args:
