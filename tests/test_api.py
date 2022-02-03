@@ -86,7 +86,10 @@ def test_accuracy(truth, prediction, labels, to_string):
             )
             truth = truth[mask]
             prediction = prediction[mask]
-        accuracy = sklearn.metrics.accuracy_score(truth, prediction)
+        accuracy = sklearn.metrics.accuracy_score(
+            list(truth),
+            list(prediction),
+        )
 
     np.testing.assert_almost_equal(
         audmetric.accuracy(truth, prediction, labels=labels),
@@ -260,9 +263,15 @@ def test_event_error_rate(truth, prediction, eer):
         np.zeros(10),
     ),
 ])
-def test_concordancecc(truth, prediction):
+def test_concordance_cc(truth, prediction):
+
+    ccc = audmetric.concordance_cc(truth, prediction)
+
+    prediction = np.array(list(prediction))
+    truth = np.array(list(truth))
+
     if len(prediction) < 2:
-        ccc = np.NaN
+        ccc_expected = np.NaN
     else:
         denominator = (
             prediction.std() ** 2
@@ -270,13 +279,14 @@ def test_concordancecc(truth, prediction):
             + (prediction.mean() - truth.mean()) ** 2
         )
         if denominator == 0:
-            ccc = np.NaN
+            ccc_expected = np.NaN
         else:
-            r = np.corrcoef(prediction, truth)[0][1]
-            ccc = 2 * r * prediction.std() * truth.std() / denominator
+            r = np.corrcoef(list(prediction), list(truth))[0][1]
+            ccc_expected = 2 * r * prediction.std() * truth.std() / denominator
+
     np.testing.assert_almost_equal(
-        audmetric.concordance_cc(truth, prediction),
         ccc,
+        ccc_expected,
     )
 
 
@@ -413,11 +423,11 @@ def test_mean_squared_error(value_range, num_elements):
         np.zeros(10),
     ),
 ])
-def test_pearsoncc(truth, prediction):
+def test_pearson_cc(truth, prediction):
     if len(prediction) < 2 or prediction.std() == 0:
         pcc = np.NaN
     else:
-        pcc = np.corrcoef(truth, prediction)[0][1]
+        pcc = np.corrcoef(list(truth), list(prediction))[0][1]
     np.testing.assert_almost_equal(
         audmetric.pearson_cc(truth, prediction),
         pcc,
@@ -499,13 +509,9 @@ def test_recall_precision_fscore(truth, prediction, labels, zero_division):
             labels,
             zero_division=zero_division,
         )
-        if isinstance(truth, pd.Series):
-            truth = np.array(list(truth))
-        if isinstance(prediction, pd.Series):
-            prediction = np.array(list(prediction))
         expected = sklearn_metric(
-            truth,
-            prediction,
+            list(truth),
+            list(prediction),
             average='macro',
             zero_division=zero_division,
         ),
