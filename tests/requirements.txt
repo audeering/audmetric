@@ -1,3 +1,4 @@
+pandas
 pyeer
 pytest
 pytest-flake8
