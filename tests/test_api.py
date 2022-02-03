@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pyeer.eer_info
 import pytest
 import sklearn.metrics
@@ -10,6 +11,12 @@ import audmetric
     (
         np.random.randint(0, 10, size=5),
         np.random.randint(0, 10, size=5),
+        None,
+        False,
+    ),
+    (
+        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
+        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
         None,
         False,
     ),
@@ -229,6 +236,10 @@ def test_event_error_rate(truth, prediction, eer):
         np.random.randint(0, 10, size=5),
     ),
     (
+        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
+        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
+    ),
+    (
         np.random.randint(0, 10, size=1),
         np.random.randint(0, 10, size=1),
     ),
@@ -329,8 +340,17 @@ def test_edit_distance(truth, prediction, edit_distance):
     ([0, 2], 100),
 ])
 def test_mean_absolute_error(value_range, num_elements):
+
     t = np.random.randint(value_range[0], value_range[1], size=num_elements)
     p = np.random.randint(value_range[0], value_range[1], size=num_elements)
+
+    np.testing.assert_almost_equal(
+        audmetric.mean_absolute_error(t, p),
+        sklearn.metrics.mean_absolute_error(t, p),
+    )
+
+    t = pd.Series(t).astype('Int64')
+    t = pd.Series(t).astype('Int64')
 
     np.testing.assert_almost_equal(
         audmetric.mean_absolute_error(t, p),
@@ -345,6 +365,7 @@ def test_mean_absolute_error(value_range, num_elements):
     ([0, 2], 100),
 ])
 def test_mean_squared_error(value_range, num_elements):
+
     t = np.random.randint(value_range[0], value_range[1], size=num_elements)
     p = np.random.randint(value_range[0], value_range[1], size=num_elements)
 
@@ -353,11 +374,23 @@ def test_mean_squared_error(value_range, num_elements):
         sklearn.metrics.mean_squared_error(t, p),
     )
 
+    t = pd.Series(t).astype('Int64')
+    t = pd.Series(t).astype('Int64')
+
+    np.testing.assert_almost_equal(
+        audmetric.mean_absolute_error(t, p),
+        sklearn.metrics.mean_absolute_error(t, p),
+    )
+
 
 @pytest.mark.parametrize('truth,prediction', [
     (
         np.random.randint(0, 10, size=5),
         np.random.randint(0, 10, size=5),
+    ),
+    (
+        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
+        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
     ),
     (
         np.random.randint(0, 10, size=1),
@@ -431,6 +464,12 @@ def test_pearsoncc(truth, prediction):
             0,
         ),
         (
+            pd.Series(np.random.randint(0, 10, 5)).astype('Int64'),
+            pd.Series(np.random.randint(0, 10, 5)).astype('Int64'),
+            None,
+            0,
+        ),
+        (
             np.random.randint(0, 10, 100),
             np.random.randint(0, 10, 100),
             None,
@@ -460,6 +499,10 @@ def test_recall_precision_fscore(truth, prediction, labels, zero_division):
             labels,
             zero_division=zero_division,
         )
+        if isinstance(truth, pd.Series):
+            truth = np.array(list(truth))
+        if isinstance(prediction, pd.Series):
+            prediction = np.array(list(prediction))
         expected = sklearn_metric(
             truth,
             prediction,
