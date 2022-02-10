@@ -40,6 +40,11 @@ extensions = [
 napoleon_use_ivar = True  # List of class attributes
 autodoc_inherit_docstrings = False  # disable docstring inheritance
 bibtex_bibfiles = ['refs.bib']
+# Don't check for DOIs as they will always work
+linkcheck_ignore = [
+    'https://doi.org/10.2307/2532051',
+    'https://doi.org/10.1109/34.990140',
+]
 
 # HTML --------------------------------------------------------------------
 html_theme = 'sphinx_audeering_theme'
