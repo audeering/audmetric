@@ -83,7 +83,10 @@ def concordance_cc(
                       \mu_\text{prediction}-\mu_\text{truth})^2}
 
     where :math:`\rho` is the Pearson correlation coefficient,
-    :math:`\mu` the mean and :math:`\sigma^2` the variance.
+    :math:`\mu` the mean
+    and :math:`\sigma^2` the variance.\ :footcite:`Lin1989`
+
+    .. footbibliography::
 
     Args:
         truth: ground truth values
