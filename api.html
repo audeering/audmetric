@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.1.2
+                v1.1.3
               </div>
             
           
@@ -217,7 +217,14 @@ and ordered alphabetically.</p></li>
               {\sigma_\text{prediction}^2 + \sigma_\text{truth}^2 + (
               \mu_\text{prediction}-\mu_\text{truth})^2}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\rho\)</span> is the Pearson correlation coefficient,
-<span class="math notranslate nohighlight">\(\mu\)</span> the mean and <span class="math notranslate nohighlight">\(\sigma^2\)</span> the variance.</p>
+<span class="math notranslate nohighlight">\(\mu\)</span> the mean
+and <span class="math notranslate nohighlight">\(\sigma^2\)</span> the variance.<a class="footnote-reference brackets" href="#footcite-lin1989" id="id1">1</a></p>
+<p id="id2"><dl class="footnote brackets">
+<dt class="label" id="footcite-lin1989"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Lawrence I-Kuei Lin. A concordance correlation coefficient to evaluate reproducibility. <em>Biometrics</em>, 45:255–268, 1989. <a class="reference external" href="https://doi.org/10.2307/2532051">doi:10.2307/2532051</a>.</p>
+</dd>
+</dl>
+</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -390,7 +397,7 @@ how often an impostor was verified as the enrolled speaker.</p>
 <p>In practice the score distribution is not continuous
 and an interval is returned instead.
 The EER value will be set as the midpoint
-of this interval:<a class="footnote-reference brackets" href="#footcite-maio2002" id="id1">1</a></p>
+of this interval:<a class="footnote-reference brackets" href="#footcite-maio2002" id="id3">2</a></p>
 <div class="math notranslate nohighlight">
 \[\text{EER} = \frac{
     \min(\text{FNMR}[t], \text{FMR}[t])
@@ -402,8 +409,8 @@ whereas prediction values
 can also contain similarity scores, e.g. <code class="docutils literal notranslate"><span class="pre">[0.8,</span> <span class="pre">0.1,</span> <span class="pre">...]</span></code>.</p>
 <p>The implementation is identical with the one provided
 by the <a class="reference external" href="https://github.com/manuelaguadomtz/pyeer">pyeer</a> package.</p>
-<p id="id2"><dl class="footnote brackets">
-<dt class="label" id="footcite-maio2002"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<p id="id4"><dl class="footnote brackets">
+<dt class="label" id="footcite-maio2002"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
 <dd><p>D. Maio, D. Maltoni, R. Cappelli, J. L. Wayman, and A. K. Jain. Fvc2000: fingerprint verification competition. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 24:402–412, 2002. <a class="reference external" href="https://doi.org/10.1109/34.990140">doi:10.1109/34.990140</a>.</p>
 </dd>
 </dl>
@@ -1012,7 +1019,7 @@ and ordered alphabetically.</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/11 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
