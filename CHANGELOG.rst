@@ -11,7 +11,7 @@ Version 1.1.3 (2022/02/16)
 --------------------------
 
 * Added: reference for CCC formula
-* Fixed: Support pandas series with datatype ``Int64``
+* Fixed: support pandas series with datatype ``Int64``
 
 
 Version 1.1.2 (2022/01/11)
