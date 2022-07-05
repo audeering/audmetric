@@ -24,7 +24,7 @@ def accuracy(
     .. math::
 
         \text{accuracy} = \frac{\text{number of correct predictions}}
-                               {\text{number of incorrect predictions}}
+                               {\text{number of total predictions}}
 
     Args:
         truth: ground truth values/classes
