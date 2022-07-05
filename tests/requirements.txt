@@ -1,7 +1,9 @@
+numpy >=1.23.0
 pandas
 pyeer
 pytest
 pytest-flake8
 pytest-doctestplus
 pytest-cov
+scipy >=1.8.1
 sklearn

@@ -175,7 +175,7 @@ def test_equal_error_rate_warnings():
     # No imposter scores (division by 0)
     truth = np.array([1, 1])
     prediction = np.array([1, 1])
-    warning = 'invalid value encountered in true_divide'
+    warning = 'invalid value encountered in divide'
     with pytest.warns(RuntimeWarning, match=warning):
         eer, stats = audmetric.equal_error_rate(truth, prediction)
         pyeer_stats = pyeer.eer_info.get_eer_stats(
