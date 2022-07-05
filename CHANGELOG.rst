@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.4 (2022/07/05)
+--------------------------
+
+* Fixed: accuracy formula in docstring
+
+
 Version 1.1.3 (2022/02/16)
 --------------------------
 
