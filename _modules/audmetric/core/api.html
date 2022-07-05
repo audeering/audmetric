@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.1.3
+                v1.1.4
               </div>
             
           
@@ -168,7 +168,7 @@
 <span class="sd">    .. math::</span>
 
 <span class="sd">        \text{accuracy} = \frac{\text{number of correct predictions}}</span>
-<span class="sd">                               {\text{number of incorrect predictions}}</span>
+<span class="sd">                               {\text{number of total predictions}}</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        truth: ground truth values/classes</span>
@@ -177,7 +177,8 @@
 <span class="sd">            Sample is considered in computation if either prediction or</span>
 <span class="sd">            ground truth (logical OR) is contained in labels.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 
 <span class="sd">    Returns:</span>
@@ -287,7 +288,8 @@
 <span class="sd">        prediction: predicted values/classes</span>
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 <span class="sd">        normalize: normalize confusion matrix over the rows</span>
 
@@ -676,7 +678,8 @@
 <span class="sd">        prediction: predicted values/classes</span>
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 <span class="sd">        zero_division: set the value to return when there is a zero division</span>
 
@@ -841,7 +844,8 @@
 <span class="sd">        prediction: predicted values/classes</span>
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 <span class="sd">        zero_division: set the value to return when there is a zero division</span>
 
@@ -885,7 +889,8 @@
 <span class="sd">        prediction: predicted values/classes</span>
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 <span class="sd">        zero_division: set the value to return when there is a zero division</span>
 
@@ -958,7 +963,8 @@
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            The bias is computed only on the specified labels.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 <span class="sd">        subgroups: included subgroups in preferred ordering.</span>
 <span class="sd">            The direction of the bias is determined by the ordering of the</span>
@@ -1070,7 +1076,8 @@
 <span class="sd">        prediction: predicted values/classes</span>
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 <span class="sd">        zero_division: set the value to return when there is a zero division</span>
 
@@ -1112,7 +1119,8 @@
 <span class="sd">        prediction: predicted values/classes</span>
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 <span class="sd">        zero_division: set the value to return when there is a zero division</span>
 
@@ -1154,7 +1162,8 @@
 <span class="sd">        prediction: predicted values/classes</span>
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 <span class="sd">        zero_division: set the value to return when there is a zero division</span>
 
@@ -1200,7 +1209,8 @@
 <span class="sd">            ``[[w_r0_c0, ..., w_r0_cN], ..., [w_rN_c0, ..., w_rN_cN]]``</span>
 <span class="sd">        labels: included labels in preferred ordering.</span>
 <span class="sd">            If no labels are supplied,</span>
-<span class="sd">            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
 <span class="sd">            and ordered alphabetically.</span>
 
 <span class="sd">    Returns:</span>
@@ -1287,7 +1297,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1322,6 +1332,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>

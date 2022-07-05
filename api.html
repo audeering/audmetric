@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.1.3
+                v1.1.4
               </div>
             
           
@@ -165,16 +165,16 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-audmetric">
-<span id="audmetric"></span><h1>audmetric<a class="headerlink" href="#module-audmetric" title="Permalink to this headline">¶</a></h1>
+<span id="audmetric"></span><h1>audmetric<a class="headerlink" href="#module-audmetric" title="Permalink to this heading">¶</a></h1>
 <div class="section" id="accuracy">
-<h2>accuracy<a class="headerlink" href="#accuracy" title="Permalink to this headline">¶</a></h2>
+<h2>accuracy<a class="headerlink" href="#accuracy" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.accuracy">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.accuracy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Classification accuracy.</p>
 <div class="math notranslate nohighlight">
 \[\text{accuracy} = \frac{\text{number of correct predictions}}
-                       {\text{number of incorrect predictions}}\]</div>
+                       {\text{number of total predictions}}\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -184,7 +184,8 @@
 Sample is considered in computation if either prediction or
 ground truth (logical OR) is contained in labels.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 </ul>
 </dd>
@@ -207,7 +208,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="concordance-cc">
-<h2>concordance_cc<a class="headerlink" href="#concordance-cc" title="Permalink to this headline">¶</a></h2>
+<h2>concordance_cc<a class="headerlink" href="#concordance-cc" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.concordance_cc">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">concordance_cc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#concordance_cc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.concordance_cc" title="Permalink to this definition">¶</a></dt>
@@ -219,12 +220,13 @@ and ordered alphabetically.</p></li>
 <p>where <span class="math notranslate nohighlight">\(\rho\)</span> is the Pearson correlation coefficient,
 <span class="math notranslate nohighlight">\(\mu\)</span> the mean
 and <span class="math notranslate nohighlight">\(\sigma^2\)</span> the variance.<a class="footnote-reference brackets" href="#footcite-lin1989" id="id1">1</a></p>
-<p id="id2"><dl class="footnote brackets">
+<div class="docutils container" id="id2">
+<dl class="footnote brackets">
 <dt class="label" id="footcite-lin1989"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Lawrence I-Kuei Lin. A concordance correlation coefficient to evaluate reproducibility. <em>Biometrics</em>, 45:255–268, 1989. <a class="reference external" href="https://doi.org/10.2307/2532051">doi:10.2307/2532051</a>.</p>
 </dd>
 </dl>
-</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -251,7 +253,7 @@ and <span class="math notranslate nohighlight">\(\sigma^2\)</span> the variance.
 
 </div>
 <div class="section" id="confusion-matrix">
-<h2>confusion_matrix<a class="headerlink" href="#confusion-matrix" title="Permalink to this headline">¶</a></h2>
+<h2>confusion_matrix<a class="headerlink" href="#confusion-matrix" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.confusion_matrix">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.confusion_matrix" title="Permalink to this definition">¶</a></dt>
@@ -263,7 +265,8 @@ and <span class="math notranslate nohighlight">\(\sigma^2\)</span> the variance.
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted values/classes</p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 <li><p><strong>normalize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – normalize confusion matrix over the rows</p></li>
 </ul>
@@ -289,7 +292,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="detection-error-tradeoff">
-<h2>detection_error_tradeoff<a class="headerlink" href="#detection-error-tradeoff" title="Permalink to this headline">¶</a></h2>
+<h2>detection_error_tradeoff<a class="headerlink" href="#detection-error-tradeoff" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.detection_error_tradeoff">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">detection_error_tradeoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#detection_error_tradeoff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.detection_error_tradeoff" title="Permalink to this definition">¶</a></dt>
@@ -346,7 +349,7 @@ by the <a class="reference external" href="https://github.com/manuelaguadomtz/py
 
 </div>
 <div class="section" id="edit-distance">
-<h2>edit_distance<a class="headerlink" href="#edit-distance" title="Permalink to this headline">¶</a></h2>
+<h2>edit_distance<a class="headerlink" href="#edit-distance" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.edit_distance">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">edit_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#edit_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.edit_distance" title="Permalink to this definition">¶</a></dt>
@@ -381,7 +384,7 @@ by the <a class="reference external" href="https://github.com/manuelaguadomtz/py
 
 </div>
 <div class="section" id="equal-error-rate">
-<h2>equal_error_rate<a class="headerlink" href="#equal-error-rate" title="Permalink to this headline">¶</a></h2>
+<h2>equal_error_rate<a class="headerlink" href="#equal-error-rate" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.equal_error_rate">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">equal_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#equal_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.equal_error_rate" title="Permalink to this definition">¶</a></dt>
@@ -409,12 +412,13 @@ whereas prediction values
 can also contain similarity scores, e.g. <code class="docutils literal notranslate"><span class="pre">[0.8,</span> <span class="pre">0.1,</span> <span class="pre">...]</span></code>.</p>
 <p>The implementation is identical with the one provided
 by the <a class="reference external" href="https://github.com/manuelaguadomtz/pyeer">pyeer</a> package.</p>
-<p id="id4"><dl class="footnote brackets">
+<div class="docutils container" id="id4">
+<dl class="footnote brackets">
 <dt class="label" id="footcite-maio2002"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
 <dd><p>D. Maio, D. Maltoni, R. Cappelli, J. L. Wayman, and A. K. Jain. Fvc2000: fingerprint verification competition. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 24:402–412, 2002. <a class="reference external" href="https://doi.org/10.1109/34.990140">doi:10.1109/34.990140</a>.</p>
 </dd>
 </dl>
-</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -457,7 +461,7 @@ corresponding to the returned EER</p></li>
 
 </div>
 <div class="section" id="event-error-rate">
-<h2>event_error_rate<a class="headerlink" href="#event-error-rate" title="Permalink to this headline">¶</a></h2>
+<h2>event_error_rate<a class="headerlink" href="#event-error-rate" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.event_error_rate">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">event_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#event_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.event_error_rate" title="Permalink to this definition">¶</a></dt>
@@ -501,7 +505,7 @@ normalized distance is bound to [0, 1].</p>
 
 </div>
 <div class="section" id="mean-absolute-error">
-<h2>mean_absolute_error<a class="headerlink" href="#mean-absolute-error" title="Permalink to this headline">¶</a></h2>
+<h2>mean_absolute_error<a class="headerlink" href="#mean-absolute-error" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.mean_absolute_error">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">mean_absolute_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#mean_absolute_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.mean_absolute_error" title="Permalink to this definition">¶</a></dt>
@@ -535,7 +539,7 @@ normalized distance is bound to [0, 1].</p>
 
 </div>
 <div class="section" id="mean-squared-error">
-<h2>mean_squared_error<a class="headerlink" href="#mean-squared-error" title="Permalink to this headline">¶</a></h2>
+<h2>mean_squared_error<a class="headerlink" href="#mean-squared-error" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.mean_squared_error">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">mean_squared_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#mean_squared_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.mean_squared_error" title="Permalink to this definition">¶</a></dt>
@@ -569,7 +573,7 @@ normalized distance is bound to [0, 1].</p>
 
 </div>
 <div class="section" id="pearson-cc">
-<h2>pearson_cc<a class="headerlink" href="#pearson-cc" title="Permalink to this headline">¶</a></h2>
+<h2>pearson_cc<a class="headerlink" href="#pearson-cc" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.pearson_cc">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">pearson_cc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#pearson_cc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.pearson_cc" title="Permalink to this definition">¶</a></dt>
@@ -605,7 +609,7 @@ and <span class="math notranslate nohighlight">\(\text{cov}\)</span> is the cova
 
 </div>
 <div class="section" id="fscore-per-class">
-<h2>fscore_per_class<a class="headerlink" href="#fscore-per-class" title="Permalink to this headline">¶</a></h2>
+<h2>fscore_per_class<a class="headerlink" href="#fscore-per-class" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.fscore_per_class">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">fscore_per_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_division</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#fscore_per_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.fscore_per_class" title="Permalink to this definition">¶</a></dt>
@@ -621,7 +625,8 @@ and <span class="math notranslate nohighlight">\(\text{cov}\)</span> is the cova
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted values/classes</p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 <li><p><strong>zero_division</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – set the value to return when there is a zero division</p></li>
 </ul>
@@ -642,7 +647,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="precision-per-class">
-<h2>precision_per_class<a class="headerlink" href="#precision-per-class" title="Permalink to this headline">¶</a></h2>
+<h2>precision_per_class<a class="headerlink" href="#precision-per-class" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.precision_per_class">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">precision_per_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_division</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#precision_per_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.precision_per_class" title="Permalink to this definition">¶</a></dt>
@@ -657,7 +662,8 @@ and ordered alphabetically.</p></li>
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted values/classes</p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 <li><p><strong>zero_division</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – set the value to return when there is a zero division</p></li>
 </ul>
@@ -678,7 +684,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="recall-per-class">
-<h2>recall_per_class<a class="headerlink" href="#recall-per-class" title="Permalink to this headline">¶</a></h2>
+<h2>recall_per_class<a class="headerlink" href="#recall-per-class" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.recall_per_class">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">recall_per_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_division</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#recall_per_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.recall_per_class" title="Permalink to this definition">¶</a></dt>
@@ -693,7 +699,8 @@ and ordered alphabetically.</p></li>
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted values/classes</p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 <li><p><strong>zero_division</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – set the value to return when there is a zero division</p></li>
 </ul>
@@ -714,7 +721,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="unweighted-average-bias">
-<h2>unweighted_average_bias<a class="headerlink" href="#unweighted-average-bias" title="Permalink to this headline">¶</a></h2>
+<h2>unweighted_average_bias<a class="headerlink" href="#unweighted-average-bias" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_bias">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">unweighted_average_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protected_variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroups=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric=&lt;function</span> <span class="pre">fscore_per_class&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">std&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#unweighted_average_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.unweighted_average_bias" title="Permalink to this definition">¶</a></dt>
@@ -745,7 +752,8 @@ subgroups “male” and “female” of variable “sex”</p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 The bias is computed only on the specified labels.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 <li><p><strong>subgroups</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included subgroups in preferred ordering.
 The direction of the bias is determined by the ordering of the
@@ -804,7 +812,7 @@ and standard deviation of scores for more than two subgroups.</p></li>
 
 </div>
 <div class="section" id="unweighted-average-fscore">
-<h2>unweighted_average_fscore<a class="headerlink" href="#unweighted-average-fscore" title="Permalink to this headline">¶</a></h2>
+<h2>unweighted_average_fscore<a class="headerlink" href="#unweighted-average-fscore" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_fscore">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">unweighted_average_fscore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_division</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#unweighted_average_fscore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.unweighted_average_fscore" title="Permalink to this definition">¶</a></dt>
@@ -821,7 +829,8 @@ and standard deviation of scores for more than two subgroups.</p></li>
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted values/classes</p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 <li><p><strong>zero_division</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – set the value to return when there is a zero division</p></li>
 </ul>
@@ -842,7 +851,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="unweighted-average-precision">
-<h2>unweighted_average_precision<a class="headerlink" href="#unweighted-average-precision" title="Permalink to this headline">¶</a></h2>
+<h2>unweighted_average_precision<a class="headerlink" href="#unweighted-average-precision" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_precision">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">unweighted_average_precision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_division</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#unweighted_average_precision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.unweighted_average_precision" title="Permalink to this definition">¶</a></dt>
@@ -858,7 +867,8 @@ and ordered alphabetically.</p></li>
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted values/classes</p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 <li><p><strong>zero_division</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – set the value to return when there is a zero division</p></li>
 </ul>
@@ -879,7 +889,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="unweighted-average-recall">
-<h2>unweighted_average_recall<a class="headerlink" href="#unweighted-average-recall" title="Permalink to this headline">¶</a></h2>
+<h2>unweighted_average_recall<a class="headerlink" href="#unweighted-average-recall" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.unweighted_average_recall">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">unweighted_average_recall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_division</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#unweighted_average_recall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.unweighted_average_recall" title="Permalink to this definition">¶</a></dt>
@@ -895,7 +905,8 @@ and ordered alphabetically.</p></li>
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted values/classes</p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 <li><p><strong>zero_division</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – set the value to return when there is a zero division</p></li>
 </ul>
@@ -916,7 +927,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="weighted-confusion-error">
-<h2>weighted_confusion_error<a class="headerlink" href="#weighted-confusion-error" title="Permalink to this headline">¶</a></h2>
+<h2>weighted_confusion_error<a class="headerlink" href="#weighted-confusion-error" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.weighted_confusion_error">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">weighted_confusion_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#weighted_confusion_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.weighted_confusion_error" title="Permalink to this definition">¶</a></dt>
@@ -938,7 +949,8 @@ Expected as a list of lists in the following form
 <code class="docutils literal notranslate"><span class="pre">[[w_r0_c0,</span> <span class="pre">...,</span> <span class="pre">w_r0_cN],</span> <span class="pre">...,</span> <span class="pre">[w_rN_c0,</span> <span class="pre">...,</span> <span class="pre">w_rN_cN]]</span></code></p></li>
 <li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
 If no labels are supplied,
-they will inferred from <span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
+they will be inferred from
+<span class="math notranslate nohighlight">\(\{\text{prediction}, \text{truth}\}\)</span>
 and ordered alphabetically.</p></li>
 </ul>
 </dd>
@@ -962,7 +974,7 @@ and ordered alphabetically.</p></li>
 
 </div>
 <div class="section" id="word-error-rate">
-<h2>word_error_rate<a class="headerlink" href="#word-error-rate" title="Permalink to this headline">¶</a></h2>
+<h2>word_error_rate<a class="headerlink" href="#word-error-rate" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.word_error_rate">
 <span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">word_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audmetric/core/api.html#word_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.word_error_rate" title="Permalink to this definition">¶</a></dt>
@@ -1019,7 +1031,7 @@ and ordered alphabetically.</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1054,6 +1066,7 @@ and ordered alphabetically.</p></li>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
