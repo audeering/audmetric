@@ -33,7 +33,8 @@ def accuracy(
             Sample is considered in computation if either prediction or
             ground truth (logical OR) is contained in labels.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
 
     Returns:
@@ -143,7 +144,8 @@ def confusion_matrix(
         prediction: predicted values/classes
         labels: included labels in preferred ordering.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
         normalize: normalize confusion matrix over the rows
 
@@ -532,7 +534,8 @@ def fscore_per_class(
         prediction: predicted values/classes
         labels: included labels in preferred ordering.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
         zero_division: set the value to return when there is a zero division
 
@@ -697,7 +700,8 @@ def precision_per_class(
         prediction: predicted values/classes
         labels: included labels in preferred ordering.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
         zero_division: set the value to return when there is a zero division
 
@@ -741,7 +745,8 @@ def recall_per_class(
         prediction: predicted values/classes
         labels: included labels in preferred ordering.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
         zero_division: set the value to return when there is a zero division
 
@@ -814,7 +819,8 @@ def unweighted_average_bias(
         labels: included labels in preferred ordering.
             The bias is computed only on the specified labels.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
         subgroups: included subgroups in preferred ordering.
             The direction of the bias is determined by the ordering of the
@@ -926,7 +932,8 @@ def unweighted_average_fscore(
         prediction: predicted values/classes
         labels: included labels in preferred ordering.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
         zero_division: set the value to return when there is a zero division
 
@@ -968,7 +975,8 @@ def unweighted_average_precision(
         prediction: predicted values/classes
         labels: included labels in preferred ordering.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
         zero_division: set the value to return when there is a zero division
 
@@ -1010,7 +1018,8 @@ def unweighted_average_recall(
         prediction: predicted values/classes
         labels: included labels in preferred ordering.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
         zero_division: set the value to return when there is a zero division
 
@@ -1056,7 +1065,8 @@ def weighted_confusion_error(
             ``[[w_r0_c0, ..., w_r0_cN], ..., [w_rN_c0, ..., w_rN_cN]]``
         labels: included labels in preferred ordering.
             If no labels are supplied,
-            they will inferred from :math:`\{\text{prediction}, \text{truth}\}`
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
             and ordered alphabetically.
 
     Returns:
