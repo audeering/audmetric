@@ -38,6 +38,7 @@ extensions = [
     'sphinx_autodoc_typehints',
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
+    'sphinxcontrib.katex',  # has to be before jupyter_sphinx
 ]
 
 napoleon_use_ivar = True  # List of class attributes
