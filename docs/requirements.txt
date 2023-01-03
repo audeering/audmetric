@@ -1,7 +1,7 @@
 audeer >=1.18.0
 docutils
 sphinx >=3.5.4
-sphinx-audeering-theme >=1.0.12
+sphinx-audeering-theme >=1.2.1
 sphinx-autodoc-typehints
 sphinx-copybutton
 sphinxcontrib-bibtex >=2.3.0
