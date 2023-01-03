@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>weighted_confusion_error() &mdash; Documentation</title>
@@ -26,12 +25,8 @@
     
 
   
-
-  
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css" type="text/css" />
@@ -61,7 +56,7 @@
 
           <a href="../index.html">
           
-            <img src="../_static/images/audeering.svg" class="logo" alt="audEERING"/>
+            <img src="../_static/images/audeering.png" class="logo" alt="audEERING"/>
           
           
             <span> audmetric</span>
@@ -72,7 +67,7 @@
             
             
               <div class="version">
-                v1.1.5
+                v1.1.6
               </div>
             
           
@@ -154,52 +149,21 @@
         
         <div class="rst-content">
         
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="audmetric.html">audmetric</a> &raquo;</li>
-        
       <li>weighted_confusion_error()</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
-            
-              <a href="https://github.com/audeering/audmetric/blob/v1.1.5/docs/api/audmetric.weighted_confusion_error.rst" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
+              <a href="https://github.com/audeering/audmetric/" class="fa fa-github"> GitHub</a>
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="weighted-confusion-error">
+  <div class="section" id="weighted-confusion-error">
 <h1>weighted_confusion_error()<a class="headerlink" href="#weighted-confusion-error" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.weighted_confusion_error">
@@ -212,7 +176,7 @@ the more costly will be the error. A weight of 0 means that the cell
 is not taken into account for the error, this is usually the case for the
 diagonal as it holds correctly classified samples.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>truth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – ground truth values/classes</p></li>
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted values/classes</p></li>
@@ -227,10 +191,10 @@ they will be inferred from
 and ordered alphabetically.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>weighted confusion error</p>
 </dd>
 </dl>
@@ -245,7 +209,7 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</section>
+</div>
 
 
            </div>
@@ -303,6 +267,9 @@ and ordered alphabetically.</p></li>
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
