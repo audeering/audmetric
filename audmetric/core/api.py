@@ -292,7 +292,7 @@ def edit_distance(
     truth: typing.Union[str, typing.Sequence[int]],
     prediction: typing.Union[str, typing.Sequence[int]]
 ) -> int:
-    r"""Edit distance between two strings of characters or sequences of ints.
+    r"""Edit distance between two sequences of chars or ints.
 
     The implementation follows the `Wagner-Fischer algorithm`_.
 
@@ -793,7 +793,7 @@ def unweighted_average_bias(
             float,
         ] = np.std,
 ) -> float:
-    r"""Compute unweighted average bias with respect to a protected variable.
+    r"""Unweighted average bias of protected variable.
 
     The bias is measured in terms of *equalized odds* which requires
     the classifier to have identical performance for all classes independent
