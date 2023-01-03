@@ -3,7 +3,8 @@ audmetric.utils
 
 .. automodule:: audmetric.utils
 
-infer_labels
-------------
+.. autosummary::
+    :toctree:
+    :nosignatures:
 
-.. autofunction:: infer_labels
+    infer_labels

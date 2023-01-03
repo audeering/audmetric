@@ -15,8 +15,8 @@
     :caption: API Documentation
     :hidden:
 
-    api
-    api-utils
+    api/audmetric
+    api/audmetric.utils
     genindex
 
 .. toctree::
