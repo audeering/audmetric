@@ -43,7 +43,7 @@ def accuracy(
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
 
-    Example:
+    Examples:
         >>> accuracy([0, 0], [0, 1])
         0.5
 
@@ -99,7 +99,7 @@ def concordance_cc(
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
 
-    Example:
+    Examples:
         >>> concordance_cc([0, 1, 2], [0, 1, 1])
         0.6666666666666666
 
@@ -155,7 +155,7 @@ def confusion_matrix(
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
 
-    Example:
+    Examples:
         >>> truth = [0, 1, 2]
         >>> prediction = [0, 2, 0]
         >>> confusion_matrix(truth, prediction)
@@ -237,7 +237,7 @@ def detection_error_tradeoff(
         ValueError: if ``truth`` contains values
             different from ``1, 0, True, False``
 
-    Example:
+    Examples:
         >>> truth = [1, 0]
         >>> prediction = [0.9, 0.1]
         >>> detection_error_tradeoff(truth, prediction)
@@ -292,7 +292,7 @@ def edit_distance(
     truth: typing.Union[str, typing.Sequence[int]],
     prediction: typing.Union[str, typing.Sequence[int]]
 ) -> int:
-    r"""Edit distance between two strings of characters or sequences of ints.
+    r"""Edit distance between two sequences of chars or ints.
 
     The implementation follows the `Wagner-Fischer algorithm`_.
 
@@ -306,7 +306,7 @@ def edit_distance(
     Returns:
         edit distance
 
-    Example:
+    Examples:
         >>> truth = 'lorem'
         >>> prediction = 'lorm'
         >>> edit_distance(truth, prediction)
@@ -410,7 +410,7 @@ def equal_error_rate(
         ValueError: if ``truth`` contains values
             different from ``1, 0, True, False``
 
-    Example:
+    Examples:
         >>> truth = [0, 1, 0, 1, 0]
         >>> prediction = [0.2, 0.8, 0.4, 0.5, 0.5]
         >>> eer, stats = equal_error_rate(truth, prediction)
@@ -487,7 +487,7 @@ def event_error_rate(
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
 
-    Example:
+    Examples:
         >>> event_error_rate([[0, 1]], [[0]])
         0.5
         >>> event_error_rate([[0, 1], [2]], [[0], [2]])
@@ -542,7 +542,7 @@ def fscore_per_class(
     Returns:
         dictionary with label as key and F-score as value
 
-    Example:
+    Examples:
         >>> fscore_per_class([0, 0], [0, 1])
         {0: 0.6666666666666666, 1: 0.0}
 
@@ -594,7 +594,7 @@ def mean_absolute_error(
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
 
-    Example:
+    Examples:
         >>> mean_absolute_error([0, 0], [0, 1])
         0.5
 
@@ -628,7 +628,7 @@ def mean_squared_error(
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
 
-    Example:
+    Examples:
         >>> mean_squared_error([0, 0], [0, 1])
         0.5
 
@@ -665,7 +665,7 @@ def pearson_cc(
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
 
-    Example:
+    Examples:
         >>> pearson_cc([0, 1, 2], [0, 1, 1])
         0.8660254037844385
 
@@ -708,7 +708,7 @@ def precision_per_class(
     Returns:
         dictionary with label as key and precision as value
 
-    Example:
+    Examples:
         >>> precision_per_class([0, 0], [0, 1])
         {0: 1.0, 1: 0.0}
 
@@ -753,7 +753,7 @@ def recall_per_class(
     Returns:
         dictionary with label as key and recall as value
 
-    Example:
+    Examples:
         >>> recall_per_class([0, 0], [0, 1])
         {0: 0.5, 1: 0.0}
 
@@ -793,7 +793,7 @@ def unweighted_average_bias(
             float,
         ] = np.std,
 ) -> float:
-    r"""Compute unweighted average bias with respect to a protected variable.
+    r"""Unweighted average bias of protected variable.
 
     The bias is measured in terms of *equalized odds* which requires
     the classifier to have identical performance for all classes independent
@@ -847,7 +847,7 @@ def unweighted_average_bias(
         ValueError: if ``subgroups`` contains values not contained in
             ``protected_variable``
 
-    Example:
+    Examples:
         >>> unweighted_average_bias([1, 1], [1, 0], ['male', 'female'])
         0.5
         >>> unweighted_average_bias(
@@ -940,7 +940,7 @@ def unweighted_average_fscore(
     Returns:
         unweighted average precision
 
-    Example:
+    Examples:
         >>> unweighted_average_fscore([0, 0], [0, 1])
         0.3333333333333333
 
@@ -983,7 +983,7 @@ def unweighted_average_precision(
     Returns:
         unweighted average precision
 
-    Example:
+    Examples:
         >>> unweighted_average_precision([0, 0], [0, 1])
         0.5
 
@@ -1026,7 +1026,7 @@ def unweighted_average_recall(
     Returns:
         unweighted average recall
 
-    Example:
+    Examples:
         >>> unweighted_average_recall([0, 0], [0, 1])
         0.25
 
@@ -1072,7 +1072,7 @@ def weighted_confusion_error(
     Returns:
         weighted confusion error
 
-    Example:
+    Examples:
 
         >>> truth = [0, 1, 2]
         >>> prediction = [0, 2, 0]
@@ -1114,7 +1114,7 @@ def word_error_rate(
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
 
-    Example:
+    Examples:
         >>> truth = [['lorem', 'ipsum'], ['north', 'wind', 'and', 'sun']]
         >>> prediction = [['lorm', 'ipsum'], ['north', 'wind']]
         >>> word_error_rate(truth, prediction)
