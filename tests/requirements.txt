@@ -4,4 +4,4 @@ pyeer
 pytest
 pytest-doctestplus
 pytest-cov
-sklearn
+scikit-learn
