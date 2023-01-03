@@ -1,0 +1,6 @@
+﻿edit\_distance\(\)
+==================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.edit_distance

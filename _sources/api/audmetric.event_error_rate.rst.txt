@@ -1,0 +1,6 @@
+﻿event\_error\_rate\(\)
+======================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.event_error_rate

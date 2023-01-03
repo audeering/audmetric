@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>audmetric.core.api &mdash; audmetric Documentation</title>
+  <title>audmetric.core.api &mdash; Documentation</title>
   
 
   
@@ -33,6 +33,8 @@
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     
@@ -56,7 +58,7 @@
 
           <a href="../../../index.html">
           
-            <img src="../../../_static/images/audeering.png" class="logo" alt="audEERING"/>
+            <img src="../../../_static/images/audeering.svg" class="logo" alt="audEERING"/>
           
           
             <span> audmetric</span>
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                v1.1.4
+                v1.1.5
               </div>
             
           
@@ -97,8 +99,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../api.html">audmetric</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api-utils.html">audmetric.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audmetric.html">audmetric</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audmetric.utils.html">audmetric.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
@@ -128,14 +130,40 @@
         
         <div class="rst-content">
         
-          <div role="navigation" aria-label="Page navigation">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
       <li>audmetric.core.api</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -158,12 +186,12 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="accuracy"><a class="viewcode-back" href="../../../api.html#audmetric.accuracy">[docs]</a><span class="k">def</span> <span class="nf">accuracy</span><span class="p">(</span>
+<div class="viewcode-block" id="accuracy"><a class="viewcode-back" href="../../../api/audmetric.accuracy.html#audmetric.accuracy">[docs]</a><span class="k">def</span> <span class="nf">accuracy</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Classification accuracy.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Classification accuracy.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -187,7 +215,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; accuracy([0, 0], [0, 1])</span>
 <span class="sd">        0.5</span>
 
@@ -215,11 +243,11 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">prediction</span> <span class="o">==</span> <span class="n">truth</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="concordance_cc"><a class="viewcode-back" href="../../../api.html#audmetric.concordance_cc">[docs]</a><span class="k">def</span> <span class="nf">concordance_cc</span><span class="p">(</span>
+<div class="viewcode-block" id="concordance_cc"><a class="viewcode-back" href="../../../api/audmetric.concordance_cc.html#audmetric.concordance_cc">[docs]</a><span class="k">def</span> <span class="nf">concordance_cc</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concordance correlation coefficient.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concordance correlation coefficient.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -243,7 +271,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; concordance_cc([0, 1, 2], [0, 1, 1])</span>
 <span class="sd">        0.6666666666666666</span>
 
@@ -274,14 +302,14 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">ccc</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="confusion_matrix"><a class="viewcode-back" href="../../../api.html#audmetric.confusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">confusion_matrix</span><span class="p">(</span>
+<div class="viewcode-block" id="confusion_matrix"><a class="viewcode-back" href="../../../api/audmetric.confusion_matrix.html#audmetric.confusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">confusion_matrix</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confusion matrix.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confusion matrix.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        truth: ground truth values/classes</span>
@@ -299,7 +327,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; truth = [0, 1, 2]</span>
 <span class="sd">        &gt;&gt;&gt; prediction = [0, 2, 0]</span>
 <span class="sd">        &gt;&gt;&gt; confusion_matrix(truth, prediction)</span>
@@ -331,7 +359,7 @@
     <span class="k">return</span> <span class="n">matrix</span></div>
 
 
-<div class="viewcode-block" id="detection_error_tradeoff"><a class="viewcode-back" href="../../../api.html#audmetric.detection_error_tradeoff">[docs]</a><span class="k">def</span> <span class="nf">detection_error_tradeoff</span><span class="p">(</span>
+<div class="viewcode-block" id="detection_error_tradeoff"><a class="viewcode-back" href="../../../api/audmetric.detection_error_tradeoff.html#audmetric.detection_error_tradeoff">[docs]</a><span class="k">def</span> <span class="nf">detection_error_tradeoff</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
         <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
         <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
@@ -341,7 +369,7 @@
         <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
     <span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Detection error tradeoff for verification experiments.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Detection error tradeoff for verification experiments.</span>
 
 <span class="sd">    The `detection error tradeoff (DET)`_</span>
 <span class="sd">    is a graph showing</span>
@@ -381,7 +409,7 @@
 <span class="sd">        ValueError: if ``truth`` contains values</span>
 <span class="sd">            different from ``1, 0, True, False``</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; truth = [1, 0]</span>
 <span class="sd">        &gt;&gt;&gt; prediction = [0.9, 0.1]</span>
 <span class="sd">        &gt;&gt;&gt; detection_error_tradeoff(truth, prediction)</span>
@@ -396,7 +424,7 @@
             <span class="s2">&quot;&#39;truth&#39; is only allowed to contain &quot;</span>
             <span class="s2">&quot;[1, 0, True, False], &quot;</span>
             <span class="s1">&#39;yours contains:</span><span class="se">\n</span><span class="s1">&#39;</span>
-            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">truth</span><span class="p">)])</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">set</span><span class="p">(</span><span class="n">truth</span><span class="p">)])</span><span class="si">}</span><span class="s2">]&quot;</span>
         <span class="p">)</span>
 
     <span class="n">truth</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
@@ -432,11 +460,11 @@
     <span class="k">return</span> <span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span></div>
 
 
-<div class="viewcode-block" id="edit_distance"><a class="viewcode-back" href="../../../api.html#audmetric.edit_distance">[docs]</a><span class="k">def</span> <span class="nf">edit_distance</span><span class="p">(</span>
+<div class="viewcode-block" id="edit_distance"><a class="viewcode-back" href="../../../api/audmetric.edit_distance.html#audmetric.edit_distance">[docs]</a><span class="k">def</span> <span class="nf">edit_distance</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Edit distance between two strings of characters or sequences of ints.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Edit distance between two sequences of chars or ints.</span>
 
 <span class="sd">    The implementation follows the `Wagner-Fischer algorithm`_.</span>
 
@@ -450,7 +478,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        edit distance</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; truth = &#39;lorem&#39;</span>
 <span class="sd">        &gt;&gt;&gt; prediction = &#39;lorm&#39;</span>
 <span class="sd">        &gt;&gt;&gt; edit_distance(truth, prediction)</span>
@@ -490,7 +518,7 @@
     <span class="k">return</span> <span class="n">m1</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)]</span></div>
 
 
-<div class="viewcode-block" id="equal_error_rate"><a class="viewcode-back" href="../../../api.html#audmetric.equal_error_rate">[docs]</a><span class="k">def</span> <span class="nf">equal_error_rate</span><span class="p">(</span>
+<div class="viewcode-block" id="equal_error_rate"><a class="viewcode-back" href="../../../api/audmetric.equal_error_rate.html#audmetric.equal_error_rate">[docs]</a><span class="k">def</span> <span class="nf">equal_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
         <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
         <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
@@ -500,7 +528,7 @@
         <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
     <span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">namedtuple</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Equal error rate for verification tasks.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Equal error rate for verification tasks.</span>
 
 <span class="sd">    The equal error rate (EER) is the point</span>
 <span class="sd">    where false non-match rate (FNMR)</span>
@@ -554,7 +582,7 @@
 <span class="sd">        ValueError: if ``truth`` contains values</span>
 <span class="sd">            different from ``1, 0, True, False``</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; truth = [0, 1, 0, 1, 0]</span>
 <span class="sd">        &gt;&gt;&gt; prediction = [0.2, 0.8, 0.4, 0.5, 0.5]</span>
 <span class="sd">        &gt;&gt;&gt; eer, stats = equal_error_rate(truth, prediction)</span>
@@ -602,7 +630,7 @@
     <span class="k">return</span> <span class="n">eer</span><span class="p">,</span> <span class="n">Stats</span><span class="p">(</span><span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="event_error_rate"><a class="viewcode-back" href="../../../api.html#audmetric.event_error_rate">[docs]</a><span class="k">def</span> <span class="nf">event_error_rate</span><span class="p">(</span>
+<div class="viewcode-block" id="event_error_rate"><a class="viewcode-back" href="../../../api/audmetric.event_error_rate.html#audmetric.event_error_rate">[docs]</a><span class="k">def</span> <span class="nf">event_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
         <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span>
     <span class="p">],</span>
@@ -610,7 +638,7 @@
         <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span>
     <span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Event error rate based on edit distance.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Event error rate based on edit distance.</span>
 
 <span class="sd">    The event error rate is computed by aggregating the mean edit</span>
 <span class="sd">    distances of each (truth, prediction)-pair and averaging the</span>
@@ -631,7 +659,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; event_error_rate([[0, 1]], [[0]])</span>
 <span class="sd">        0.5</span>
 <span class="sd">        &gt;&gt;&gt; event_error_rate([[0, 1], [2]], [[0], [2]])</span>
@@ -658,14 +686,14 @@
     <span class="k">return</span> <span class="n">eer</span> <span class="o">/</span> <span class="n">num_samples</span></div>
 
 
-<div class="viewcode-block" id="fscore_per_class"><a class="viewcode-back" href="../../../api.html#audmetric.fscore_per_class">[docs]</a><span class="k">def</span> <span class="nf">fscore_per_class</span><span class="p">(</span>
+<div class="viewcode-block" id="fscore_per_class"><a class="viewcode-back" href="../../../api/audmetric.fscore_per_class.html#audmetric.fscore_per_class">[docs]</a><span class="k">def</span> <span class="nf">fscore_per_class</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;F-score per class.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;F-score per class.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -686,7 +714,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        dictionary with label as key and F-score as value</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; fscore_per_class([0, 0], [0, 1])</span>
 <span class="sd">        {0: 0.6666666666666666, 1: 0.0}</span>
 
@@ -717,11 +745,11 @@
     <span class="k">return</span> <span class="n">fscore</span></div>
 
 
-<div class="viewcode-block" id="mean_absolute_error"><a class="viewcode-back" href="../../../api.html#audmetric.mean_absolute_error">[docs]</a><span class="k">def</span> <span class="nf">mean_absolute_error</span><span class="p">(</span>
+<div class="viewcode-block" id="mean_absolute_error"><a class="viewcode-back" href="../../../api/audmetric.mean_absolute_error.html#audmetric.mean_absolute_error">[docs]</a><span class="k">def</span> <span class="nf">mean_absolute_error</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mean absolute error.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mean absolute error.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -738,7 +766,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; mean_absolute_error([0, 0], [0, 1])</span>
 <span class="sd">        0.5</span>
 
@@ -751,11 +779,11 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">truth</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="mean_squared_error"><a class="viewcode-back" href="../../../api.html#audmetric.mean_squared_error">[docs]</a><span class="k">def</span> <span class="nf">mean_squared_error</span><span class="p">(</span>
+<div class="viewcode-block" id="mean_squared_error"><a class="viewcode-back" href="../../../api/audmetric.mean_squared_error.html#audmetric.mean_squared_error">[docs]</a><span class="k">def</span> <span class="nf">mean_squared_error</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mean squared error.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mean squared error.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -772,7 +800,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; mean_squared_error([0, 0], [0, 1])</span>
 <span class="sd">        0.5</span>
 
@@ -785,11 +813,11 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">truth</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="pearson_cc"><a class="viewcode-back" href="../../../api.html#audmetric.pearson_cc">[docs]</a><span class="k">def</span> <span class="nf">pearson_cc</span><span class="p">(</span>
+<div class="viewcode-block" id="pearson_cc"><a class="viewcode-back" href="../../../api/audmetric.pearson_cc.html#audmetric.pearson_cc">[docs]</a><span class="k">def</span> <span class="nf">pearson_cc</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pearson correlation coefficient.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pearson correlation coefficient.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -809,7 +837,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; pearson_cc([0, 1, 2], [0, 1, 1])</span>
 <span class="sd">        0.8660254037844385</span>
 
@@ -825,14 +853,14 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">truth</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="precision_per_class"><a class="viewcode-back" href="../../../api.html#audmetric.precision_per_class">[docs]</a><span class="k">def</span> <span class="nf">precision_per_class</span><span class="p">(</span>
+<div class="viewcode-block" id="precision_per_class"><a class="viewcode-back" href="../../../api/audmetric.precision_per_class.html#audmetric.precision_per_class">[docs]</a><span class="k">def</span> <span class="nf">precision_per_class</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Precision per class.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Precision per class.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -852,7 +880,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        dictionary with label as key and precision as value</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; precision_per_class([0, 0], [0, 1])</span>
 <span class="sd">        {0: 1.0, 1: 0.0}</span>
 
@@ -870,14 +898,14 @@
     <span class="k">return</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">recall</span><span class="p">)}</span></div>
 
 
-<div class="viewcode-block" id="recall_per_class"><a class="viewcode-back" href="../../../api.html#audmetric.recall_per_class">[docs]</a><span class="k">def</span> <span class="nf">recall_per_class</span><span class="p">(</span>
+<div class="viewcode-block" id="recall_per_class"><a class="viewcode-back" href="../../../api/audmetric.recall_per_class.html#audmetric.recall_per_class">[docs]</a><span class="k">def</span> <span class="nf">recall_per_class</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recall per class.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recall per class.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -897,7 +925,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        dictionary with label as key and recall as value</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; recall_per_class([0, 0], [0, 1])</span>
 <span class="sd">        {0: 0.5, 1: 0.0}</span>
 
@@ -915,7 +943,7 @@
     <span class="k">return</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">recall</span><span class="p">)}</span></div>
 
 
-<div class="viewcode-block" id="unweighted_average_bias"><a class="viewcode-back" href="../../../api.html#audmetric.unweighted_average_bias">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_bias</span><span class="p">(</span>
+<div class="viewcode-block" id="unweighted_average_bias"><a class="viewcode-back" href="../../../api/audmetric.unweighted_average_bias.html#audmetric.unweighted_average_bias">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_bias</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">protected_variable</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
@@ -937,7 +965,7 @@
             <span class="nb">float</span><span class="p">,</span>
         <span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute unweighted average bias with respect to a protected variable.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average bias of protected variable.</span>
 
 <span class="sd">    The bias is measured in terms of *equalized odds* which requires</span>
 <span class="sd">    the classifier to have identical performance for all classes independent</span>
@@ -991,7 +1019,7 @@
 <span class="sd">        ValueError: if ``subgroups`` contains values not contained in</span>
 <span class="sd">            ``protected_variable``</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; unweighted_average_bias([1, 1], [1, 0], [&#39;male&#39;, &#39;female&#39;])</span>
 <span class="sd">        0.5</span>
 <span class="sd">        &gt;&gt;&gt; unweighted_average_bias(</span>
@@ -1055,14 +1083,14 @@
     <span class="k">return</span> <span class="n">bias</span> <span class="o">/</span> <span class="n">denominator</span></div>
 
 
-<div class="viewcode-block" id="unweighted_average_fscore"><a class="viewcode-back" href="../../../api.html#audmetric.unweighted_average_fscore">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_fscore</span><span class="p">(</span>
+<div class="viewcode-block" id="unweighted_average_fscore"><a class="viewcode-back" href="../../../api/audmetric.unweighted_average_fscore.html#audmetric.unweighted_average_fscore">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_fscore</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average F-score.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average F-score.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -1084,7 +1112,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        unweighted average precision</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; unweighted_average_fscore([0, 0], [0, 1])</span>
 <span class="sd">        0.3333333333333333</span>
 
@@ -1099,14 +1127,14 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">fscore</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="unweighted_average_precision"><a class="viewcode-back" href="../../../api.html#audmetric.unweighted_average_precision">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_precision</span><span class="p">(</span>
+<div class="viewcode-block" id="unweighted_average_precision"><a class="viewcode-back" href="../../../api/audmetric.unweighted_average_precision.html#audmetric.unweighted_average_precision">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_precision</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average precision.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average precision.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -1127,7 +1155,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        unweighted average precision</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; unweighted_average_precision([0, 0], [0, 1])</span>
 <span class="sd">        0.5</span>
 
@@ -1142,14 +1170,14 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">precision</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="unweighted_average_recall"><a class="viewcode-back" href="../../../api.html#audmetric.unweighted_average_recall">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_recall</span><span class="p">(</span>
+<div class="viewcode-block" id="unweighted_average_recall"><a class="viewcode-back" href="../../../api/audmetric.unweighted_average_recall.html#audmetric.unweighted_average_recall">[docs]</a><span class="k">def</span> <span class="nf">unweighted_average_recall</span><span class="p">(</span>
         <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average recall.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unweighted average recall.</span>
 
 <span class="sd">    .. math::</span>
 
@@ -1170,7 +1198,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        unweighted average recall</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; unweighted_average_recall([0, 0], [0, 1])</span>
 <span class="sd">        0.25</span>
 
@@ -1185,13 +1213,13 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">recall</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="weighted_confusion_error"><a class="viewcode-back" href="../../../api.html#audmetric.weighted_confusion_error">[docs]</a><span class="k">def</span> <span class="nf">weighted_confusion_error</span><span class="p">(</span>
+<div class="viewcode-block" id="weighted_confusion_error"><a class="viewcode-back" href="../../../api/audmetric.weighted_confusion_error.html#audmetric.weighted_confusion_error">[docs]</a><span class="k">def</span> <span class="nf">weighted_confusion_error</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">weights</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Weighted confusion error.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Weighted confusion error.</span>
 
 <span class="sd">    Computes the normalized confusion matrix, applies given weights to each</span>
 <span class="sd">    cell and sums them up. Weights are expected as positive numbers and</span>
@@ -1216,7 +1244,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        weighted confusion error</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 
 <span class="sd">        &gt;&gt;&gt; truth = [0, 1, 2]</span>
 <span class="sd">        &gt;&gt;&gt; prediction = [0, 2, 0]</span>
@@ -1242,11 +1270,11 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weighted_cm</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="word_error_rate"><a class="viewcode-back" href="../../../api.html#audmetric.word_error_rate">[docs]</a><span class="k">def</span> <span class="nf">word_error_rate</span><span class="p">(</span>
+<div class="viewcode-block" id="word_error_rate"><a class="viewcode-back" href="../../../api/audmetric.word_error_rate.html#audmetric.word_error_rate">[docs]</a><span class="k">def</span> <span class="nf">word_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Word error rate based on edit distance.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Word error rate based on edit distance.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        truth: ground truth strings</span>
@@ -1258,7 +1286,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: if ``truth`` and ``prediction`` differ in length</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; truth = [[&#39;lorem&#39;, &#39;ipsum&#39;], [&#39;north&#39;, &#39;wind&#39;, &#39;and&#39;, &#39;sun&#39;]]</span>
 <span class="sd">        &gt;&gt;&gt; prediction = [[&#39;lorm&#39;, &#39;ipsum&#39;], [&#39;north&#39;, &#39;wind&#39;]]</span>
 <span class="sd">        &gt;&gt;&gt; word_error_rate(truth, prediction)</span>
@@ -1297,7 +1325,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1305,7 +1333,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2022 audEERING GmbH
+      &copy; 2019-2023 audEERING GmbH
     </p>
   </div> 
 
@@ -1330,10 +1358,8 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>
     

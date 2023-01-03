@@ -1,0 +1,6 @@
+﻿mean\_absolute\_error\(\)
+=========================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.mean_absolute_error

@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>audmetric &mdash; Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="accuracy()" href="audmetric.accuracy.html" />
+    <link rel="prev" title="Installation" href="../install.html" />
+    
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../index.html">
+          
+            <img src="../_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audmetric</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.1.5
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">audmetric</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.accuracy.html">accuracy()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.concordance_cc.html">concordance_cc()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.confusion_matrix.html">confusion_matrix()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.detection_error_tradeoff.html">detection_error_tradeoff()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.edit_distance.html">edit_distance()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.equal_error_rate.html">equal_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.event_error_rate.html">event_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.mean_absolute_error.html">mean_absolute_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.mean_squared_error.html">mean_squared_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.pearson_cc.html">pearson_cc()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.fscore_per_class.html">fscore_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.precision_per_class.html">precision_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.recall_per_class.html">recall_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_bias.html">unweighted_average_bias()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_fscore.html">unweighted_average_fscore()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_precision.html">unweighted_average_precision()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_recall.html">unweighted_average_recall()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.weighted_confusion_error.html">weighted_confusion_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.word_error_rate.html">word_error_rate()</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="audmetric.utils.html">audmetric.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">audmetric</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>audmetric</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/audeering/audmetric/blob/v1.1.5/docs/api/audmetric.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-audmetric">
+<span id="audmetric"></span><h1>audmetric<a class="headerlink" href="#module-audmetric" title="Permalink to this heading">¶</a></h1>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.accuracy.html#audmetric.accuracy" title="audmetric.accuracy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accuracy</span></code></a></p></td>
+<td><p>Classification accuracy.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.concordance_cc.html#audmetric.concordance_cc" title="audmetric.concordance_cc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concordance_cc</span></code></a></p></td>
+<td><p>Concordance correlation coefficient.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.confusion_matrix.html#audmetric.confusion_matrix" title="audmetric.confusion_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">confusion_matrix</span></code></a></p></td>
+<td><p>Confusion matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.detection_error_tradeoff.html#audmetric.detection_error_tradeoff" title="audmetric.detection_error_tradeoff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detection_error_tradeoff</span></code></a></p></td>
+<td><p>Detection error tradeoff for verification experiments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.edit_distance.html#audmetric.edit_distance" title="audmetric.edit_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edit_distance</span></code></a></p></td>
+<td><p>Edit distance between two sequences of chars or ints.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.equal_error_rate.html#audmetric.equal_error_rate" title="audmetric.equal_error_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_error_rate</span></code></a></p></td>
+<td><p>Equal error rate for verification tasks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.event_error_rate.html#audmetric.event_error_rate" title="audmetric.event_error_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">event_error_rate</span></code></a></p></td>
+<td><p>Event error rate based on edit distance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.mean_absolute_error.html#audmetric.mean_absolute_error" title="audmetric.mean_absolute_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_absolute_error</span></code></a></p></td>
+<td><p>Mean absolute error.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.mean_squared_error.html#audmetric.mean_squared_error" title="audmetric.mean_squared_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_squared_error</span></code></a></p></td>
+<td><p>Mean squared error.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.pearson_cc.html#audmetric.pearson_cc" title="audmetric.pearson_cc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pearson_cc</span></code></a></p></td>
+<td><p>Pearson correlation coefficient.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.fscore_per_class.html#audmetric.fscore_per_class" title="audmetric.fscore_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fscore_per_class</span></code></a></p></td>
+<td><p>F-score per class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.precision_per_class.html#audmetric.precision_per_class" title="audmetric.precision_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">precision_per_class</span></code></a></p></td>
+<td><p>Precision per class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.recall_per_class.html#audmetric.recall_per_class" title="audmetric.recall_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recall_per_class</span></code></a></p></td>
+<td><p>Recall per class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.unweighted_average_bias.html#audmetric.unweighted_average_bias" title="audmetric.unweighted_average_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_bias</span></code></a></p></td>
+<td><p>Unweighted average bias of protected variable.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.unweighted_average_fscore.html#audmetric.unweighted_average_fscore" title="audmetric.unweighted_average_fscore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_fscore</span></code></a></p></td>
+<td><p>Unweighted average F-score.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.unweighted_average_precision.html#audmetric.unweighted_average_precision" title="audmetric.unweighted_average_precision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_precision</span></code></a></p></td>
+<td><p>Unweighted average precision.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.unweighted_average_recall.html#audmetric.unweighted_average_recall" title="audmetric.unweighted_average_recall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_recall</span></code></a></p></td>
+<td><p>Unweighted average recall.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.weighted_confusion_error.html#audmetric.weighted_confusion_error" title="audmetric.weighted_confusion_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weighted_confusion_error</span></code></a></p></td>
+<td><p>Weighted confusion error.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.word_error_rate.html#audmetric.word_error_rate" title="audmetric.word_error_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">word_error_rate</span></code></a></p></td>
+<td><p>Word error rate based on edit distance.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="audmetric.accuracy.html" class="btn btn-neutral float-right" title="accuracy()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2019-2023 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

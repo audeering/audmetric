@@ -1,0 +1,6 @@
+﻿confusion\_matrix\(\)
+=====================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.confusion_matrix

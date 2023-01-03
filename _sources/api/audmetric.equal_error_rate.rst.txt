@@ -1,0 +1,6 @@
+﻿equal\_error\_rate\(\)
+======================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.equal_error_rate

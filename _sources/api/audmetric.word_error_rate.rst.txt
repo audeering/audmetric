@@ -1,0 +1,6 @@
+﻿word\_error\_rate\(\)
+=====================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.word_error_rate

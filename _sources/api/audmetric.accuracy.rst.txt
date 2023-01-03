@@ -1,0 +1,6 @@
+﻿accuracy\(\)
+============
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.accuracy

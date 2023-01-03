@@ -1,0 +1,6 @@
+﻿unweighted\_average\_fscore\(\)
+===============================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.unweighted_average_fscore

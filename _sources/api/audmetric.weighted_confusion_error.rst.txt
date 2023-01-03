@@ -1,0 +1,6 @@
+﻿weighted\_confusion\_error\(\)
+==============================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.weighted_confusion_error

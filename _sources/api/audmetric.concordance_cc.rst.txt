@@ -1,0 +1,6 @@
+﻿concordance\_cc\(\)
+===================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.concordance_cc

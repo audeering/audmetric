@@ -1,0 +1,6 @@
+﻿detection\_error\_tradeoff\(\)
+==============================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.detection_error_tradeoff

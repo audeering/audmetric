@@ -1,0 +1,6 @@
+﻿unweighted\_average\_precision\(\)
+==================================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.unweighted_average_precision

@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; audmetric Documentation</title>
+  <title>Installation &mdash; Documentation</title>
   
 
   
@@ -33,9 +34,11 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="audmetric" href="api.html" />
+    <link rel="next" title="audmetric" href="api/audmetric.html" />
     <link rel="prev" title="audmetric" href="index.html" />
     
   
@@ -58,7 +61,7 @@
 
           <a href="index.html">
           
-            <img src="_static/images/audeering.png" class="logo" alt="audEERING"/>
+            <img src="_static/images/audeering.svg" class="logo" alt="audEERING"/>
           
           
             <span> audmetric</span>
@@ -69,7 +72,7 @@
             
             
               <div class="version">
-                v1.1.4
+                v1.1.5
               </div>
             
           
@@ -99,8 +102,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">audmetric</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api-utils.html">audmetric.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/audmetric.html">audmetric</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/audmetric.utils.html">audmetric.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
@@ -130,29 +133,59 @@
         
         <div class="rst-content">
         
-          <div role="navigation" aria-label="Page navigation">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
       <li>Installation</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/audeering/audmetric/" class="fa fa-github"> GitHub</a>
+        
+            
+            
+              <a href="https://github.com/audeering/audmetric/blob/v1.1.5/docs/install.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
+  <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
-<p>To install <a class="reference internal" href="api.html#module-audmetric" title="audmetric"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmetric</span></code></a> run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="c1"># Create and activate Python virtual environment, e.g.</span>
-$ <span class="c1"># virtualenv --python=python3 ${HOME}/.envs/audmetric</span>
-$ <span class="c1"># source ${HOME}/.envs/audmetric/bin/activate</span>
-$ pip install audmetric
+<p>To install <a class="reference internal" href="api/audmetric.html#module-audmetric" title="audmetric"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmetric</span></code></a> run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="c1"># Create and activate Python virtual environment, e.g.</span>
+$<span class="w"> </span><span class="c1"># virtualenv --python=python3 ${HOME}/.envs/audmetric</span>
+$<span class="w"> </span><span class="c1"># source ${HOME}/.envs/audmetric/bin/activate</span>
+$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>audmetric
 </pre></div>
 </div>
-</div>
+</section>
 
 
            </div>
@@ -162,7 +195,7 @@ $ pip install audmetric
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="api.html" class="btn btn-neutral float-right" title="audmetric" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="api/audmetric.html" class="btn btn-neutral float-right" title="audmetric" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral float-left" title="audmetric" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -177,7 +210,7 @@ $ pip install audmetric
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -185,7 +218,7 @@ $ pip install audmetric
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2022 audEERING GmbH
+      &copy; 2019-2023 audEERING GmbH
     </p>
   </div> 
 
@@ -210,10 +243,8 @@ $ pip install audmetric
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
     

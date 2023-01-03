@@ -1,0 +1,6 @@
+﻿infer\_labels\(\)
+=================
+
+.. currentmodule:: audmetric.utils
+
+.. autofunction:: audmetric.utils.infer_labels

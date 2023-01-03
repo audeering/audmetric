@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>unweighted_average_bias() &mdash; Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="unweighted_average_fscore()" href="audmetric.unweighted_average_fscore.html" />
+    <link rel="prev" title="recall_per_class()" href="audmetric.recall_per_class.html" />
+    
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../index.html">
+          
+            <img src="../_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audmetric</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.1.5
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="audmetric.html">audmetric</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audmetric.accuracy.html">accuracy()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.concordance_cc.html">concordance_cc()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.confusion_matrix.html">confusion_matrix()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.detection_error_tradeoff.html">detection_error_tradeoff()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.edit_distance.html">edit_distance()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.equal_error_rate.html">equal_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.event_error_rate.html">event_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.mean_absolute_error.html">mean_absolute_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.mean_squared_error.html">mean_squared_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.pearson_cc.html">pearson_cc()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.fscore_per_class.html">fscore_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.precision_per_class.html">precision_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.recall_per_class.html">recall_per_class()</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">unweighted_average_bias()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_fscore.html">unweighted_average_fscore()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_precision.html">unweighted_average_precision()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_recall.html">unweighted_average_recall()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.weighted_confusion_error.html">weighted_confusion_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.word_error_rate.html">word_error_rate()</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="audmetric.utils.html">audmetric.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">audmetric</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="audmetric.html">audmetric</a> &raquo;</li>
+        
+      <li>unweighted_average_bias()</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/audeering/audmetric/blob/v1.1.5/docs/api/audmetric.unweighted_average_bias.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="unweighted-average-bias">
+<h1>unweighted_average_bias()<a class="headerlink" href="#unweighted-average-bias" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="audmetric.unweighted_average_bias">
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">unweighted_average_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protected_variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroups=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric=&lt;function</span> <span class="pre">fscore_per_class&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">std&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#unweighted_average_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.unweighted_average_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unweighted average bias of protected variable.</p>
+<p>The bias is measured in terms of <em>equalized odds</em> which requires
+the classifier to have identical performance for all classes independent
+of a protected variable such as race. The performance of the classifier
+for its different classes can be assessed with standard metrics
+such as <em>recall</em> or <em>precision</em>. The difference in performance, denoted
+as score divergence, can be computed in different ways, as well.
+For two subgroups the (absolute) difference serves as a standard choice.
+For more than two subgroups the score divergence could be estimated by
+the standard deviation of the scores.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If for a class less than two subgroups exhibit a performance score,
+the corresponding class is ignored in the bias computation.
+This occurs if there is no class sample for a subgroup,
+e.g. no negative (class label) female (subgroup of sex).</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>truth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – ground truth classes</p></li>
+<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – predicted classes</p></li>
+<li><p><strong>protected_variable</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – manifestations of protected variable such as
+subgroups “male” and “female” of variable “sex”</p></li>
+<li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included labels in preferred ordering.
+The bias is computed only on the specified labels.
+If no labels are supplied,
+they will be inferred from
+<span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">{</mo><mtext>prediction</mtext><mo separator="true">,</mo><mtext>truth</mtext><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\{\text{prediction}, \text{truth}\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord text"><span class="mord">prediction</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">truth</span></span><span class="mclose">}</span></span></span></span></span>
+and ordered alphabetically.</p></li>
+<li><p><strong>subgroups</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – included subgroups in preferred ordering.
+The direction of the bias is determined by the ordering of the
+subgroups.
+Besides, the bias is computed only on the specified subgroups.
+If no subgroups are supplied, they will be inferred from
+<span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>protected_variable</mtext></mrow><annotation encoding="application/x-tex">\text{protected\_variable}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord text"><span class="mord">protected_variable</span></span></span></span></span></span> and ordered alphanumerically.</p></li>
+<li><p><strong>metric</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – metric which equalized odds are measured with.
+Typical choices are: <a class="reference internal" href="audmetric.recall_per_class.html#audmetric.recall_per_class" title="audmetric.recall_per_class"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmetric.recall_per_class()</span></code></a>,
+<a class="reference internal" href="audmetric.precision_per_class.html#audmetric.precision_per_class" title="audmetric.precision_per_class"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmetric.precision_per_class()</span></code></a> or
+<a class="reference internal" href="audmetric.fscore_per_class.html#audmetric.fscore_per_class" title="audmetric.fscore_per_class"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmetric.fscore_per_class()</span></code></a></p></li>
+<li><p><strong>reduction</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]], <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – specifies the reduction operation to measure the divergence
+between the scores of the subgroups of the protected variable
+for each class. Typical choices are:
+difference or absolute difference between scores for two subgroups
+and standard deviation of scores for more than two subgroups.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>unweighted average bias</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">truth</span></code>, <code class="docutils literal notranslate"><span class="pre">prediction</span></code> and <code class="docutils literal notranslate"><span class="pre">protected_variable</span></code>
+    have different lengths</p></li>
+<li><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">subgroups</span></code> contains values not contained in
+    <code class="docutils literal notranslate"><span class="pre">protected_variable</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unweighted_average_bias</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;male&#39;</span><span class="p">,</span> <span class="s1">&#39;female&#39;</span><span class="p">])</span>
+<span class="go">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unweighted_average_bias</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;male&#39;</span><span class="p">,</span> <span class="s1">&#39;female&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgroups</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;female&#39;</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">reduction</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">-1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unweighted_average_bias</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;male&#39;</span><span class="p">,</span> <span class="s1">&#39;female&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">metric</span><span class="o">=</span><span class="n">recall_per_class</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">nan</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unweighted_average_bias</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">metric</span><span class="o">=</span><span class="n">recall_per_class</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">0.5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="audmetric.unweighted_average_fscore.html" class="btn btn-neutral float-right" title="unweighted_average_fscore()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="audmetric.recall_per_class.html" class="btn btn-neutral float-left" title="recall_per_class()" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2019-2023 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

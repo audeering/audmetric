@@ -1,0 +1,6 @@
+﻿pearson\_cc\(\)
+===============
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.pearson_cc
