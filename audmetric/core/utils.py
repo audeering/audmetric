@@ -71,7 +71,7 @@ def scores_per_subgroup_and_class(
         ValueError: if `subgroups` contains values not contained in
             `protected_variable`
 
-    Example:
+    Examples:
         >>> import audmetric
         >>> scores_per_subgroup_and_class(
         ...     [1, 1], [0, 1], ['male', 'female'], audmetric.recall_per_class,
