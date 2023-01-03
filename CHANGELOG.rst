@@ -10,7 +10,7 @@ and this project adheres to `Semantic Versioning`_.
 Version 1.1.6 (2023/01/03)
 --------------------------
 
-* Fixed: require ``sphinx-audeering-theme >=1.2.1``
+* Fixed: require ``sphinx-audeering-theme>=1.2.1``
   to enforce correct theme
   in published docs
 
