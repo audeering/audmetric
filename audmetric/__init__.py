@@ -8,6 +8,7 @@ from audmetric.core.api import (
     equal_error_rate,
     event_error_rate,
     fscore_per_class,
+    linkability,
     mean_absolute_error,
     mean_squared_error,
     pearson_cc,
