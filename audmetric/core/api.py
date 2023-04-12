@@ -574,11 +574,25 @@ def linkability(
 ) -> float:
     r"""Linkability for verification tasks.
 
-    ...
+    Let :math:`s` be the provided prediction score
+    for the similarity of the tested sample.
+    The clipped local linkability metric is then defined as:
+
+    .. math::
+
+        \text{max}(0, p(\text{mated} | s) - p(\text{non-mated} | s))
+
+    The higher the value the more likely
+    that an attacker can link two mated samples.
+    The global linkability metric :math:`D_\text{sys}`
+    is the mean value
+    over all local scores.\ :footcite:`GomezBarrero2017`
 
     Implementation is based on
     `code from M. Maouche`_,
     which is licensed under LGPL.
+
+    .. footbibliography::
 
     .. _code from M. Maouche: https://gitlab.inria.fr/magnet/anonymization_metrics
 
@@ -594,21 +608,16 @@ def linkability(
 
     Raises:
         ValueError: if ``truth`` contains values
-            different from ``1, 0, True, False``
+            different from ``1``, ``0``, ``True``, ``False``
 
     Examples:
-        >>> truth = [1, 0]
-        >>> prediction = [0.9, 0.1]
+        >>> truth = [1, 1, 0, 0]
+        >>> prediction = [0.9, 0.85, 0.1, 0.05]
+        >>> linkability(truth, prediction)
+        0.4999999999999999
+        >>> prediction = [0.1, 0.11, 0.09, 0.13]
         >>> linkability(truth, prediction)
         0.0
-
-    Notes:
-        Adaptation of the linkability measure of Gomez-Barrero et al. [1]
-
-        [1] Gomez-Barrero, M., Galbally, J., Rathgeb, C. and Busch,
-        C., 2017. General framework to evaluate unlinkability in biometric
-        template protection systems. IEEE Transactions on Information
-        Forensics and Security, 13(6), pp.1406-1420.
 
     """  # noqa: E501
     mated_scores, non_mated_scores = _matching_scores(truth, prediction)
@@ -617,6 +626,7 @@ def linkability(
     # (100 maximum or lower if few scores available)
     if nbins is None:
         nbins = min(int(len(mated_scores) / 10), 100)
+        nbins = max(len(mated_scores), nbins)
 
     # Define range of scores to compute D
     bin_edges = np.linspace(
