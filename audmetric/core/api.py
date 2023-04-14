@@ -600,7 +600,7 @@ def linkability(
         truth: ground truth classes
         prediction: predicted classes or similarity scores
         omega: prior ratio
-            :math:`\frac{P_\text{mated}}{P_\text{non-mated}}`
+            :math:`\frac{p(\text{mated})}{p(\text{non-mated})}`
         nbins: number of bins ...
 
     Returns:
@@ -611,13 +611,20 @@ def linkability(
             different from ``1``, ``0``, ``True``, ``False``
 
     Examples:
-        >>> truth = [1, 1, 0, 0]
-        >>> prediction = [0.9, 0.85, 0.1, 0.05]
+        >>> np.random.seed(1)
+        >>> samples = 10000
+        >>> truth = [1, 0] * int(samples / 2)
+        >>> prediction = []
+        >>> for _ in range(int(samples / 2)):
+        ...     prediction.extend(
+        ...         [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
+        ...     )
         >>> linkability(truth, prediction)
-        0.4999999999999999
-        >>> prediction = [0.1, 0.11, 0.09, 0.13]
-        >>> linkability(truth, prediction)
-        0.0
+        0.9990000000000006
+        >>> truth = [1, 0, 0, 0] * int(samples / 4)
+        >>> prediction = [np.random.uniform(0, 1) for _ in range(samples)]
+        >>> linkability(truth, prediction, omega=1/3)
+        0.11513142857142902
 
     """  # noqa: E501
     mated_scores, non_mated_scores = _matching_scores(truth, prediction)
