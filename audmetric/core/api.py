@@ -106,8 +106,10 @@ def concordance_cc(
     """
     assert_equal_length(truth, prediction)
 
-    prediction = np.array(list(prediction))
-    truth = np.array(list(truth))
+    if not isinstance(truth, np.ndarray):
+        truth = np.array(list(truth))
+    if not isinstance(prediction, np.ndarray):
+        prediction = np.array(list(prediction))
 
     if len(prediction) < 2:
         return np.NaN
@@ -672,8 +674,10 @@ def pearson_cc(
     """
     assert_equal_length(truth, prediction)
 
-    prediction = np.array(list(prediction))
-    truth = np.array(list(truth))
+    if not isinstance(truth, np.ndarray):
+        truth = np.array(list(truth))
+    if not isinstance(prediction, np.ndarray):
+        prediction = np.array(list(prediction))
 
     if len(prediction) < 2 or prediction.std() == 0:
         return np.NaN
