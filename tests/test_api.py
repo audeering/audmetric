@@ -8,9 +8,6 @@ import audeer
 import audmetric
 
 
-np.random.seed(1)
-
-
 @pytest.mark.parametrize('truth,prediction,labels,to_string', [
     (
         np.random.randint(0, 10, size=5),
@@ -347,8 +344,37 @@ def test_edit_distance(truth, prediction, edit_distance):
     )
 
 
-# Number of samples
-samples = 1000
+# test_linkability()
+#
+# To ensure reproducibility of the signals
+# we create our own signal generator functions
+#
+def truth(samples=1000):
+    r"""Generate truth values for linkability test.
+
+    The truth values are in the form:
+    ``[0, 1, 0, 1, ..., 0, 1]``
+
+    """
+    return [0, 1] * samples
+
+
+def prediction(range1, range2, samples=1000, random_state=1):
+    r"""Generate prediction values for linkability test.
+
+    The values are returned as pairs
+    drawn from uniform distribution
+    given by ``range1`` and ``range2``, e.g.
+    ``[0.12, 0.84, 0.07, 0.81, ..., 0.13, 0.84]``
+
+    """
+    np.random.seed(random_state)
+    return audeer.flatten_list(
+        [
+            [np.random.uniform(*range1), np.random.uniform(*range2)]
+            for _ in range(samples)
+        ]
+    )
 
 
 @pytest.mark.parametrize(
@@ -358,13 +384,8 @@ samples = 1000
             # Distribution 1: ##________
             # Distribution 2: ________##
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.0, 0.2), (0.8, 1.0)),
             1,
             1,
         ),
@@ -372,13 +393,8 @@ samples = 1000
             # Distribution 1: ##________
             # Distribution 2: ________##
             # Guessing: 0.1
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.0, 0.2), (0.8, 1.0)),
             1 / 9.0,
             1,
         ),
@@ -386,13 +402,8 @@ samples = 1000
             # Distribution 1: _##_______
             # Distribution 2: _______##_
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.1, 0.3), np.random.uniform(0.7, 0.9)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.1, 0.3), (0.7, 0.9)),
             1,
             1,
         ),
@@ -400,13 +411,8 @@ samples = 1000
             # Distribution 1: __##______
             # Distribution 2: ______##__
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.2, 0.4), np.random.uniform(0.6, 0.8)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.2, 0.4), (0.6, 0.8)),
             1,
             1,
         ),
@@ -414,13 +420,8 @@ samples = 1000
             # Distribution 1: ___##_____
             # Distribution 2: _____##___
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.3, 0.5), np.random.uniform(0.5, 0.7)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.3, 0.5), (0.5, 0.7)),
             1,
             1,
         ),
@@ -428,13 +429,8 @@ samples = 1000
             # Distribution 1: ____##____
             # Distribution 2: _____##___
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.4, 0.6), np.random.uniform(0.5, 0.7)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.4, 0.6), (0.5, 0.7)),
             1,
             0.65,
         ),
@@ -442,13 +438,8 @@ samples = 1000
             # Distribution 1: ___##_____
             # Distribution 2: ____##____
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.3, 0.5), np.random.uniform(0.4, 0.6)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.3, 0.5), (0.4, 0.6)),
             1,
             0.65,
         ),
@@ -456,13 +447,8 @@ samples = 1000
             # Distribution 1: ____##____
             # Distribution 2: ____##____
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.4, 0.6), np.random.uniform(0.4, 0.6)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.4, 0.6), (0.4, 0.6)),
             1,
             0.5,
         ),
@@ -470,13 +456,8 @@ samples = 1000
             # Distribution 1: _____##___
             # Distribution 2: ___##_____
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.5, 0.7), np.random.uniform(0.3, 0.5)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.5, 0.7), (0.3, 0.5)),
             1,
             1,
         ),
@@ -484,13 +465,8 @@ samples = 1000
             # Distribution 1: ___###____
             # Distribution 2: _____###__
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.3, 0.6), np.random.uniform(0.5, 0.8)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.3, 0.6), (0.5, 0.8)),
             1,
             0.79,
         ),
@@ -498,13 +474,8 @@ samples = 1000
             # Distribution 1: __####____
             # Distribution 2: _____####_
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.2, 0.6), np.random.uniform(0.5, 0.9)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.2, 0.6), (0.5, 0.9)),
             1,
             0.84,
         ),
@@ -512,13 +483,8 @@ samples = 1000
             # Distribution 1: _#####____
             # Distribution 2: _____#####
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.1, 0.6), np.random.uniform(0.5, 1.0)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.1, 0.6), (0.5, 1.0)),
             1,
             0.9,
         ),
@@ -526,13 +492,8 @@ samples = 1000
             # Distribution 1: _#####____
             # Distribution 2: _____#####
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0.4, 0.6), np.random.uniform(0.5, 0.7)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.4, 0.6), (0.5, 0.7)),
             1,
             0.72,
         ),
@@ -540,13 +501,8 @@ samples = 1000
             # Distribution 1: ###########
             # Distribution 2: ###########
             # Guessing: 0.5
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0, 1.0), np.random.uniform(0, 1.0)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.0, 1.0), (0.0, 1.0)),
             1.0,
             0.49,
         ),
@@ -554,13 +510,8 @@ samples = 1000
             # Distribution 1: ###########
             # Distribution 2: ###########
             # Guessing: 0.33
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0, 1.0), np.random.uniform(0, 1.0)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.0, 1.0), (0.0, 1.0)),
             1 / 2.0,
             0.35,
         ),
@@ -568,13 +519,8 @@ samples = 1000
             # Distribution 1: ###########
             # Distribution 2: ###########
             # Guessing: 0.66
-            [0, 1] * samples,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0, 1.0), np.random.uniform(0, 1.0)]
-                    for _ in range(samples)
-                ]
-            ),
+            truth(),
+            prediction((0.0, 1.0), (0.0, 1.0)),
             2.0 / 1,
             0.6,
         ),
@@ -583,13 +529,8 @@ samples = 1000
             # Distribution 2: ________##
             # Guessing: 0.5
             # Only 50 samples
-            [0, 1] * 50,
-            audeer.flatten_list(
-                [
-                    [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
-                    for _ in range(50)
-                ]
-            ),
+            truth(samples=50),
+            prediction((0.0, 0.2), (0.8, 1.0), samples=50),
             1,
             1,
         ),
