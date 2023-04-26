@@ -4,7 +4,11 @@ import pyeer.eer_info
 import pytest
 import sklearn.metrics
 
+import audeer
 import audmetric
+
+
+np.random.seed(1)
 
 
 @pytest.mark.parametrize('truth,prediction,labels,to_string', [
@@ -341,6 +345,259 @@ def test_edit_distance(truth, prediction, edit_distance):
         audmetric.edit_distance(truth, prediction),
         edit_distance
     )
+
+
+# Number of samples
+samples = 1000
+
+
+@pytest.mark.parametrize(
+    'truth, prediction, omega, expected',
+    [
+        (
+            # Distribution 1: ##________
+            # Distribution 2: ________##
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            1,
+        ),
+        (
+            # Distribution 1: ##________
+            # Distribution 2: ________##
+            # Guessing: 0.1
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
+                    for _ in range(samples)
+                ]
+            ),
+            1 / 9.0,
+            1,
+        ),
+        (
+            # Distribution 1: _##_______
+            # Distribution 2: _______##_
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.1, 0.3), np.random.uniform(0.7, 0.9)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            1,
+        ),
+        (
+            # Distribution 1: __##______
+            # Distribution 2: ______##__
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.2, 0.4), np.random.uniform(0.6, 0.8)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            1,
+        ),
+        (
+            # Distribution 1: ___##_____
+            # Distribution 2: _____##___
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.3, 0.5), np.random.uniform(0.5, 0.7)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            1,
+        ),
+        (
+            # Distribution 1: ____##____
+            # Distribution 2: _____##___
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.4, 0.6), np.random.uniform(0.5, 0.7)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            0.65,
+        ),
+        (
+            # Distribution 1: ___##_____
+            # Distribution 2: ____##____
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.3, 0.5), np.random.uniform(0.4, 0.6)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            0.65,
+        ),
+        (
+            # Distribution 1: ____##____
+            # Distribution 2: ____##____
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.4, 0.6), np.random.uniform(0.4, 0.6)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            0.5,
+        ),
+        (
+            # Distribution 1: _____##___
+            # Distribution 2: ___##_____
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.5, 0.7), np.random.uniform(0.3, 0.5)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            1,
+        ),
+        (
+            # Distribution 1: ___###____
+            # Distribution 2: _____###__
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.3, 0.6), np.random.uniform(0.5, 0.8)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            0.79,
+        ),
+        (
+            # Distribution 1: __####____
+            # Distribution 2: _____####_
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.2, 0.6), np.random.uniform(0.5, 0.9)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            0.84,
+        ),
+        (
+            # Distribution 1: _#####____
+            # Distribution 2: _____#####
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.1, 0.6), np.random.uniform(0.5, 1.0)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            0.9,
+        ),
+        (
+            # Distribution 1: _#####____
+            # Distribution 2: _____#####
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0.4, 0.6), np.random.uniform(0.5, 0.7)]
+                    for _ in range(samples)
+                ]
+            ),
+            1,
+            0.72,
+        ),
+        (
+            # Distribution 1: ###########
+            # Distribution 2: ###########
+            # Guessing: 0.5
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0, 1.0), np.random.uniform(0, 1.0)]
+                    for _ in range(samples)
+                ]
+            ),
+            1.0,
+            0.49,
+        ),
+        (
+            # Distribution 1: ###########
+            # Distribution 2: ###########
+            # Guessing: 0.33
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0, 1.0), np.random.uniform(0, 1.0)]
+                    for _ in range(samples)
+                ]
+            ),
+            1 / 2.0,
+            0.35,
+        ),
+        (
+            # Distribution 1: ###########
+            # Distribution 2: ###########
+            # Guessing: 0.66
+            [0, 1] * samples,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0, 1.0), np.random.uniform(0, 1.0)]
+                    for _ in range(samples)
+                ]
+            ),
+            2.0 / 1,
+            0.6,
+        ),
+        (
+            # Distribution 1: ##________
+            # Distribution 2: ________##
+            # Guessing: 0.5
+            # Only 50 samples
+            [0, 1] * 50,
+            audeer.flatten_list(
+                [
+                    [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
+                    for _ in range(50)
+                ]
+            ),
+            1,
+            1,
+        ),
+    ]
+)
+def test_linkability(truth, prediction, omega, expected):
+    linkability = audmetric.linkability(truth, prediction, omega=omega)
+    np.testing.assert_allclose(linkability, expected, rtol=0.15)
 
 
 @pytest.mark.parametrize('value_range,num_elements', [
