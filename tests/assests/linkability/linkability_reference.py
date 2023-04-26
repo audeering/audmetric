@@ -141,6 +141,8 @@ for n, (truth, prediction, omega) in enumerate(test_cases):
             'anonymization_metrics/compute_metrics.py',
             '-s',
             f'{file}',
+            '--omega',
+            f'{omega}',
         ]
         out = subprocess.check_output(
             shell_command,

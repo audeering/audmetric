@@ -177,7 +177,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.0, 1.0), (0.0, 1.0)),
             1 / 2.0,
-            0.1374,
+            0.0226,
         ),
         (
             # Distribution 1: ###########
@@ -186,7 +186,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.0, 1.0), (0.0, 1.0)),
             2.0 / 1,
-            0.1374,
+            0.3751,
         ),
         (
             # Distribution 1: ##________
@@ -196,10 +196,14 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(samples=50),
             prediction((0.0, 0.2), (0.8, 1.0), samples=50),
             1,
+            # The following reference value
+            # is not provided by the original implementation
+            # as this does not support
+            # such a low number of samples
             1,
         ),
     ]
 )
 def test_linkability(truth, prediction, omega, expected):
     linkability = audmetric.linkability(truth, prediction, omega=omega)
-    np.testing.assert_allclose(linkability, expected, rtol=0.15)
+    np.testing.assert_allclose(linkability, expected, rtol=0.05)
