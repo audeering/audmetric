@@ -620,11 +620,11 @@ def linkability(
         ...         [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
         ...     )
         >>> linkability(truth, prediction)
-        0.9990000000000006
+        0.9747999999999999
         >>> truth = [1, 0, 0, 0] * int(samples / 4)
         >>> prediction = [np.random.uniform(0, 1) for _ in range(samples)]
         >>> linkability(truth, prediction, omega=1/3)
-        0.11513142857142902
+        0.0
 
     """  # noqa: E501
     mated_scores, non_mated_scores = _matching_scores(truth, prediction)
@@ -633,7 +633,6 @@ def linkability(
     # (100 maximum or lower if few scores available)
     if nbins is None:
         nbins = min(int(len(mated_scores) / 10), 100)
-        nbins = max(len(mated_scores), nbins)
 
     # Define range of scores to compute D
     bin_edges = np.linspace(
