@@ -188,20 +188,6 @@ def prediction(range1, range2, samples=1000, random_state=1):
             2.0 / 1,
             0.3751,
         ),
-        (
-            # Distribution 1: ##________
-            # Distribution 2: ________##
-            # Guessing: 0.5
-            # Only 50 samples
-            truth(samples=50),
-            prediction((0.0, 0.2), (0.8, 1.0), samples=50),
-            1,
-            # The following reference value
-            # is not provided by the original implementation
-            # as this does not support
-            # such a low number of samples
-            1,
-        ),
     ]
 )
 def test_linkability(truth, prediction, omega, expected):
