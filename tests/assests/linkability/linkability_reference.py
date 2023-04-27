@@ -1,5 +1,5 @@
-import os
 import subprocess
+import tempfile
 
 import numpy as np
 
@@ -119,32 +119,39 @@ test_cases = [
     ),
 ]
 
+results = []
 for n, (truth, prediction, omega) in enumerate(test_cases):
     mated_scores, nonmated_scores = audmetric.core.api._matching_scores(
         truth,
         prediction,
     )
-    # Write scores to disk
-    file = 'scores.txt'
-    with open(file, 'w') as fp:
-        for score in mated_scores:
-            fp.write(f'{score} 1\n')
-        for score in nonmated_scores:
-            fp.write(f'{score} 0\n')
-    shell_command = [
-        'python',
-        'anonymization_metrics/compute_metrics.py',
-        '-s',
-        f'{file}',
-        '--omega',
-        f'{omega}',
-    ]
-    out = subprocess.check_output(
-        shell_command,
-        stderr=subprocess.STDOUT
-    )
-    linkability = out.split()[0].decode("utf-8").split(',')[-4]
-    print(f'linkability: {linkability}')
+    with tempfile.TemporaryDirectory() as tmp:
+        score_file = audeer.path(tmp, 'score')
+        with open(score_file, 'w') as fp:
+            for score in mated_scores:
+                fp.write(f'{score} 1\n')
+            for score in nonmated_scores:
+                fp.write(f'{score} 0\n')
+        shell_command = [
+            'python',
+            'anonymization_metrics/compute_metrics.py',
+            '-s',
+            f'{score_file}',
+            '--omega',
+            f'{omega}',
+        ]
+        out = subprocess.check_output(
+            shell_command,
+            stderr=subprocess.STDOUT
+        )
+        # The above Python command returns a string containing:
+        # id,matedMean,nonMatedMean,matedStd,nonMatedStd,linkability,cllr,cmin,eer
+        # which means we can access the linkability by -4 from the end
+        linkability = out.split()[0].decode("utf-8").split(',')[-4]
+        results.append((omega, linkability))
 
-if os.path.exists(file):
-    os.remove(file)
+# Store results
+with open('results.txt', 'w') as fp:
+    fp.write('testcase,omega,linkability\n')
+    for n, (omega, linkability) in enumerate(results):
+        fp.write(f'{n},{omega},{linkability}\n')
