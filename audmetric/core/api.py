@@ -586,7 +586,8 @@ def linkability(
     that an attacker can link two mated samples.
     The global linkability metric :math:`D_\text{sys}`
     is the mean value
-    over all local scores.\ :footcite:`GomezBarrero2017`
+    over all local scores\ :footcite:`GomezBarrero2017`
+    and in the range :math:`0` and :math:`1`.
 
     Implementation is based on
     `code from M. Maouche`_,
@@ -601,7 +602,12 @@ def linkability(
         prediction: predicted classes or similarity scores
         omega: prior ratio
             :math:`\frac{p(\text{mated})}{p(\text{non-mated})}`
-        nbins: number of bins ...
+        nbins: number of bins
+            of the histograms
+            that estimate the distributions
+            of mated and non-mated scores.
+            If ``None`` it is set to
+            :math:`\min(\frac{\text{len}(\text{mated})}{10}, 100)`
 
     Returns:
         global linkability :math:`D_\text{sys}`
