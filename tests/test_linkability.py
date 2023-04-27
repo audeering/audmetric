@@ -8,7 +8,8 @@ import audmetric
 # The expected values were manually calculated using code from
 # https://gitlab.inria.fr/magnet/anonymization_metrics.
 # See tests/assests/linkability/README.md
-# for instructions
+# for instructions,
+# and results in tests/assests/linkability/results.csv
 #
 # To ensure reproducibility of the signals
 # we create our own signal generator functions
