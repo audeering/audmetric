@@ -96,7 +96,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.4, 0.6), (0.5, 0.7)),
             1,
-            0.5634,
+            0.5619,
         ),
         (
             # Distribution 1: ___##_____
@@ -105,7 +105,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.3, 0.5), (0.4, 0.6)),
             1,
-            0.5625,
+            0.5619,
         ),
         (
             # Distribution 1: ____##____
@@ -114,7 +114,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.4, 0.6), (0.4, 0.6)),
             1,
-            0.1371,
+            0.1352,
         ),
         (
             # Distribution 1: _____##___
@@ -132,7 +132,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.3, 0.6), (0.5, 0.8)),
             1,
-            0.7074,
+            0.7066,
         ),
         (
             # Distribution 1: __####____
@@ -141,7 +141,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.2, 0.6), (0.5, 0.9)),
             1,
-            0.7655,
+            0.7654,
         ),
         (
             # Distribution 1: _#####____
@@ -150,7 +150,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.1, 0.6), (0.5, 1.0)),
             1,
-            0.8092,
+            0.8083,
         ),
         (
             # Distribution 1: _#####____
@@ -159,7 +159,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.4, 0.6), (0.5, 0.7)),
             1,
-            0.5634,
+            0.5619,
         ),
         (
             # Distribution 1: ###########
@@ -168,7 +168,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.0, 1.0), (0.0, 1.0)),
             1.0,
-            0.1374,
+            0.1352,
         ),
         (
             # Distribution 1: ###########
@@ -177,7 +177,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.0, 1.0), (0.0, 1.0)),
             1 / 2.0,
-            0.0226,
+            0.0167,
         ),
         (
             # Distribution 1: ###########
@@ -186,10 +186,10 @@ def prediction(range1, range2, samples=1000, random_state=1):
             truth(),
             prediction((0.0, 1.0), (0.0, 1.0)),
             2.0 / 1,
-            0.3751,
+            0.3746,
         ),
     ]
 )
 def test_linkability(truth, prediction, omega, expected):
     linkability = audmetric.linkability(truth, prediction, omega=omega)
-    np.testing.assert_allclose(linkability, expected, rtol=0.05)
+    np.testing.assert_allclose(linkability, expected, rtol=0.001)

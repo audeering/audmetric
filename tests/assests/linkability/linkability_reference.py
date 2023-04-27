@@ -136,20 +136,20 @@ for n, (truth, prediction, omega) in enumerate(test_cases):
             fp.write(f'{score} 1\n')
         for score in nonmated_scores:
             fp.write(f'{score} 0\n')
-        shell_command = [
-            'python',
-            'anonymization_metrics/compute_metrics.py',
-            '-s',
-            f'{file}',
-            '--omega',
-            f'{omega}',
-        ]
-        out = subprocess.check_output(
-            shell_command,
-            stderr=subprocess.STDOUT
-        )
-        linkability = out.split()[0].decode("utf-8").split(',')[-4]
-        print(f'linkability: {linkability}')
+    shell_command = [
+        'python',
+        'anonymization_metrics/compute_metrics.py',
+        '-s',
+        f'{file}',
+        '--omega',
+        f'{omega}',
+    ]
+    out = subprocess.check_output(
+        shell_command,
+        stderr=subprocess.STDOUT
+    )
+    linkability = out.split()[0].decode("utf-8").split(',')[-4]
+    print(f'linkability: {linkability}')
 
 if os.path.exists(file):
     os.remove(file)

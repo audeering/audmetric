@@ -648,9 +648,9 @@ def linkability(
     y2 = np.histogram(non_mated_scores, bins=bin_edges, density=True)[0]
     # LR = P[s|mated ]/P[s|non-mated]
     LR = np.divide(y1, y2, out=np.ones_like(y1), where=y2 != 0)
-    D = 2*(omega * LR / (1 + omega*LR)) - 1
+    D = 2 * (omega * LR / (1 + omega*LR)) - 1
     # Def of D
-    D[omega*LR <= 1] = 0
+    D[omega * LR <= 1] = 0
     # Taking care of inf/NaN
     mask = [
         True if y2[i] == 0 and y1[i] != 0 else False
