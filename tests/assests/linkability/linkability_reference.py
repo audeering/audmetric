@@ -117,11 +117,6 @@ test_cases = [
         prediction((0.0, 1.0), (0.0, 1.0)),
         2.0 / 1,
     ),
-    # (
-    #     truth(samples=100),
-    #     prediction((0.0, 0.2), (0.8, 1.0), samples=100),
-    #     1,
-    # ),
 ]
 
 for n, (truth, prediction, omega) in enumerate(test_cases):
