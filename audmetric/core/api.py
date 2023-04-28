@@ -582,11 +582,12 @@ def linkability(
 
         \text{max}(0, p(\text{mated} | s) - p(\text{non-mated} | s))
 
-    The higher the value the more likely
+    The higher the value,
+    the more likely
     that an attacker can link two mated samples.
     The global linkability metric :math:`D_\text{sys}`
     is the mean value
-    over all local scores\ :footcite:`GomezBarrero2017`
+    over all local scores,\ :footcite:`GomezBarrero2017`
     and in the range :math:`0` and :math:`1`.
 
     Implementation is based on
