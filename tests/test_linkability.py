@@ -45,6 +45,21 @@ def prediction(range1, range2, samples=1000, random_state=1):
 @pytest.mark.parametrize(
     'truth, prediction, omega, expected',
     [
+        # All following tests get [0, 1, 0, 1, ..., 0, 1] as truth values.
+        # The corresponding prediction values
+        # are drawn from two uniform distributions,
+        # from Distribution 1 for all non-mated entries
+        # (matching 0 positions from truth)
+        # and from Distribution 2 for all mated entries
+        # (matching 1 positions from truth).
+        # The ranges of the two distributions
+        # are provided as arguments to the `prediction()` function
+        # and indicated by the ____##____ distribution sketches.
+        # The guessing probability for identifying the mated speakers
+        # is given for each test,
+        # and determines the `omega` value.
+        # The expected values were pre-calculated by
+        # `tests/assests/linkability/linkability_reference.py`.
         (
             # Distribution 1: ##________
             # Distribution 2: ________##
