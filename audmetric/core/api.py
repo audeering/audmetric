@@ -1,4 +1,4 @@
-from collections import namedtuple
+import collections
 import operator
 import typing
 import warnings
@@ -342,7 +342,7 @@ def equal_error_rate(
         typing.Union[bool, int, float],
         typing.Sequence[typing.Union[bool, int, float]]
     ],
-) -> typing.Tuple[float, namedtuple]:
+) -> typing.Tuple[float, collections.namedtuple]:
     r"""Equal error rate for verification tasks.
 
     The equal error rate (EER) is the point
@@ -407,7 +407,7 @@ def equal_error_rate(
         0.5
 
     """
-    Stats = namedtuple(
+    Stats = collections.namedtuple(
         'stats',
         [
             'fmr',  # False match rates (FMR)
