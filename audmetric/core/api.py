@@ -1,4 +1,4 @@
-from collections import namedtuple
+import collections
 import operator
 import typing
 import warnings
@@ -246,24 +246,11 @@ def detection_error_tradeoff(
         (array([1., 0.]), array([0., 0.]), array([0.1, 0.9]))
 
     """  # noqa: E501
-    truth = np.array(truth)
-
-    allowed_truth_values = set([1, 0, True, False])
-    if not set(truth).issubset(allowed_truth_values):
-        raise ValueError(
-            "'truth' is only allowed to contain "
-            "[1, 0, True, False], "
-            'yours contains:\n'
-            f"[{', '.join([str(t) for t in set(truth)])}]"
-        )
-
-    truth = truth.astype(bool)
-    prediction = np.array(prediction).astype(np.float64)
-
-    # Genuine matching scores
-    gscores = prediction[truth]
-    # Impostor matching scores
-    iscores = prediction[~truth]
+    # Get mated scores
+    # (genuine matching scores)
+    # and non-mated scores
+    # (impostor matching scores)
+    gscores, iscores = _matching_scores(truth, prediction)
 
     gscores_number = len(gscores)
     iscores_number = len(iscores)
@@ -357,7 +344,7 @@ def equal_error_rate(
         typing.Union[bool, int, float],
         typing.Sequence[typing.Union[bool, int, float]]
     ],
-) -> typing.Tuple[float, namedtuple]:
+) -> typing.Tuple[float, collections.namedtuple]:
     r"""Equal error rate for verification tasks.
 
     The equal error rate (EER) is the point
@@ -422,7 +409,7 @@ def equal_error_rate(
         0.5
 
     """
-    Stats = namedtuple(
+    Stats = collections.namedtuple(
         'stats',
         [
             'fmr',  # False match rates (FMR)
@@ -573,6 +560,116 @@ def fscore_per_class(
         else:
             fscore[label] = (2 * p * r) / (p + r)
     return fscore
+
+
+def linkability(
+        truth: typing.Union[
+            typing.Union[bool, int],
+            typing.Sequence[typing.Union[bool, int]]
+        ],
+        prediction: typing.Union[
+            typing.Union[bool, int, float],
+            typing.Sequence[typing.Union[bool, int, float]]
+        ],
+        omega: float = 1.0,
+        nbins: int = None,
+) -> float:
+    r"""Linkability for verification tasks.
+
+    Let :math:`s` be the provided prediction score
+    for the similarity of the tested sample.
+    The clipped local linkability metric is then defined as:
+
+    .. math::
+
+        \text{max}(0, p(\text{mated} | s) - p(\text{non-mated} | s))
+
+    The higher the value,
+    the more likely
+    that an attacker can link two mated samples.
+    The global linkability metric :math:`D_\text{sys}`
+    is the mean value
+    over all local scores,\ :footcite:`GomezBarrero2017`
+    and in the range :math:`0` and :math:`1`.
+
+    Implementation is based on
+    `code from M. Maouche`_,
+    which is licensed under LGPL.
+
+    .. footbibliography::
+
+    .. _code from M. Maouche: https://gitlab.inria.fr/magnet/anonymization_metrics
+
+    Args:
+        truth: ground truth classes
+        prediction: predicted classes or similarity scores
+        omega: prior ratio
+            :math:`\frac{p(\text{mated})}{p(\text{non-mated})}`
+        nbins: number of bins
+            of the histograms
+            that estimate the distributions
+            of mated and non-mated scores.
+            If ``None`` it is set to
+            :math:`\min(\frac{\text{len}(\text{mated})}{10}, 100)`
+
+    Returns:
+        global linkability :math:`D_\text{sys}`
+
+    Raises:
+        ValueError: if ``truth`` contains values
+            different from ``1``, ``0``, ``True``, ``False``
+
+    Examples:
+        >>> np.random.seed(1)
+        >>> samples = 10000
+        >>> truth = [1, 0] * int(samples / 2)
+        >>> prediction = []
+        >>> for _ in range(int(samples / 2)):
+        ...     prediction.extend(
+        ...         [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
+        ...     )
+        >>> linkability(truth, prediction)
+        0.9747999999999999
+        >>> truth = [1, 0, 0, 0] * int(samples / 4)
+        >>> prediction = [np.random.uniform(0, 1) for _ in range(samples)]
+        >>> linkability(truth, prediction, omega=1/3)
+        0.0
+
+    """  # noqa: E501
+    mated_scores, non_mated_scores = _matching_scores(truth, prediction)
+
+    # Limiting the number of bins
+    # (100 maximum or lower if few scores available)
+    if nbins is None:
+        nbins = min(int(len(mated_scores) / 10), 100)
+
+    # Define range of scores to compute D
+    bin_edges = np.linspace(
+        min([min(mated_scores), min(non_mated_scores)]),
+        max([max(mated_scores), max(non_mated_scores)]),
+        num=nbins + 1,
+        endpoint=True,
+    )
+    bin_centers = (bin_edges[1:] + bin_edges[:-1]) / 2
+
+    # Compute score distributions using normalized histograms
+    y1 = np.histogram(mated_scores, bins=bin_edges, density=True)[0]
+    y2 = np.histogram(non_mated_scores, bins=bin_edges, density=True)[0]
+    # LR = P[s|mated ]/P[s|non-mated]
+    LR = np.divide(y1, y2, out=np.ones_like(y1), where=y2 != 0)
+    D = 2 * (omega * LR / (1 + omega*LR)) - 1
+    # Def of D
+    D[omega * LR <= 1] = 0
+    # Taking care of inf/NaN
+    mask = [
+        True if y2[i] == 0 and y1[i] != 0 else False
+        for i in range(len(y1))
+    ]
+    D[mask] = 1
+    # Global measure using trapz numerical integration
+    Dsys = np.trapz(x=bin_centers, y=D * y1)
+
+    return Dsys
 
 
 def mean_absolute_error(
@@ -1142,3 +1239,79 @@ def word_error_rate(
 
     num_samples = len(truth) if len(truth) > 1 else 1
     return wer / num_samples
+
+
+def _matching_scores(
+    truth: typing.Union[
+        typing.Union[bool, int],
+        typing.Sequence[typing.Union[bool, int]]
+    ],
+    prediction: typing.Union[
+        typing.Union[bool, int, float],
+        typing.Sequence[typing.Union[bool, int, float]]
+    ],
+) -> typing.Tuple[np.ndarray, np.ndarray]:
+    r"""Mated and non-mated scores for verification tasks.
+
+    For verification task,
+    predictions are usually seperated
+    in all predictions belonging
+    to the matching examples,
+    and all other predictions.
+    The first are called mated scores
+    or genuine matching scores,
+    the second non-mated scores
+    or impostor matching scores.
+
+    For example,
+    in a speaker verification task
+    the mated scores are all similarity values
+    that belong to the matching speaker.
+
+    Args:
+        truth: ground truth classes
+        prediction: predicted classes or similarity scores
+
+    Returns:
+        * mated scores
+        * non-mated scores
+
+    Raises:
+        ValueError: if ``truth`` contains values
+            different from ``1, 0, True, False``
+
+    Examples:
+        >>> truth = [1, 0]
+        >>> prediction = [0.9, 0.1]
+        >>> _matching_scores(truth, prediction)
+        (array([0.9]), array([0.1]))
+
+    """
+    truth = np.array(truth)
+
+    allowed_truth_values = set([1, 0, True, False])
+    if not set(truth).issubset(allowed_truth_values):
+        raise ValueError(
+            "'truth' is only allowed to contain "
+            "[1, 0, True, False], "
+            'yours contains:\n'
+            f"[{', '.join([str(t) for t in set(truth)])}]"
+        )
+
+    truth = truth.astype(bool)
+    prediction = np.array(prediction).astype(np.float64)
+
+    # Predictions for all matching examples
+    # (truth is 1 or True)
+    # In literature these are called
+    # "genuine matching scores"
+    # or "mated scores"
+    mated_scores = prediction[truth]
+    # Predictions for all non-matching examples
+    # (truth is 0 or False)
+    # In literature these are called
+    # "impostor matching scores"
+    # or "non-mated scores"
+    non_mated_scores = prediction[~truth]
+
+    return mated_scores, non_mated_scores

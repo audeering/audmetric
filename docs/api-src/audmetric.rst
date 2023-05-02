@@ -14,6 +14,7 @@ audmetric
     edit_distance
     equal_error_rate
     event_error_rate
+    linkability
     mean_absolute_error
     mean_squared_error
     pearson_cc
