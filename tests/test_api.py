@@ -265,29 +265,50 @@ def test_event_error_rate(truth, prediction, eer):
 ])
 def test_concordance_cc(truth, prediction):
 
+    def expected(truth, prediction):
+        if len(prediction) < 2:
+            ccc_expected = np.NaN
+        else:
+            denominator = (
+                prediction.std() ** 2
+                + truth.std() ** 2
+                + (prediction.mean() - truth.mean()) ** 2
+            )
+            if denominator == 0:
+                ccc_expected = np.NaN
+            else:
+                r = np.corrcoef(list(prediction), list(truth))[0][1]
+                ccc_expected = (
+                    2 * r * prediction.std() * truth.std()
+                    / denominator
+                )
+        return ccc_expected
+
     ccc = audmetric.concordance_cc(truth, prediction)
 
     prediction = np.array(list(prediction))
     truth = np.array(list(truth))
 
-    if len(prediction) < 2:
-        ccc_expected = np.NaN
-    else:
-        denominator = (
-            prediction.std() ** 2
-            + truth.std() ** 2
-            + (prediction.mean() - truth.mean()) ** 2
-        )
-        if denominator == 0:
-            ccc_expected = np.NaN
-        else:
-            r = np.corrcoef(list(prediction), list(truth))[0][1]
-            ccc_expected = 2 * r * prediction.std() * truth.std() / denominator
-
     np.testing.assert_almost_equal(
         ccc,
-        ccc_expected,
+        expected(truth, prediction),
     )
+
+    # Handle NaN in prediction
+    if len(prediction) > 0:
+        prediction = prediction.astype('float')
+        prediction[0] = np.NaN
+
+        print(prediction)
+
+        ccc = audmetric.concordance_cc(truth, prediction)
+        assert np.isnan(ccc)
+
+        ccc = audmetric.concordance_cc(truth, prediction, ignore_nan=True)
+        np.testing.assert_almost_equal(
+            ccc,
+            expected(truth[1:], prediction[1:]),
+        )
 
 
 @pytest.mark.parametrize('class_range,num_elements,to_string,percentage', [

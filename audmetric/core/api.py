@@ -125,9 +125,12 @@ def concordance_cc(
     else:
         mask = np.isreal(prediction)
 
+    print(f'{mask=}')
+
     length = mask.sum()
     mean_y = np.dot(mask, truth) / length
     mean_x = np.dot(mask, prediction) / length
+    print(f'{mean_x=}')
     a = mask * (prediction - mean_x)
     b = mask * (truth - mean_y)
     numerator = 2 * np.dot(a, b)
