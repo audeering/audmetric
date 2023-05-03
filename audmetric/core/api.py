@@ -74,6 +74,8 @@ def accuracy(
 def concordance_cc(
         truth: typing.Sequence[float],
         prediction: typing.Sequence[float],
+        *,
+        ignore_nan: bool = False,
 ) -> float:
     r"""Concordance correlation coefficient.
 
@@ -92,6 +94,10 @@ def concordance_cc(
     Args:
         truth: ground truth values
         prediction: predicted values
+        ignore_nan: if ``True``
+            all entries in ``truth`` and ``prediction``
+            will be ignored
+            that match positions of ``NaN`` inside ``prediction``
 
     Returns:
         concordance correlation coefficient :math:`\in [-1, 1]`
@@ -114,20 +120,38 @@ def concordance_cc(
     if len(prediction) < 2:
         return np.NaN
 
-    r = pearson_cc(prediction, truth)
-    x_mean = prediction.mean()
-    y_mean = truth.mean()
-    x_std = prediction.std()
-    y_std = truth.std()
-    denominator = (
-        x_std * x_std
-        + y_std * y_std
-        + (x_mean - y_mean) * (x_mean - y_mean)
-    )
+    if ignore_nan:
+        mask = ~np.isnan(prediction)
+        N = mask.sum()
+    else:
+        N = len(prediction)
+        mask = np.array([True] * N)
+    mean_y = np.dot(mask, truth) / N
+    mean_x = np.dot(mask, prediction) / N
+    a = mask * (prediction - mean_x)
+    b = mask * (truth - mean_y)
+    numerator = 2 * np.dot(a, b)
+    denominator = np.dot(a, a) + np.dot(b, b) + (mean_x - mean_y)**2 * N
+
     if denominator == 0:
         ccc = np.nan
     else:
-        ccc = 2 * r * x_std * y_std / denominator
+        ccc = numerator / denominator
+
+    # r = pearson_cc(prediction, truth)
+    # x_mean = prediction.mean()
+    # y_mean = truth.mean()
+    # x_std = prediction.std()
+    # y_std = truth.std()
+    # denominator = (
+    #     x_std * x_std
+    #     + y_std * y_std
+    #     + (x_mean - y_mean) * (x_mean - y_mean)
+    # )
+    # if denominator == 0:
+    #     ccc = np.nan
+    # else:
+    #     ccc = 2 * r * x_std * y_std / denominator
 
     return float(ccc)
 
