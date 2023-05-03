@@ -107,7 +107,7 @@ def concordance_cc(
 
     Examples:
         >>> concordance_cc([0, 1, 2], [0, 1, 1])
-        0.6666666666666666
+        0.6666666666666665
 
     """
     assert_equal_length(truth, prediction)
@@ -122,15 +122,13 @@ def concordance_cc(
 
     if ignore_nan:
         mask = ~np.isnan(prediction)
+        prediction[~mask] = 0
     else:
         mask = np.isreal(prediction)
-
-    print(f'{mask=}')
 
     length = mask.sum()
     mean_y = np.dot(mask, truth) / length
     mean_x = np.dot(mask, prediction) / length
-    print(f'{mean_x=}')
     a = mask * (prediction - mean_x)
     b = mask * (truth - mean_y)
     numerator = 2 * np.dot(a, b)
