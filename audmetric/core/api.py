@@ -122,36 +122,21 @@ def concordance_cc(
 
     if ignore_nan:
         mask = ~np.isnan(prediction)
-        N = mask.sum()
     else:
-        N = len(prediction)
-        mask = np.array([True] * N)
-    mean_y = np.dot(mask, truth) / N
-    mean_x = np.dot(mask, prediction) / N
+        mask = np.isreal(prediction)
+
+    length = mask.sum()
+    mean_y = np.dot(mask, truth) / length
+    mean_x = np.dot(mask, prediction) / length
     a = mask * (prediction - mean_x)
     b = mask * (truth - mean_y)
     numerator = 2 * np.dot(a, b)
-    denominator = np.dot(a, a) + np.dot(b, b) + (mean_x - mean_y)**2 * N
+    denominator = np.dot(a, a) + np.dot(b, b) + length * (mean_x - mean_y) ** 2
 
     if denominator == 0:
         ccc = np.nan
     else:
         ccc = numerator / denominator
-
-    # r = pearson_cc(prediction, truth)
-    # x_mean = prediction.mean()
-    # y_mean = truth.mean()
-    # x_std = prediction.std()
-    # y_std = truth.std()
-    # denominator = (
-    #     x_std * x_std
-    #     + y_std * y_std
-    #     + (x_mean - y_mean) * (x_mean - y_mean)
-    # )
-    # if denominator == 0:
-    #     ccc = np.nan
-    # else:
-    #     ccc = 2 * r * x_std * y_std / denominator
 
     return float(ccc)
 
