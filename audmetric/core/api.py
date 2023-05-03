@@ -144,7 +144,6 @@ def concordance_cc(
         a = prediction - mean_x
         b = truth - mean_y
 
-    length = prediction.size
     numerator = 2 * np.dot(a, b)
     denominator = np.dot(a, a) + np.dot(b, b) + length * (mean_x - mean_y) ** 2
 
