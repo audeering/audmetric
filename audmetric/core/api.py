@@ -95,9 +95,9 @@ def concordance_cc(
         truth: ground truth values
         prediction: predicted values
         ignore_nan: if ``True``
-            all entries in ``truth`` and ``prediction``
-            will be ignored
-            that match positions of ``NaN`` inside ``prediction``
+            all samples that contain ``NaN``
+            in ``truth`` or ``prediction``
+            are ignored
 
     Returns:
         concordance correlation coefficient :math:`\in [-1, 1]`
@@ -124,7 +124,7 @@ def concordance_cc(
     # to be as fast as possible
     consider_nan = False
     if ignore_nan:
-        mask = ~np.isnan(prediction)
+        mask = ~(np.isnan(truth) + np.isnan(prediction))
         length = mask.sum()
         if length < prediction.size:
             consider_nan = True

@@ -295,9 +295,11 @@ def test_concordance_cc(truth, prediction):
     )
 
     # Handle NaN in prediction
-    if len(prediction) > 0:
+    if len(prediction) > 1:
         prediction = prediction.astype('float')
+        truth = truth.astype('float')
         prediction[0] = np.NaN
+        truth[-1] = np.NaN
 
         ccc = audmetric.concordance_cc(truth, prediction)
         assert np.isnan(ccc)
@@ -305,7 +307,7 @@ def test_concordance_cc(truth, prediction):
         ccc = audmetric.concordance_cc(truth, prediction, ignore_nan=True)
         np.testing.assert_almost_equal(
             ccc,
-            expected(truth[1:], prediction[1:]),
+            expected(truth[1:-1], prediction[1:-1]),
         )
 
 
