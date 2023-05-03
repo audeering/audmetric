@@ -299,8 +299,6 @@ def test_concordance_cc(truth, prediction):
         prediction = prediction.astype('float')
         prediction[0] = np.NaN
 
-        print(prediction)
-
         ccc = audmetric.concordance_cc(truth, prediction)
         assert np.isnan(ccc)
 
