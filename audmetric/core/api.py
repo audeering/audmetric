@@ -124,7 +124,7 @@ def concordance_cc(
     # to be as fast as possible
     consider_nan = False
     if ignore_nan:
-        mask = ~(np.isnan(truth) + np.isnan(prediction))
+        mask = ~(np.isnan(truth) | np.isnan(prediction))
         length = mask.sum()
         if length < prediction.size:
             consider_nan = True
