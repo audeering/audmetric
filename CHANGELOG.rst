@@ -7,6 +7,17 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.0 (2023/05/08)
+--------------------------
+
+* Added: ``audmetric.linkability()``
+* Changed: speedup ``audmetric.concordance_cc()``
+  and ``audmetric.pearson_cc()``
+  when providing ``truth``
+  and/or ``prediction``
+  as numpy arrays
+
+
 Version 1.1.6 (2023/01/03)
 --------------------------
 
