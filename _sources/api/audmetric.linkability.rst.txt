@@ -1,0 +1,6 @@
+﻿linkability\(\)
+===============
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.linkability

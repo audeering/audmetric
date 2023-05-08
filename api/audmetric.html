@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.1.6
+                v1.2.0
               </div>
             
           
@@ -105,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="audmetric.edit_distance.html">edit_distance()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.equal_error_rate.html">equal_error_rate()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.event_error_rate.html">event_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.linkability.html">linkability()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.mean_absolute_error.html">mean_absolute_error()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.mean_squared_error.html">mean_squared_error()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.pearson_cc.html">pearson_cc()</a></li>
@@ -191,40 +192,43 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="audmetric.event_error_rate.html#audmetric.event_error_rate" title="audmetric.event_error_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">event_error_rate</span></code></a></p></td>
 <td><p>Event error rate based on edit distance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmetric.mean_absolute_error.html#audmetric.mean_absolute_error" title="audmetric.mean_absolute_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_absolute_error</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.linkability.html#audmetric.linkability" title="audmetric.linkability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linkability</span></code></a></p></td>
+<td><p>Linkability for verification tasks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.mean_absolute_error.html#audmetric.mean_absolute_error" title="audmetric.mean_absolute_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_absolute_error</span></code></a></p></td>
 <td><p>Mean absolute error.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.mean_squared_error.html#audmetric.mean_squared_error" title="audmetric.mean_squared_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_squared_error</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.mean_squared_error.html#audmetric.mean_squared_error" title="audmetric.mean_squared_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_squared_error</span></code></a></p></td>
 <td><p>Mean squared error.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmetric.pearson_cc.html#audmetric.pearson_cc" title="audmetric.pearson_cc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pearson_cc</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.pearson_cc.html#audmetric.pearson_cc" title="audmetric.pearson_cc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pearson_cc</span></code></a></p></td>
 <td><p>Pearson correlation coefficient.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.fscore_per_class.html#audmetric.fscore_per_class" title="audmetric.fscore_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fscore_per_class</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.fscore_per_class.html#audmetric.fscore_per_class" title="audmetric.fscore_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fscore_per_class</span></code></a></p></td>
 <td><p>F-score per class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmetric.precision_per_class.html#audmetric.precision_per_class" title="audmetric.precision_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">precision_per_class</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.precision_per_class.html#audmetric.precision_per_class" title="audmetric.precision_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">precision_per_class</span></code></a></p></td>
 <td><p>Precision per class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.recall_per_class.html#audmetric.recall_per_class" title="audmetric.recall_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recall_per_class</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.recall_per_class.html#audmetric.recall_per_class" title="audmetric.recall_per_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recall_per_class</span></code></a></p></td>
 <td><p>Recall per class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmetric.unweighted_average_bias.html#audmetric.unweighted_average_bias" title="audmetric.unweighted_average_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_bias</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.unweighted_average_bias.html#audmetric.unweighted_average_bias" title="audmetric.unweighted_average_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_bias</span></code></a></p></td>
 <td><p>Unweighted average bias of protected variable.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.unweighted_average_fscore.html#audmetric.unweighted_average_fscore" title="audmetric.unweighted_average_fscore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_fscore</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.unweighted_average_fscore.html#audmetric.unweighted_average_fscore" title="audmetric.unweighted_average_fscore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_fscore</span></code></a></p></td>
 <td><p>Unweighted average F-score.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmetric.unweighted_average_precision.html#audmetric.unweighted_average_precision" title="audmetric.unweighted_average_precision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_precision</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.unweighted_average_precision.html#audmetric.unweighted_average_precision" title="audmetric.unweighted_average_precision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_precision</span></code></a></p></td>
 <td><p>Unweighted average precision.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.unweighted_average_recall.html#audmetric.unweighted_average_recall" title="audmetric.unweighted_average_recall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_recall</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.unweighted_average_recall.html#audmetric.unweighted_average_recall" title="audmetric.unweighted_average_recall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unweighted_average_recall</span></code></a></p></td>
 <td><p>Unweighted average recall.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmetric.weighted_confusion_error.html#audmetric.weighted_confusion_error" title="audmetric.weighted_confusion_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weighted_confusion_error</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.weighted_confusion_error.html#audmetric.weighted_confusion_error" title="audmetric.weighted_confusion_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">weighted_confusion_error</span></code></a></p></td>
 <td><p>Weighted confusion error.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmetric.word_error_rate.html#audmetric.word_error_rate" title="audmetric.word_error_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">word_error_rate</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmetric.word_error_rate.html#audmetric.word_error_rate" title="audmetric.word_error_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">word_error_rate</span></code></a></p></td>
 <td><p>Word error rate based on edit distance.</p></td>
 </tr>
 </tbody>
@@ -254,7 +258,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/05/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
