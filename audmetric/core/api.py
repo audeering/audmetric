@@ -117,32 +117,19 @@ def concordance_cc(
     if not isinstance(prediction, np.ndarray):
         prediction = np.array(list(prediction))
 
+    if ignore_nan:
+        mask = ~(np.isnan(truth) | np.isnan(prediction))
+        truth = truth[mask]
+        prediction = prediction[mask]
+
     if len(prediction) < 2:
         return np.NaN
 
-    # Handle mask NaN cases separetly
-    # to be as fast as possible
-    consider_nan = False
-    if ignore_nan:
-        mask = ~(np.isnan(truth) | np.isnan(prediction))
-        length = mask.sum()
-        if length < prediction.size:
-            consider_nan = True
-            # Replace NaN values,
-            # otherwise mask * x would return NaN
-            prediction[~mask] = 0
-            truth[~mask] = 0
-            mean_y = np.sum(truth) / length
-            mean_x = np.sum(prediction) / length
-            a = mask * (prediction - mean_x)
-            b = mask * (truth - mean_y)
-
-    if not consider_nan:
-        length = prediction.size
-        mean_y = np.mean(truth)
-        mean_x = np.mean(prediction)
-        a = prediction - mean_x
-        b = truth - mean_y
+    length = prediction.size
+    mean_y = np.mean(truth)
+    mean_x = np.mean(prediction)
+    a = prediction - mean_x
+    b = truth - mean_y
 
     numerator = 2 * np.dot(a, b)
     denominator = np.dot(a, a) + np.dot(b, b) + length * (mean_x - mean_y) ** 2
