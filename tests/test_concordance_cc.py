@@ -5,7 +5,7 @@ import pytest
 import audmetric
 
 
-def expected_ccc(truth, prediction, ignore_nan):
+def expected_ccc(truth, prediction):
     r"""Expecte Concordance Correlation Coefficient.
 
     This is a direct implementation of its math equation.
@@ -16,11 +16,6 @@ def expected_ccc(truth, prediction, ignore_nan):
     """
     prediction = np.array(list(prediction))
     truth = np.array(list(truth))
-
-    if ignore_nan:
-        mask = ~(np.isnan(truth) | np.isnan(prediction))
-        truth = truth[mask]
-        prediction = prediction[mask]
 
     if len(prediction) < 2:
         ccc = np.NaN
@@ -39,53 +34,40 @@ def expected_ccc(truth, prediction, ignore_nan):
     return ccc
 
 
+@pytest.mark.parametrize('ignore_nan', [True, False])
 @pytest.mark.parametrize(
-    'truth, prediction, ignore_nan',
+    'truth, prediction',
     [
+        # NOTE: this test assumes
+        # that all truth and prediction values
+        # do not contain NaN
         (
             np.random.randint(0, 10, size=5),
             np.random.randint(0, 10, size=5),
-            False,
         ),
         (
             pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
             pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
-            False,
         ),
         (
             np.random.randint(0, 10, size=1),
             np.random.randint(0, 10, size=1),
-            False,
         ),
         (
             np.random.randint(0, 10, size=10),
             np.random.randint(0, 10, size=10),
-            False,
         ),
         (
             np.random.randint(0, 2, size=100),
             np.random.randint(0, 2, size=100),
-            False,
         ),
         (
             np.array([]),
             np.array([]),
-            False,
         ),
         (
             np.zeros(10),
             np.zeros(10),
-            False,
-        ),
-        (
-            [0, 1, 2, 3, 4, 5, 6, np.NaN],
-            [0, 2, 3, 5, 6, 7, 7, np.NaN],
-            False,
-        ),
-        (
-            [0, 1, 2, 3, 4, 5, 6, np.NaN],
-            [0, 2, 3, 5, 6, 7, 7, np.NaN],
-            True,
         ),
     ]
 )
@@ -95,7 +77,80 @@ def test_concordance_cc(truth, prediction, ignore_nan):
 
     np.testing.assert_almost_equal(
         ccc,
-        expected_ccc(truth, prediction, ignore_nan),
+        expected_ccc(truth, prediction),
+    )
+
+
+@pytest.mark.parametrize(
+    'truth, prediction, ignore_nan, expected_truth, expected_prediction',
+    [
+        # expected_truth and expected_prediction
+        # represent truth and prediction
+        # after ignore_nan was taken into account
+        (
+            [0, 1, 2, 3],
+            [1, 2, 3, 4],
+            True,
+            [0, 1, 2, 3],
+            [1, 2, 3, 4],
+        ),
+        (
+            [np.NaN, 1, 2, 3],
+            [np.NaN, 2, 3, 4],
+            True,
+            [1, 2, 3],
+            [2, 3, 4],
+        ),
+        (
+            [np.NaN, 1, 2, 3],
+            [1, 2, 3, np.NaN],
+            True,
+            [1, 2],
+            [2, 3],
+        ),
+        (
+            [0, np.NaN, 2, 3],
+            [1, 2, 3, 4],
+            True,
+            [0, 2, 3],
+            [1, 3, 4],
+        ),
+        (
+            [0, 1, 2, 3],
+            [1, 2, np.NaN, 4],
+            True,
+            [0, 1, 3],
+            [1, 2, 4],
+        ),
+        (
+            [np.NaN, np.NaN, 2, 3],
+            [1, 2, 3, np.NaN],
+            True,
+            [2],
+            [3],
+        ),
+        (
+            [np.NaN, np.NaN, 2, 3],
+            [1, 2, 3, np.NaN],
+            False,
+            [np.NaN, np.NaN, 2, 3],
+            [1, 2, 3, np.NaN],
+        ),
+    ]
+)
+def test_concordance_cc_ignore_nan(
+        truth,
+        prediction,
+        ignore_nan,
+        expected_truth,
+        expected_prediction,
+):
+
+    ccc = audmetric.concordance_cc(truth, prediction, ignore_nan=ignore_nan)
+
+    np.testing.assert_almost_equal(
+        ccc,
+        expected_ccc(expected_truth, expected_prediction),
     )
 
 
