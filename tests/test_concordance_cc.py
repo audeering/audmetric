@@ -10,9 +10,6 @@ def expected_ccc(truth, prediction):
 
     This is a direct implementation of its math equation.
 
-    If only a single sample is given,
-    it should return NaN.
-
     """
     prediction = np.array(list(prediction))
     truth = np.array(list(truth))
