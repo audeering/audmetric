@@ -82,59 +82,49 @@ def test_concordance_cc(truth, prediction, ignore_nan):
 
 
 @pytest.mark.parametrize(
-    'truth, prediction, ignore_nan, expected_truth, expected_prediction',
+    'truth, prediction, ignore_nan, expected',
     [
-        # expected_truth and expected_prediction
-        # represent truth and prediction
-        # after ignore_nan was taken into account
         (
             [0, 1, 2, 3],
             [1, 2, 3, 4],
             True,
-            [0, 1, 2, 3],
-            [1, 2, 3, 4],
+            expected_ccc([0, 1, 2, 3], [1, 2, 3, 4]),
         ),
         (
             [np.NaN, 1, 2, 3],
             [np.NaN, 2, 3, 4],
             True,
-            [1, 2, 3],
-            [2, 3, 4],
+            expected_ccc([1, 2, 3], [2, 3, 4]),
         ),
         (
             [np.NaN, 1, 2, 3],
             [1, 2, 3, np.NaN],
             True,
-            [1, 2],
-            [2, 3],
+            expected_ccc([1, 2], [2, 3]),
         ),
         (
             [0, np.NaN, 2, 3],
             [1, 2, 3, 4],
             True,
-            [0, 2, 3],
-            [1, 3, 4],
+            expected_ccc([0, 2, 3], [1, 3, 4]),
         ),
         (
             [0, 1, 2, 3],
             [1, 2, np.NaN, 4],
             True,
-            [0, 1, 3],
-            [1, 2, 4],
+            expected_ccc([0, 1, 3], [1, 2, 4]),
         ),
         (
             [np.NaN, np.NaN, 2, 3],
             [1, 2, 3, np.NaN],
             True,
-            [2],
-            [3],
+            expected_ccc([2], [3]),
         ),
         (
             [np.NaN, np.NaN, 2, 3],
             [1, 2, 3, np.NaN],
             False,
-            [np.NaN, np.NaN, 2, 3],
-            [1, 2, 3, np.NaN],
+            np.NaN,
         ),
     ]
 )
@@ -142,15 +132,14 @@ def test_concordance_cc_ignore_nan(
         truth,
         prediction,
         ignore_nan,
-        expected_truth,
-        expected_prediction,
+        expected,
 ):
 
     ccc = audmetric.concordance_cc(truth, prediction, ignore_nan=ignore_nan)
 
     np.testing.assert_almost_equal(
         ccc,
-        expected_ccc(expected_truth, expected_prediction),
+        expected,
     )
 
 
