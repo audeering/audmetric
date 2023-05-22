@@ -85,6 +85,42 @@ def test_concordance_cc(truth, prediction, ignore_nan):
     'truth, prediction, ignore_nan, expected',
     [
         (
+            [],
+            [],
+            True,
+            np.NaN,
+        ),
+        (
+            [],
+            [],
+            False,
+            np.NaN,
+        ),
+        (
+            [0],
+            [0],
+            True,
+            np.NaN,
+        ),
+        (
+            [0],
+            [0],
+            False,
+            np.NaN,
+        ),
+        (
+            [0, np.NaN],
+            [0, np.NaN],
+            True,
+            np.NaN,
+        ),
+        (
+            [0, np.NaN],
+            [0, np.NaN],
+            False,
+            np.NaN,
+        ),
+        (
             [0, 1, 2, 3],
             [1, 2, 3, 4],
             True,
@@ -141,26 +177,3 @@ def test_concordance_cc_ignore_nan(
         ccc,
         expected,
     )
-
-
-@pytest.mark.parametrize('ignore_nan', [True, False])
-@pytest.mark.parametrize(
-    'truth, prediction',
-    [
-        (
-            [],
-            [],
-        ),
-        (
-            [0],
-            [0],
-        ),
-        (
-            [0, np.NaN],
-            [0, np.NaN],
-        ),
-    ]
-)
-def test_concordance_cc_expected_nan(truth, prediction, ignore_nan):
-    ccc = audmetric.concordance_cc(truth, prediction, ignore_nan=ignore_nan)
-    assert np.isnan(ccc)
