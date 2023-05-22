@@ -17,20 +17,18 @@ def expected_ccc(truth, prediction):
     prediction = np.array(list(prediction))
     truth = np.array(list(truth))
 
-    if len(prediction) < 2:
+    denominator = (
+        prediction.std() ** 2
+        + truth.std() ** 2
+        + (prediction.mean() - truth.mean()) ** 2
+    )
+    if denominator == 0:
         ccc = np.NaN
     else:
-        denominator = (
-            prediction.std() ** 2
-            + truth.std() ** 2
-            + (prediction.mean() - truth.mean()) ** 2
-        )
-        if denominator == 0:
-            ccc = np.NaN
-        else:
-            r = np.corrcoef(list(prediction), list(truth))[0][1]
-            numerator = 2 * r * prediction.std() * truth.std()
-            ccc = numerator / denominator
+        r = np.corrcoef(list(prediction), list(truth))[0][1]
+        numerator = 2 * r * prediction.std() * truth.std()
+        ccc = numerator / denominator
+
     return ccc
 
 
