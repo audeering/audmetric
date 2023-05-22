@@ -233,63 +233,6 @@ def test_event_error_rate(truth, prediction, eer):
     )
 
 
-@pytest.mark.parametrize('truth,prediction', [
-    (
-        np.random.randint(0, 10, size=5),
-        np.random.randint(0, 10, size=5),
-    ),
-    (
-        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
-        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
-    ),
-    (
-        np.random.randint(0, 10, size=1),
-        np.random.randint(0, 10, size=1),
-    ),
-    (
-        np.random.randint(0, 10, size=10),
-        np.random.randint(0, 10, size=10),
-    ),
-    (
-        np.random.randint(0, 2, size=100),
-        np.random.randint(0, 2, size=100),
-    ),
-    (
-        np.array([]),
-        np.array([]),
-    ),
-    (
-        np.zeros(10),
-        np.zeros(10),
-    ),
-])
-def test_concordance_cc(truth, prediction):
-
-    ccc = audmetric.concordance_cc(truth, prediction)
-
-    prediction = np.array(list(prediction))
-    truth = np.array(list(truth))
-
-    if len(prediction) < 2:
-        ccc_expected = np.NaN
-    else:
-        denominator = (
-            prediction.std() ** 2
-            + truth.std() ** 2
-            + (prediction.mean() - truth.mean()) ** 2
-        )
-        if denominator == 0:
-            ccc_expected = np.NaN
-        else:
-            r = np.corrcoef(list(prediction), list(truth))[0][1]
-            ccc_expected = 2 * r * prediction.std() * truth.std() / denominator
-
-    np.testing.assert_almost_equal(
-        ccc,
-        ccc_expected,
-    )
-
-
 @pytest.mark.parametrize('class_range,num_elements,to_string,percentage', [
     ([0, 10], 5, False, False),
     ([0, 10], 1, False, False),

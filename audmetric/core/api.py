@@ -74,6 +74,8 @@ def accuracy(
 def concordance_cc(
         truth: typing.Sequence[float],
         prediction: typing.Sequence[float],
+        *,
+        ignore_nan: bool = False,
 ) -> float:
     r"""Concordance correlation coefficient.
 
@@ -92,6 +94,10 @@ def concordance_cc(
     Args:
         truth: ground truth values
         prediction: predicted values
+        ignore_nan: if ``True``
+            all samples that contain ``NaN``
+            in ``truth`` or ``prediction``
+            are ignored
 
     Returns:
         concordance correlation coefficient :math:`\in [-1, 1]`
@@ -101,7 +107,7 @@ def concordance_cc(
 
     Examples:
         >>> concordance_cc([0, 1, 2], [0, 1, 1])
-        0.6666666666666666
+        0.6666666666666665
 
     """
     assert_equal_length(truth, prediction)
@@ -111,23 +117,27 @@ def concordance_cc(
     if not isinstance(prediction, np.ndarray):
         prediction = np.array(list(prediction))
 
+    if ignore_nan:
+        mask = ~(np.isnan(truth) | np.isnan(prediction))
+        truth = truth[mask]
+        prediction = prediction[mask]
+
     if len(prediction) < 2:
         return np.NaN
 
-    r = pearson_cc(prediction, truth)
-    x_mean = prediction.mean()
-    y_mean = truth.mean()
-    x_std = prediction.std()
-    y_std = truth.std()
-    denominator = (
-        x_std * x_std
-        + y_std * y_std
-        + (x_mean - y_mean) * (x_mean - y_mean)
-    )
+    length = prediction.size
+    mean_y = np.mean(truth)
+    mean_x = np.mean(prediction)
+    a = prediction - mean_x
+    b = truth - mean_y
+
+    numerator = 2 * np.dot(a, b)
+    denominator = np.dot(a, a) + np.dot(b, b) + length * (mean_x - mean_y) ** 2
+
     if denominator == 0:
         ccc = np.nan
     else:
-        ccc = 2 * r * x_std * y_std / denominator
+        ccc = numerator / denominator
 
     return float(ccc)
 
