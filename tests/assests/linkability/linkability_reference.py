@@ -4,6 +4,7 @@ import tempfile
 import numpy as np
 
 import audeer
+
 import audmetric
 
 
@@ -145,7 +146,7 @@ for n, (truth, prediction, omega) in enumerate(test_cases):
             stderr=subprocess.STDOUT
         )
         # The above Python command returns a string containing:
-        # id,matedMean,nonMatedMean,matedStd,nonMatedStd,linkability,cllr,cmin,eer
+        # id,matedMean,nonMatedMean,matedStd,nonMatedStd,linkability,cllr,cmin,eer  # noqa: E501
         # which means we can access the linkability by -4 from the end
         linkability = out.split()[0].decode("utf-8").split(',')[-4]
         results.append((omega, linkability))
