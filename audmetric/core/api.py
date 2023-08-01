@@ -1264,7 +1264,7 @@ def _matching_scores(
     r"""Mated and non-mated scores for verification tasks.
 
     For verification task,
-    predictions are usually seperated
+    predictions are usually separated
     in all predictions belonging
     to the matching examples,
     and all other predictions.

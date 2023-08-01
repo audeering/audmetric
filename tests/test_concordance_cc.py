@@ -6,7 +6,7 @@ import audmetric
 
 
 def expected_ccc(truth, prediction):
-    r"""Expecte Concordance Correlation Coefficient.
+    r"""Expected Concordance Correlation Coefficient.
 
     This is a direct implementation of its math equation.
 
