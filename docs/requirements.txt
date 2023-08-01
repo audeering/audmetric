@@ -6,3 +6,4 @@ sphinx-autodoc-typehints
 sphinx-copybutton
 sphinxcontrib-bibtex >=2.3.0
 sphinxcontrib-katex >=0.8.6
+toml

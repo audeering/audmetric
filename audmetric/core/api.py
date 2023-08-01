@@ -7,11 +7,9 @@ import numpy as np
 
 import audeer
 
-from audmetric.core.utils import (
-    assert_equal_length,
-    infer_labels,
-    scores_per_subgroup_and_class,
-)
+from audmetric.core.utils import assert_equal_length
+from audmetric.core.utils import infer_labels
+from audmetric.core.utils import scores_per_subgroup_and_class
 
 
 def accuracy(
@@ -666,20 +664,20 @@ def linkability(
     y1 = np.histogram(mated_scores, bins=bin_edges, density=True)[0]
     y2 = np.histogram(non_mated_scores, bins=bin_edges, density=True)[0]
     # LR = P[s|mated ]/P[s|non-mated]
-    LR = np.divide(y1, y2, out=np.ones_like(y1), where=y2 != 0)
-    D = 2 * (omega * LR / (1 + omega*LR)) - 1
+    lr = np.divide(y1, y2, out=np.ones_like(y1), where=y2 != 0)
+    d = 2 * (omega * lr / (1 + omega * lr)) - 1
     # Def of D
-    D[omega * LR <= 1] = 0
+    d[omega * lr <= 1] = 0
     # Taking care of inf/NaN
     mask = [
         True if y2[i] == 0 and y1[i] != 0 else False
         for i in range(len(y1))
     ]
-    D[mask] = 1
+    d[mask] = 1
     # Global measure using trapz numerical integration
-    Dsys = np.trapz(x=bin_centers, y=D * y1)
+    d_sys = np.trapz(x=bin_centers, y=d * y1)
 
-    return Dsys
+    return d_sys
 
 
 def mean_absolute_error(
@@ -1184,7 +1182,6 @@ def weighted_confusion_error(
         weighted confusion error
 
     Examples:
-
         >>> truth = [0, 1, 2]
         >>> prediction = [0, 2, 0]
         >>> # penalize only errors > 1
@@ -1264,7 +1261,7 @@ def _matching_scores(
     r"""Mated and non-mated scores for verification tasks.
 
     For verification task,
-    predictions are usually seperated
+    predictions are usually separated
     in all predictions belonging
     to the matching examples,
     and all other predictions.
