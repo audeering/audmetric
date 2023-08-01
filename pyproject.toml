@@ -149,7 +149,7 @@ section-order = [
 ]
 [tool.ruff.isort.sections]
 'audeering' = [
-    'audb'
+    'audb',
     'audmetricackend',
     'audeer',
     'audformat',
