@@ -1,11 +1,4 @@
-# numpy 1.24 has removed numpy.int,
-# which is needed by pyeer.
-# A fix is proposed at
-# https://github.com/manuelaguadomtz/pyeer/pull/10
-# until this is accepted we pin numpy
-numpy < 1.24
 pandas
-pyeer
 pytest
 pytest-doctestplus
 pytest-cov
