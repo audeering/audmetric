@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import pyeer.eer_info
 import pytest
 import sklearn.metrics
 
@@ -153,21 +152,19 @@ def test_accuracy(truth, prediction, labels, to_string):
     ]
 )
 def test_equal_error_rate(truth, prediction, expected_eer, expected_threshold):
+    r"""Test audmetric.equal_error_rate().
+
+    The expected values for EER and the thresholds
+    were calculated by the ``pyeer`` package,
+    see https://github.com/manuelaguadomtz/pyeer.
+
+    """
     eer, stats = audmetric.equal_error_rate(truth, prediction)
     # Check expected results
     assert type(eer) == float
     assert type(stats.threshold) == float
     assert eer == expected_eer
     assert stats.threshold == expected_threshold
-    # Compare to pyeer package
-    truth = np.array(truth)
-    prediction = np.array(prediction)
-    pyeer_stats = pyeer.eer_info.get_eer_stats(
-        prediction[truth],
-        prediction[~truth],
-    )
-    assert eer == pyeer_stats.eer
-    assert stats.threshold == pyeer_stats.eer_th
 
 
 def test_equal_error_rate_warnings():
@@ -178,12 +175,6 @@ def test_equal_error_rate_warnings():
     warning = 'invalid value encountered'
     with pytest.warns(RuntimeWarning, match=warning):
         eer, stats = audmetric.equal_error_rate(truth, prediction)
-        pyeer_stats = pyeer.eer_info.get_eer_stats(
-            prediction[truth],
-            prediction[~truth],
-        )
-        assert eer == pyeer_stats.eer
-        assert stats.threshold == pyeer_stats.eer_th
 
     # Curves to not overlap
     truth = np.array([1, 1, 0])
@@ -194,12 +185,6 @@ def test_equal_error_rate_warnings():
     )
     with pytest.warns(RuntimeWarning, match=warning):
         eer, stats = audmetric.equal_error_rate(truth, prediction)
-        pyeer_stats = pyeer.eer_info.get_eer_stats(
-            prediction[truth],
-            prediction[~truth],
-        )
-        assert eer == pyeer_stats.eer
-        assert stats.threshold == pyeer_stats.eer_th
 
 
 @pytest.mark.parametrize(
