@@ -32,7 +32,9 @@ def infer_labels(
         labels in sorted order
 
     """
-    return sorted(list(set(truth) | set(prediction)))
+    truth = _remove_nan(truth)
+    prediction = _remove_nan(prediction)
+    return sorted(list(set(truth) | set(prediction)), key=str)
 
 
 def scores_per_subgroup_and_class(
@@ -104,3 +106,10 @@ def scores_per_subgroup_and_class(
             zero_division=zero_division,
         )
     return score
+
+
+def _remove_nan(sequence):
+    return [
+        s for s in sequence
+        if not isinstance(s, float) or not np.isnan(s)
+    ]
