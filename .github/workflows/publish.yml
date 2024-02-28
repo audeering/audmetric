@@ -9,7 +9,6 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
-    runs-on: ubuntu-latest
     environment: release
     permissions:
       contents: write
@@ -25,7 +24,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.8'
+        python-version: '3.10'
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
@@ -53,13 +52,13 @@ jobs:
 
     - name: Build documentation
       run: |
-        python -m sphinx docs/ docs/_build/ -b html -D katex_prerender=1
+        python -m sphinx docs/ build/html -b html -D katex_prerender=1
 
     - name: Deploy documentation to Github pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_build
+        publish_dir: ./build/html
 
     # Github release
     - name: Read CHANGELOG
