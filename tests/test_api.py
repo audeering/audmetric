@@ -141,7 +141,7 @@ def test_accuracy(truth, prediction, labels, to_string):
             [0., 1/3, 1/3, 2/3],
             [0.2, 0.4, 0.5, 0.8],
         ),
-        # Non [1, 0, True, False] truth not allowed
+        # Float values not allowed in truth
         pytest.param(
             [1, 0.5, 0, 0],
             [1, 1, 0, 0],
