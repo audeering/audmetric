@@ -13,7 +13,7 @@ Version 1.2.1 (2024/02/28)
 * Added: ``ignore_nan`` argument
   to ``audmetric.concordance_cc()``
 * Added: support for Python 3.12
-* Fixed: speedup ``audmetric.detection_error_tradeoff()``
+* Changed: speedup ``audmetric.detection_error_tradeoff()``
 * Fixed: avoid deprecation warning for ``pkg_resources``
 * Removed: support for Python 3.7
 
