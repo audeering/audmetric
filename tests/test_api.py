@@ -97,7 +97,7 @@ def test_accuracy(truth, prediction, labels, to_string):
 
 
 @pytest.mark.parametrize(
-    'truth, prediction, expected_fmr, expected_fnmr, expected_threshold',
+    'truth, prediction, expected_fmr, expected_fnmr, expected_thresholds',
     [
         (
             [1, 1, 0, 0],
