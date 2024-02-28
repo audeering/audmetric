@@ -1,13 +1,14 @@
 MIT License
 
-Copyright (c) 2019-2021 audEERING GmbH and Contributors
+Copyright (c) 2019-present audEERING GmbH and Contributors
 
 Authors:
     Johannes Wagner
     Hagen Wierstorf
+    Uwe Reichel
+    Maximilian Schmitt
     Stephan Huber
     Andreas Triantafyllopoulos
-    Uwe Reichel
     Manuel Aguado Martínez (for equal_error_rate and detection_error_tradeoff)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
