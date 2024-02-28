@@ -4,20 +4,20 @@ import numpy as np
 
 
 def assert_equal_length(
-        truth: typing.Sequence[typing.Any],
-        prediction: typing.Sequence[typing.Any],
+    truth: typing.Sequence[typing.Any],
+    prediction: typing.Sequence[typing.Any],
 ):
     r"""Assert truth and prediction have equal length."""
     if len(truth) != len(prediction):
         raise ValueError(
-            f'Truth and prediction differ in length: '
-            f'{len(truth)} != {len(prediction)}.'
+            f"Truth and prediction differ in length: "
+            f"{len(truth)} != {len(prediction)}."
         )
 
 
 def infer_labels(
-        truth: typing.Sequence[typing.Any],
-        prediction: typing.Sequence[typing.Any],
+    truth: typing.Sequence[typing.Any],
+    prediction: typing.Sequence[typing.Any],
 ) -> typing.List[typing.Any]:
     r"""Infer labels from truth and prediction.
 
@@ -36,21 +36,21 @@ def infer_labels(
 
 
 def scores_per_subgroup_and_class(
-        truth: typing.Sequence[typing.Any],
-        prediction: typing.Sequence[typing.Any],
-        protected_variable: typing.Sequence[typing.Any],
-        metric: typing.Callable[
-            [
-                typing.Sequence[typing.Any],
-                typing.Sequence[typing.Any],
-                typing.Optional[typing.Sequence[str]],
-                float
-            ],
-            typing.Dict[str, float],
+    truth: typing.Sequence[typing.Any],
+    prediction: typing.Sequence[typing.Any],
+    protected_variable: typing.Sequence[typing.Any],
+    metric: typing.Callable[
+        [
+            typing.Sequence[typing.Any],
+            typing.Sequence[typing.Any],
+            typing.Optional[typing.Sequence[str]],
+            float,
         ],
-        labels: typing.Sequence[typing.Any],
-        subgroups: typing.Sequence[typing.Any],
-        zero_division: float,
+        typing.Dict[str, float],
+    ],
+    labels: typing.Sequence[typing.Any],
+    subgroups: typing.Sequence[typing.Any],
+    zero_division: float,
 ) -> typing.Dict[typing.Hashable, typing.Dict]:
     r"""Compute scores per class for each subgroup based on metric.
 
@@ -74,20 +74,32 @@ def scores_per_subgroup_and_class(
     Examples:
         >>> import audmetric
         >>> scores_per_subgroup_and_class(
-        ...     [1, 1], [0, 1], ['male', 'female'], audmetric.recall_per_class,
-        ...     [0, 1], ['male', 'female'], 0.)
+        ...     [1, 1],
+        ...     [0, 1],
+        ...     ["male", "female"],
+        ...     audmetric.recall_per_class,
+        ...     [0, 1],
+        ...     ["male", "female"],
+        ...     0.0,
+        ... )
         {'male': {0: 0.0, 1: 0.0}, 'female': {0: 0.0, 1: 1.0}}
         >>> scores_per_subgroup_and_class(
-        ...     [1, 1], [0, 1], ['male', 'female'], audmetric.precision_per_class,
-        ...     [0, 1], ['male', 'female'], zero_division=np.nan)
+        ...     [1, 1],
+        ...     [0, 1],
+        ...     ["male", "female"],
+        ...     audmetric.precision_per_class,
+        ...     [0, 1],
+        ...     ["male", "female"],
+        ...     zero_division=np.nan,
+        ... )
         {'male': {0: 0.0, 1: nan}, 'female': {0: nan, 1: 1.0}}
 
     """  # noqa: E501
     if set(subgroups) - set(protected_variable):
         raise ValueError(
-            f'`subgroups` contains manifestations of the protected '
-            f'variable which are not contained in `protected_variable`: '
-            f'{set(subgroups) - set(protected_variable)}'
+            f"`subgroups` contains manifestations of the protected "
+            f"variable which are not contained in `protected_variable`: "
+            f"{set(subgroups) - set(protected_variable)}"
         )
 
     truth = np.array(truth)

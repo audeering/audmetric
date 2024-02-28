@@ -44,7 +44,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
 
 
 @pytest.mark.parametrize(
-    'truth, prediction, omega, expected',
+    "truth, prediction, omega, expected",
     [
         # All following tests get [0, 1, 0, 1, ..., 0, 1] as truth values.
         # The corresponding prediction values
@@ -205,7 +205,7 @@ def prediction(range1, range2, samples=1000, random_state=1):
             2.0 / 1,
             0.3746,
         ),
-    ]
+    ],
 )
 def test_linkability(truth, prediction, omega, expected):
     linkability = audmetric.linkability(truth, prediction, omega=omega)
