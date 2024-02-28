@@ -29,9 +29,9 @@ def expected_ccc(truth, prediction):
     return ccc
 
 
-@pytest.mark.parametrize('ignore_nan', [True, False])
+@pytest.mark.parametrize("ignore_nan", [True, False])
 @pytest.mark.parametrize(
-    'truth, prediction',
+    "truth, prediction",
     [
         # NOTE: this test assumes
         # that all truth and prediction values
@@ -41,8 +41,8 @@ def expected_ccc(truth, prediction):
             np.random.randint(0, 10, size=5),
         ),
         (
-            pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
-            pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
+            pd.Series(np.random.randint(0, 10, size=5)).astype("Int64"),
+            pd.Series(np.random.randint(0, 10, size=5)).astype("Int64"),
         ),
         (
             np.random.randint(0, 10, size=1),
@@ -64,10 +64,9 @@ def expected_ccc(truth, prediction):
             np.zeros(10),
             np.zeros(10),
         ),
-    ]
+    ],
 )
 def test_concordance_cc(truth, prediction, ignore_nan):
-
     ccc = audmetric.concordance_cc(truth, prediction, ignore_nan=ignore_nan)
 
     np.testing.assert_almost_equal(
@@ -77,7 +76,7 @@ def test_concordance_cc(truth, prediction, ignore_nan):
 
 
 @pytest.mark.parametrize(
-    'truth, prediction, ignore_nan, expected',
+    "truth, prediction, ignore_nan, expected",
     [
         (
             [],
@@ -157,15 +156,14 @@ def test_concordance_cc(truth, prediction, ignore_nan):
             False,
             np.NaN,
         ),
-    ]
+    ],
 )
 def test_concordance_cc_ignore_nan(
-        truth,
-        prediction,
-        ignore_nan,
-        expected,
+    truth,
+    prediction,
+    ignore_nan,
+    expected,
 ):
-
     ccc = audmetric.concordance_cc(truth, prediction, ignore_nan=ignore_nan)
 
     np.testing.assert_almost_equal(

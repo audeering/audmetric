@@ -127,32 +127,29 @@ for n, (truth, prediction, omega) in enumerate(test_cases):
         prediction,
     )
     with tempfile.TemporaryDirectory() as tmp:
-        score_file = audeer.path(tmp, 'score')
-        with open(score_file, 'w') as fp:
+        score_file = audeer.path(tmp, "score")
+        with open(score_file, "w") as fp:
             for score in mated_scores:
-                fp.write(f'{score} 1\n')
+                fp.write(f"{score} 1\n")
             for score in nonmated_scores:
-                fp.write(f'{score} 0\n')
+                fp.write(f"{score} 0\n")
         shell_command = [
-            'python',
-            'anonymization_metrics/compute_metrics.py',
-            '-s',
-            f'{score_file}',
-            '--omega',
-            f'{omega}',
+            "python",
+            "anonymization_metrics/compute_metrics.py",
+            "-s",
+            f"{score_file}",
+            "--omega",
+            f"{omega}",
         ]
-        out = subprocess.check_output(
-            shell_command,
-            stderr=subprocess.STDOUT
-        )
+        out = subprocess.check_output(shell_command, stderr=subprocess.STDOUT)
         # The above Python command returns a string containing:
         # id,matedMean,nonMatedMean,matedStd,nonMatedStd,linkability,cllr,cmin,eer  # noqa: E501
         # which means we can access the linkability by -4 from the end
-        linkability = out.split()[0].decode("utf-8").split(',')[-4]
+        linkability = out.split()[0].decode("utf-8").split(",")[-4]
         results.append((omega, linkability))
 
 # Store results
-with open('results.txt', 'w') as fp:
-    fp.write('testcase,omega,linkability\n')
+with open("results.txt", "w") as fp:
+    fp.write("testcase,omega,linkability\n")
     for n, (omega, linkability) in enumerate(results):
-        fp.write(f'{n},{omega},{linkability}\n')
+        fp.write(f"{n},{omega},{linkability}\n")

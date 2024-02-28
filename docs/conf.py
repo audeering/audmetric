@@ -7,47 +7,47 @@ import toml
 import audeer
 
 
-config = toml.load(audeer.path('..', 'pyproject.toml'))
+config = toml.load(audeer.path("..", "pyproject.toml"))
 
 
 # Project -----------------------------------------------------------------
-project = config['project']['name']
-copyright = f'2019-{date.today().year} audEERING GmbH'
-author = ', '.join(author['name'] for author in config['project']['authors'])
+project = config["project"]["name"]
+copyright = f"2019-{date.today().year} audEERING GmbH"
+author = ", ".join(author["name"] for author in config["project"]["authors"])
 version = audeer.git_repo_version()
-title = 'Documentation'
+title = "Documentation"
 
 
 # General -----------------------------------------------------------------
-master_doc = 'index'
-source_suffix = '.rst'
+master_doc = "index"
+source_suffix = ".rst"
 exclude_patterns = [
-    'build',
-    'tests',
-    'Thumbs.db',
-    '.DS_Store',
-    'api-src',
+    "build",
+    "tests",
+    "Thumbs.db",
+    ".DS_Store",
+    "api-src",
 ]
-templates_path = ['_templates']
+templates_path = ["_templates"]
 pygments_style = None
 extensions = [
-    'sphinxcontrib.bibtex',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',  # support for Google-style docstrings
-    'sphinx.ext.autosummary',
-    'sphinx_autodoc_typehints',
-    'sphinx.ext.viewcode',
-    'sphinx_copybutton',
-    'sphinxcontrib.katex',  # has to be before jupyter_sphinx
+    "sphinxcontrib.bibtex",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",  # support for Google-style docstrings
+    "sphinx.ext.autosummary",
+    "sphinx_autodoc_typehints",
+    "sphinx.ext.viewcode",
+    "sphinx_copybutton",
+    "sphinxcontrib.katex",  # has to be before jupyter_sphinx
 ]
 
 napoleon_use_ivar = True  # List of class attributes
 autodoc_inherit_docstrings = False  # disable docstring inheritance
-bibtex_bibfiles = ['refs.bib']
+bibtex_bibfiles = ["refs.bib"]
 # Don't check for DOIs as they will always work
 # and tend to fail the test
 linkcheck_ignore = [
-    'https://doi.org/',
+    "https://doi.org/",
 ]
 
 # Disable auto-generation of TOC entries in the API
@@ -56,25 +56,24 @@ toc_object_entries = False
 
 
 # HTML --------------------------------------------------------------------
-html_theme = 'sphinx_audeering_theme'
+html_theme = "sphinx_audeering_theme"
 html_theme_options = {
-    'display_version': True,
-    'logo_only': False,
-    'footer_links': False,
+    "display_version": True,
+    "logo_only": False,
+    "footer_links": False,
 }
 html_context = {
-    'display_github': True,
+    "display_github": True,
 }
 html_title = title
 
 
 # Copy API (sub-)module RST files to docs/api/ folder ---------------------
-audeer.rmdir('api')
-audeer.mkdir('api')
-api_src_files = audeer.list_file_names('api-src')
+audeer.rmdir("api")
+audeer.mkdir("api")
+api_src_files = audeer.list_file_names("api-src")
 api_dst_files = [
-    audeer.path('api', os.path.basename(src_file))
-    for src_file in api_src_files
+    audeer.path("api", os.path.basename(src_file)) for src_file in api_src_files
 ]
 for src_file, dst_file in zip(api_src_files, api_dst_files):
     shutil.copyfile(src_file, dst_file)

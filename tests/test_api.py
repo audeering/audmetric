@@ -6,68 +6,66 @@ import sklearn.metrics
 import audmetric
 
 
-@pytest.mark.parametrize('truth,prediction,labels,to_string', [
-    (
-        np.random.randint(0, 10, size=5),
-        np.random.randint(0, 10, size=5),
-        None,
-        False,
-    ),
-    (
-        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
-        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
-        None,
-        False,
-    ),
-    (
-        np.random.randint(0, 10, size=1),
-        np.random.randint(0, 10, size=1),
-        list(range(1, 10)),
-        False,
-    ),
-    (
-        np.random.randint(0, 10, size=10),
-        np.random.randint(0, 10, size=10),
-        list(range(1, 10)),
-        False,
-    ),
-    (
-        np.random.randint(0, 10, size=10),
-        np.random.randint(0, 10, size=10),
-        None,
-        True,
-    ),
-    (
-        np.array([]),
-        np.array([]),
-        None,
-        False,
-    ),
-    (
-        np.zeros(10),
-        np.zeros(10),
-        None,
-        False,
-    ),
-    (
-        np.arange(10),
-        np.arange(10),
-        list(range(1, 10)),
-        False,
-    ),
-    (
-        np.arange(10),
-        np.arange(1, 11),
-        list(range(1, 10)),
-        False,
-    ),
-    (
-        np.arange(5),
-        np.array([1, 2, 3, 4, 6]),
-        list(range(5)),
-        False
-    )
-])
+@pytest.mark.parametrize(
+    "truth,prediction,labels,to_string",
+    [
+        (
+            np.random.randint(0, 10, size=5),
+            np.random.randint(0, 10, size=5),
+            None,
+            False,
+        ),
+        (
+            pd.Series(np.random.randint(0, 10, size=5)).astype("Int64"),
+            pd.Series(np.random.randint(0, 10, size=5)).astype("Int64"),
+            None,
+            False,
+        ),
+        (
+            np.random.randint(0, 10, size=1),
+            np.random.randint(0, 10, size=1),
+            list(range(1, 10)),
+            False,
+        ),
+        (
+            np.random.randint(0, 10, size=10),
+            np.random.randint(0, 10, size=10),
+            list(range(1, 10)),
+            False,
+        ),
+        (
+            np.random.randint(0, 10, size=10),
+            np.random.randint(0, 10, size=10),
+            None,
+            True,
+        ),
+        (
+            np.array([]),
+            np.array([]),
+            None,
+            False,
+        ),
+        (
+            np.zeros(10),
+            np.zeros(10),
+            None,
+            False,
+        ),
+        (
+            np.arange(10),
+            np.arange(10),
+            list(range(1, 10)),
+            False,
+        ),
+        (
+            np.arange(10),
+            np.arange(1, 11),
+            list(range(1, 10)),
+            False,
+        ),
+        (np.arange(5), np.array([1, 2, 3, 4, 6]), list(range(5)), False),
+    ],
+)
 def test_accuracy(truth, prediction, labels, to_string):
     if to_string:
         truth = [str(w) for w in truth]
@@ -78,10 +76,7 @@ def test_accuracy(truth, prediction, labels, to_string):
     else:
         if labels:
             mask = np.nonzero(
-                np.logical_and(
-                    np.isin(truth, labels),
-                    np.isin(prediction, labels)
-                )
+                np.logical_and(np.isin(truth, labels), np.isin(prediction, labels))
             )
             truth = truth[mask]
             prediction = prediction[mask]
@@ -97,66 +92,64 @@ def test_accuracy(truth, prediction, labels, to_string):
 
 
 @pytest.mark.parametrize(
-    'truth, prediction, expected_fmr, expected_fnmr, expected_thresholds',
+    "truth, prediction, expected_fmr, expected_fnmr, expected_thresholds",
     [
         (
             [1, 1, 0, 0],
             [1, 1, 0, 0],
-            [1., 0.],
-            [0., 0.],
-            [0., 1.],
+            [1.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 1.0],
         ),
         (
             [True, True, False, False],
             [True, True, False, False],
-            [1., 0.],
-            [0., 0.],
-            [0., 1.],
+            [1.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 1.0],
         ),
         (
             [True, True, False, False],
             [1, 1, 0, 0],
-            [1., 0.],
-            [0., 0.],
-            [0., 1.],
+            [1.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 1.0],
         ),
         (  # similarities > 1 or < 0
             [True, True, False, False],
-            [1.5, 1.5, -1., -1.],
-            [1., 0.],
-            [0., 0.],
-            [-1., 1.5],
+            [1.5, 1.5, -1.0, -1.0],
+            [1.0, 0.0],
+            [0.0, 0.0],
+            [-1.0, 1.5],
         ),
         (  # unordered
             [1, 0, 1, 1],
             [0.5, 0.4, 0.8, 0.2],
-            [1., 1., 0., 0.],
-            [0., 1/3, 1/3, 2/3],
+            [1.0, 1.0, 0.0, 0.0],
+            [0.0, 1 / 3, 1 / 3, 2 / 3],
             [0.2, 0.4, 0.5, 0.8],
         ),
         (  # mixed truth types
             [1, False, 1, True],
             [0.5, 0.4, 0.8, 0.2],
-            [1., 1., 0., 0.],
-            [0., 1/3, 1/3, 2/3],
+            [1.0, 1.0, 0.0, 0.0],
+            [0.0, 1 / 3, 1 / 3, 2 / 3],
             [0.2, 0.4, 0.5, 0.8],
         ),
         # Float values not allowed in truth
         pytest.param(
             [1, 0.5, 0, 0],
             [1, 1, 0, 0],
-            [1., 0.],
-            [0., 0.],
-            [0., 1.],
+            [1.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 1.0],
             marks=pytest.mark.xfail(raises=ValueError),
         ),
-    ]
+    ],
 )
-def test_detection_error_tradeoff(truth,
-                                  prediction,
-                                  expected_fmr,
-                                  expected_fnmr,
-                                  expected_thresholds):
+def test_detection_error_tradeoff(
+    truth, prediction, expected_fmr, expected_fnmr, expected_thresholds
+):
     ret = audmetric.detection_error_tradeoff(truth, prediction)
     # Check return types
     assert len(ret) == 3  # fmr, fnmr, thresholds
@@ -172,7 +165,7 @@ def test_detection_error_tradeoff(truth,
 
 
 @pytest.mark.parametrize(
-    'truth, prediction, expected_eer, expected_threshold',
+    "truth, prediction, expected_eer, expected_threshold",
     [
         (
             [1, 1, 0, 0],
@@ -224,7 +217,7 @@ def test_detection_error_tradeoff(truth,
             1,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
-    ]
+    ],
 )
 def test_equal_error_rate(truth, prediction, expected_eer, expected_threshold):
     r"""Test audmetric.equal_error_rate().
@@ -236,74 +229,74 @@ def test_equal_error_rate(truth, prediction, expected_eer, expected_threshold):
     """
     eer, stats = audmetric.equal_error_rate(truth, prediction)
     # Check expected results
-    assert type(eer) == float
-    assert type(stats.threshold) == float
+    assert isinstance(eer, float)
+    assert isinstance(stats.threshold, float)
     assert eer == expected_eer
     assert stats.threshold == expected_threshold
 
 
 def test_equal_error_rate_warnings():
-
     # No imposter scores (division by 0)
     truth = np.array([1, 1])
     prediction = np.array([1, 1])
-    warning = 'invalid value encountered'
+    warning = "invalid value encountered"
     with pytest.warns(RuntimeWarning, match=warning):
         eer, stats = audmetric.equal_error_rate(truth, prediction)
 
     # Curves to not overlap
     truth = np.array([1, 1, 0])
-    prediction = np.array([.5, .5, .5])
+    prediction = np.array([0.5, 0.5, 0.5])
     warning = (
-        r'false match rate and false non-match rate curves '
-        r'do not intersect each other'
+        r"false match rate and false non-match rate curves "
+        r"do not intersect each other"
     )
     with pytest.warns(RuntimeWarning, match=warning):
         eer, stats = audmetric.equal_error_rate(truth, prediction)
 
 
 @pytest.mark.parametrize(
-    'truth,prediction,eer', [
+    "truth,prediction,eer",
+    [
         ([], [], 0),
         ([[]], [[]], 0),
-        ([[None]], [[]], 1.),
-        ([[None]], [[1]], 1.),
-        ([[None]], [[1, 2]], 1.),
+        ([[None]], [[]], 1.0),
+        ([[None]], [[1]], 1.0),
+        ([[None]], [[1, 2]], 1.0),
         ([[0], []], [[1], []], 0.5),
         ([[0, 1]], [[0]], 0.5),
         ([[0]], [[0, 1]], 0.5),
         ([[0, 1], [2]], [[0], [2]], 0.25),
         pytest.param(
-            [[0, 1]], [[0], [2]], 0.,
-            marks=pytest.mark.xfail(raises=ValueError)
+            [[0, 1]], [[0], [2]], 0.0, marks=pytest.mark.xfail(raises=ValueError)
         ),
-        ('lorem', 'lorm', 0.2),
-        (['lorem'], ['lorm'], 0.2),
-        (['lorem', 'ipsum'], ['lorm', 'ipsum'], 0.1),
+        ("lorem", "lorm", 0.2),
+        (["lorem"], ["lorm"], 0.2),
+        (["lorem", "ipsum"], ["lorm", "ipsum"], 0.1),
         pytest.param(
-            ['lorem', 'ipsum'], ['lorm'], 0.,
+            ["lorem", "ipsum"],
+            ["lorm"],
+            0.0,
             marks=pytest.mark.xfail(raises=ValueError),
-        )
-    ]
+        ),
+    ],
 )
 def test_event_error_rate(truth, prediction, eer):
-    np.testing.assert_equal(
-        audmetric.event_error_rate(truth, prediction),
-        eer
-    )
+    np.testing.assert_equal(audmetric.event_error_rate(truth, prediction), eer)
 
 
-@pytest.mark.parametrize('class_range,num_elements,to_string,percentage', [
-    ([0, 10], 5, False, False),
-    ([0, 10], 1, False, False),
-    ([0, 10], 10, False, False),
-    ([0, 2], 100, False, False),
-    ([0, 10], 10, True, False),
-    ([0, 10], 100, True, True),
-    ([0, 10], 10, True, True),
-])
+@pytest.mark.parametrize(
+    "class_range,num_elements,to_string,percentage",
+    [
+        ([0, 10], 5, False, False),
+        ([0, 10], 1, False, False),
+        ([0, 10], 10, False, False),
+        ([0, 2], 100, False, False),
+        ([0, 10], 10, True, False),
+        ([0, 10], 100, True, True),
+        ([0, 10], 10, True, True),
+    ],
+)
 def test_confusion_matrix(class_range, num_elements, to_string, percentage):
-
     t = np.random.randint(class_range[0], class_range[1], size=num_elements)
     p = np.random.randint(class_range[0], class_range[1], size=num_elements)
 
@@ -314,7 +307,7 @@ def test_confusion_matrix(class_range, num_elements, to_string, percentage):
     cm = audmetric.confusion_matrix(t, p, normalize=percentage)
 
     if percentage:
-        cm_sklearn = sklearn.metrics.confusion_matrix(t, p, normalize='true')
+        cm_sklearn = sklearn.metrics.confusion_matrix(t, p, normalize="true")
     else:
         cm_sklearn = sklearn.metrics.confusion_matrix(t, p)
 
@@ -322,38 +315,38 @@ def test_confusion_matrix(class_range, num_elements, to_string, percentage):
 
 
 @pytest.mark.parametrize(
-    'truth,prediction,edit_distance', [
-        ('lorem', 'lorem', 0),
-        ('lorem', '', 5),
-        ('', 'lorem', 5),
-        ('lorem', 'lorm', 1),
-        ('lorem', 'lorrem', 1),
-        ('lorem', 'lorom', 1),
-        ('lorem', 'morel', 2),
+    "truth,prediction,edit_distance",
+    [
+        ("lorem", "lorem", 0),
+        ("lorem", "", 5),
+        ("", "lorem", 5),
+        ("lorem", "lorm", 1),
+        ("lorem", "lorrem", 1),
+        ("lorem", "lorom", 1),
+        ("lorem", "morel", 2),
         ([], [0], 1),
         ([0], [], 1),
         ([0, 1, 2], [0, 1], 1),
         ([0, 1, 2], [0, 1, 1], 1),
         ([None], [], 1),
         ([None], [1], 1),
-        ([None], [1, 2], 2)
-    ]
+        ([None], [1, 2], 2),
+    ],
 )
 def test_edit_distance(truth, prediction, edit_distance):
-    np.testing.assert_equal(
-        audmetric.edit_distance(truth, prediction),
-        edit_distance
-    )
+    np.testing.assert_equal(audmetric.edit_distance(truth, prediction), edit_distance)
 
 
-@pytest.mark.parametrize('value_range,num_elements', [
-    ([0, 10], 5),
-    ([0, 10], 1),
-    ([0, 10], 10),
-    ([0, 2], 100),
-])
+@pytest.mark.parametrize(
+    "value_range,num_elements",
+    [
+        ([0, 10], 5),
+        ([0, 10], 1),
+        ([0, 10], 10),
+        ([0, 2], 100),
+    ],
+)
 def test_mean_absolute_error(value_range, num_elements):
-
     t = np.random.randint(value_range[0], value_range[1], size=num_elements)
     p = np.random.randint(value_range[0], value_range[1], size=num_elements)
 
@@ -362,8 +355,8 @@ def test_mean_absolute_error(value_range, num_elements):
         sklearn.metrics.mean_absolute_error(t, p),
     )
 
-    t = pd.Series(t).astype('Int64')
-    t = pd.Series(t).astype('Int64')
+    t = pd.Series(t).astype("Int64")
+    t = pd.Series(t).astype("Int64")
 
     np.testing.assert_almost_equal(
         audmetric.mean_absolute_error(t, p),
@@ -371,14 +364,16 @@ def test_mean_absolute_error(value_range, num_elements):
     )
 
 
-@pytest.mark.parametrize('value_range,num_elements', [
-    ([0, 10], 5),
-    ([0, 10], 1),
-    ([0, 10], 10),
-    ([0, 2], 100),
-])
+@pytest.mark.parametrize(
+    "value_range,num_elements",
+    [
+        ([0, 10], 5),
+        ([0, 10], 1),
+        ([0, 10], 10),
+        ([0, 2], 100),
+    ],
+)
 def test_mean_squared_error(value_range, num_elements):
-
     t = np.random.randint(value_range[0], value_range[1], size=num_elements)
     p = np.random.randint(value_range[0], value_range[1], size=num_elements)
 
@@ -387,8 +382,8 @@ def test_mean_squared_error(value_range, num_elements):
         sklearn.metrics.mean_squared_error(t, p),
     )
 
-    t = pd.Series(t).astype('Int64')
-    t = pd.Series(t).astype('Int64')
+    t = pd.Series(t).astype("Int64")
+    t = pd.Series(t).astype("Int64")
 
     np.testing.assert_almost_equal(
         audmetric.mean_absolute_error(t, p),
@@ -396,36 +391,39 @@ def test_mean_squared_error(value_range, num_elements):
     )
 
 
-@pytest.mark.parametrize('truth,prediction', [
-    (
-        np.random.randint(0, 10, size=5),
-        np.random.randint(0, 10, size=5),
-    ),
-    (
-        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
-        pd.Series(np.random.randint(0, 10, size=5)).astype('Int64'),
-    ),
-    (
-        np.random.randint(0, 10, size=1),
-        np.random.randint(0, 10, size=1),
-    ),
-    (
-        np.random.randint(0, 10, size=10),
-        np.random.randint(0, 10, size=10),
-    ),
-    (
-        np.random.randint(0, 2, size=100),
-        np.random.randint(0, 2, size=100),
-    ),
-    (
-        np.array([]),
-        np.array([]),
-    ),
-    (
-        np.zeros(10),
-        np.zeros(10),
-    ),
-])
+@pytest.mark.parametrize(
+    "truth,prediction",
+    [
+        (
+            np.random.randint(0, 10, size=5),
+            np.random.randint(0, 10, size=5),
+        ),
+        (
+            pd.Series(np.random.randint(0, 10, size=5)).astype("Int64"),
+            pd.Series(np.random.randint(0, 10, size=5)).astype("Int64"),
+        ),
+        (
+            np.random.randint(0, 10, size=1),
+            np.random.randint(0, 10, size=1),
+        ),
+        (
+            np.random.randint(0, 10, size=10),
+            np.random.randint(0, 10, size=10),
+        ),
+        (
+            np.random.randint(0, 2, size=100),
+            np.random.randint(0, 2, size=100),
+        ),
+        (
+            np.array([]),
+            np.array([]),
+        ),
+        (
+            np.zeros(10),
+            np.zeros(10),
+        ),
+    ],
+)
 def test_pearson_cc(truth, prediction):
     if len(prediction) < 2 or prediction.std() == 0:
         pcc = np.NaN
@@ -438,35 +436,35 @@ def test_pearson_cc(truth, prediction):
 
 
 @pytest.mark.parametrize(
-    'truth, prediction, labels, zero_division',
+    "truth, prediction, labels, zero_division",
     [
         (
-            ['a'],
-            ['a'],
+            ["a"],
+            ["a"],
             None,
             0,
         ),
         (
-            ['a'],
-            ['b'],
+            ["a"],
+            ["b"],
             None,
             0,
         ),
         (
-            ['a'],
-            ['b'],
-            ['a', 'b'],
+            ["a"],
+            ["b"],
+            ["a", "b"],
             0,
         ),
         (
-            ['a'],
-            ['b'],
-            ['a', 'b'],
+            ["a"],
+            ["b"],
+            ["a", "b"],
             1,
         ),
         (
-            ['a', 'b'],
-            ['b', 'a'],
+            ["a", "b"],
+            ["b", "a"],
             None,
             0,
         ),
@@ -477,8 +475,8 @@ def test_pearson_cc(truth, prediction):
             0,
         ),
         (
-            pd.Series(np.random.randint(0, 10, 5)).astype('Int64'),
-            pd.Series(np.random.randint(0, 10, 5)).astype('Int64'),
+            pd.Series(np.random.randint(0, 10, 5)).astype("Int64"),
+            pd.Series(np.random.randint(0, 10, 5)).astype("Int64"),
             None,
             0,
         ),
@@ -487,11 +485,10 @@ def test_pearson_cc(truth, prediction):
             np.random.randint(0, 10, 100),
             None,
             0,
-        )
-    ]
+        ),
+    ],
 )
 def test_recall_precision_fscore(truth, prediction, labels, zero_division):
-
     for metric, sklearn_metric in (
         (
             audmetric.unweighted_average_recall,
@@ -504,7 +501,7 @@ def test_recall_precision_fscore(truth, prediction, labels, zero_division):
         (
             audmetric.unweighted_average_fscore,
             sklearn.metrics.f1_score,
-        )
+        ),
     ):
         result = metric(
             truth,
@@ -512,12 +509,14 @@ def test_recall_precision_fscore(truth, prediction, labels, zero_division):
             labels,
             zero_division=zero_division,
         )
-        expected = sklearn_metric(
-            list(truth),
-            list(prediction),
-            average='macro',
-            zero_division=zero_division,
-        ),
+        expected = (
+            sklearn_metric(
+                list(truth),
+                list(prediction),
+                average="macro",
+                zero_division=zero_division,
+            ),
+        )
         np.testing.assert_almost_equal(
             result,
             expected,
@@ -525,54 +524,99 @@ def test_recall_precision_fscore(truth, prediction, labels, zero_division):
 
 
 @pytest.mark.parametrize(
-    'truth,prediction,protected_variable,metric,labels,subgroups,'
-    'zero_division,expected',
+    "truth,prediction,protected_variable,metric,labels,subgroups,"
+    "zero_division,expected",
     [
         pytest.param(
-            [], [], [], None, [], [0], None, {},
-            marks=pytest.mark.xfail(raises=ValueError)
+            [],
+            [],
+            [],
+            None,
+            [],
+            [0],
+            None,
+            {},
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        ([], [], [], audmetric.recall_per_class, [], [], 0.0, {}),
+        (
+            [1],
+            [0],
+            [0],
+            audmetric.recall_per_class,
+            [0, 1],
+            [0],
+            0.0,
+            {0: {0: 0.0, 1: 0.0}},
         ),
         (
-            [], [], [], audmetric.recall_per_class, [], [], 0., {}
+            [1],
+            [0],
+            [0],
+            audmetric.precision_per_class,
+            [0, 1],
+            [0],
+            0.0,
+            {0: {0: 0.0, 1: 0.0}},
         ),
         (
-            [1], [0], [0], audmetric.recall_per_class, [0, 1],
-            [0], 0., {0: {0: 0.0, 1: 0.0}}
+            [1, 1],
+            [0, 1],
+            [0, 1],
+            audmetric.recall_per_class,
+            [0, 1],
+            [0, 1],
+            np.nan,
+            {0: {0: np.nan, 1: 0.0}, 1: {0: np.nan, 1: 1.0}},
         ),
         (
-            [1], [0], [0], audmetric.precision_per_class, [0, 1],
-            [0], 0., {0: {0: 0.0, 1: 0.0}}
+            [1, 1],
+            [0, 1],
+            [0, 1],
+            audmetric.recall_per_class,
+            [1],
+            [0, 1],
+            np.nan,
+            {0: {1: np.nan}, 1: {1: 1.0}},
         ),
         (
-            [1, 1], [0, 1], [0, 1], audmetric.recall_per_class, [0, 1],
-            [0, 1], np.nan, {0: {0: np.nan, 1: 0.0}, 1: {0: np.nan, 1: 1.0}}
+            [1, 1],
+            [0, 1],
+            [0, 1],
+            audmetric.precision_per_class,
+            [0, 1],
+            [0, 1],
+            np.nan,
+            {0: {0: 0.0, 1: np.nan}, 1: {0: np.nan, 1: 1.0}},
         ),
-        (
-            [1, 1], [0, 1], [0, 1], audmetric.recall_per_class, [1],
-            [0, 1], np.nan, {0: {1: np.nan}, 1: {1: 1.0}}
-        ),
-        (
-            [1, 1], [0, 1], [0, 1], audmetric.precision_per_class, [0, 1],
-            [0, 1], np.nan, {0: {0: 0.0, 1: np.nan}, 1: {0: np.nan, 1: 1.0}}
-        )
-    ]
+    ],
 )
 def test_scores_per_subgroup_and_class(
-        truth, prediction, protected_variable, metric, labels, subgroups,
-        zero_division, expected):
+    truth,
+    prediction,
+    protected_variable,
+    metric,
+    labels,
+    subgroups,
+    zero_division,
+    expected,
+):
     np.testing.assert_equal(
         audmetric.core.utils.scores_per_subgroup_and_class(
-            truth, prediction, protected_variable, metric,
+            truth,
+            prediction,
+            protected_variable,
+            metric,
             labels=labels,
             subgroups=subgroups,
-            zero_division=zero_division
-        ), expected
+            zero_division=zero_division,
+        ),
+        expected,
     )
 
 
 @pytest.mark.parametrize(
-    'truth,prediction,protected_variable,labels,subgroups,metric,reduction,'
-    'expected',
+    "truth,prediction,protected_variable,labels,subgroups,metric,reduction," "expected",
     [
         (
             [],
@@ -603,7 +647,7 @@ def test_scores_per_subgroup_and_class(
             audmetric.recall_per_class,
             lambda x: abs(x[0] - x[1]),
             None,
-            marks=pytest.mark.xfail(raises=ValueError)
+            marks=pytest.mark.xfail(raises=ValueError),
         ),
         pytest.param(
             [0, 0],
@@ -614,7 +658,7 @@ def test_scores_per_subgroup_and_class(
             audmetric.recall_per_class,
             lambda x: abs(x[0] - x[1]),
             None,
-            marks=pytest.mark.xfail(raises=ValueError)
+            marks=pytest.mark.xfail(raises=ValueError),
         ),
         (
             [0, 0],
@@ -624,7 +668,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             lambda x: abs(x[0] - x[1]),
-            0.0
+            0.0,
         ),
         (
             [0, 1],
@@ -634,7 +678,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             lambda x: abs(x[0] - x[1]),
-            np.nan
+            np.nan,
         ),
         (
             [0, 1],
@@ -644,7 +688,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.precision_per_class,
             lambda x: abs(x[0] - x[1]),
-            1.0
+            1.0,
         ),
         (
             [0, 1],
@@ -654,7 +698,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.precision_per_class,
             lambda x: abs(x[0] - x[1]),
-            1.0
+            1.0,
         ),
         (
             [1, 1],
@@ -664,7 +708,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             lambda x: abs(x[0] - x[1]),
-            1.0
+            1.0,
         ),
         (
             [1, 1],
@@ -674,7 +718,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             lambda x: x[0] - x[1],
-            -1.0
+            -1.0,
         ),
         (
             [1, 1],
@@ -684,7 +728,7 @@ def test_scores_per_subgroup_and_class(
             [1, 0],
             audmetric.recall_per_class,
             lambda x: x[0] - x[1],
-            1.0
+            1.0,
         ),
         (
             [1, 1],
@@ -694,7 +738,7 @@ def test_scores_per_subgroup_and_class(
             [1, 0],
             audmetric.fscore_per_class,
             lambda x: abs(x[0] - x[1]),
-            1.0
+            1.0,
         ),
         (
             [1, 1],
@@ -704,7 +748,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             lambda x: abs(x[0] - x[1]),
-            1.0
+            1.0,
         ),
         (
             [1, 1, 2],
@@ -714,7 +758,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             lambda x: abs(x[0] - x[1]),
-            1.0
+            1.0,
         ),
         (
             [1, 1, 2, 2],
@@ -724,7 +768,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             lambda x: abs(x[0] - x[1]),
-            0.5
+            0.5,
         ),
         (
             [1, 1, 2, 2],
@@ -734,7 +778,7 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             lambda x: x[0] - x[1],
-            -0.5
+            -0.5,
         ),
         (
             [0, 0, 0, 0],
@@ -744,13 +788,19 @@ def test_scores_per_subgroup_and_class(
             None,
             audmetric.recall_per_class,
             np.std,
-            0.5
-        )
-    ]
+            0.5,
+        ),
+    ],
 )
 def test_unweighted_average_bias(
-        truth, prediction, protected_variable, labels, subgroups, metric,
-        reduction, expected
+    truth,
+    prediction,
+    protected_variable,
+    labels,
+    subgroups,
+    metric,
+    reduction,
+    expected,
 ):
     np.testing.assert_equal(
         audmetric.unweighted_average_bias(
@@ -760,22 +810,21 @@ def test_unweighted_average_bias(
             labels=labels,
             subgroups=subgroups,
             metric=metric,
-            reduction=reduction
+            reduction=reduction,
         ),
-        expected
+        expected,
     )
 
 
 def test_recall_precision_fscore_nan():
-
-    truth = ['a', 'b']
-    prediction = ['a', 'a']
-    labels = ['a', 'b', 'c']
+    truth = ["a", "b"]
+    prediction = ["a", "a"]
+    labels = ["a", "b", "c"]
 
     for metric in (
-            audmetric.unweighted_average_recall,
-            audmetric.unweighted_average_precision,
-            audmetric.unweighted_average_fscore,
+        audmetric.unweighted_average_recall,
+        audmetric.unweighted_average_precision,
+        audmetric.unweighted_average_fscore,
     ):
         result = metric(
             truth,
@@ -791,7 +840,7 @@ def test_recall_precision_fscore_nan():
         labels,
         zero_division=np.nan,
     )
-    np.testing.assert_equal(result, {'a': 1.0, 'b': 0.0, 'c': np.nan})
+    np.testing.assert_equal(result, {"a": 1.0, "b": 0.0, "c": np.nan})
 
     result = audmetric.precision_per_class(
         truth,
@@ -799,7 +848,7 @@ def test_recall_precision_fscore_nan():
         labels,
         zero_division=np.nan,
     )
-    np.testing.assert_equal(result, {'a': 0.5, 'b': np.nan, 'c': np.nan})
+    np.testing.assert_equal(result, {"a": 0.5, "b": np.nan, "c": np.nan})
 
     result = audmetric.fscore_per_class(
         truth,
@@ -807,38 +856,38 @@ def test_recall_precision_fscore_nan():
         labels,
         zero_division=np.nan,
     )
-    np.testing.assert_equal(result, {'a': 2 / 3, 'b': 0.0, 'c': np.nan})
+    np.testing.assert_equal(result, {"a": 2 / 3, "b": 0.0, "c": np.nan})
 
 
 @pytest.mark.parametrize(
-    'truth, prediction, labels, zero_division, expected',
+    "truth, prediction, labels, zero_division, expected",
     [
         (
-            ['a'],
-            ['a'],
-            ['a', 'b'],
+            ["a"],
+            ["a"],
+            ["a", "b"],
             np.nan,
             np.nan,
         ),
         (
-            ['a'],
-            ['a'],
-            ['a', 'b'],
+            ["a"],
+            ["a"],
+            ["a", "b"],
             0,
             0.5,
         ),
         (
-            ['a'],
-            ['a'],
-            ['a', 'b'],
+            ["a"],
+            ["a"],
+            ["a", "b"],
             1,
             1,
         ),
-    ]
+    ],
 )
-def test_unweighted_average_zero_division(truth, prediction, labels,
-                                          zero_division, expected):
-
+def test_unweighted_average_zero_division(
+    truth, prediction, labels, zero_division, expected
+):
     for metric in (
         audmetric.unweighted_average_recall,
         audmetric.unweighted_average_precision,
@@ -853,37 +902,39 @@ def test_unweighted_average_zero_division(truth, prediction, labels,
         np.testing.assert_equal(result, expected)
 
 
-@pytest.mark.parametrize('weights,num_elements,to_string', [
-    (
-        [
-            [0, 1, 2],
-            [1, 0, 1],
-            [2, 1, 0],
-        ],
-        5,
-        False,
-    ),
-    (
-        [
-            [0, 1, 2],
-            [1, 0, 1],
-            [2, 1, 0],
-        ],
-        5,
-        True,
-    ),
-    pytest.param(  # shape of cm and weights do not match
-        [
-            [0, 1, 2],
-            [1, 0, 1],
-        ],
-        5,
-        False,
-        marks=pytest.mark.xfail(raises=ValueError),
-    ),
-])
+@pytest.mark.parametrize(
+    "weights,num_elements,to_string",
+    [
+        (
+            [
+                [0, 1, 2],
+                [1, 0, 1],
+                [2, 1, 0],
+            ],
+            5,
+            False,
+        ),
+        (
+            [
+                [0, 1, 2],
+                [1, 0, 1],
+                [2, 1, 0],
+            ],
+            5,
+            True,
+        ),
+        pytest.param(  # shape of cm and weights do not match
+            [
+                [0, 1, 2],
+                [1, 0, 1],
+            ],
+            5,
+            False,
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+    ],
+)
 def test_weighted_confusion_error(weights, num_elements, to_string):
-
     n = len(weights)
     t = np.zeros(num_elements, dtype=int)
     t[:n] = range(n)
@@ -903,30 +954,30 @@ def test_weighted_confusion_error(weights, num_elements, to_string):
 
 
 @pytest.mark.parametrize(
-    'truth,prediction,wer', [
+    "truth,prediction,wer",
+    [
         ([[]], [[]], 0),
-        ([[None]], [[]], 1.),
-        ([[None]], [['lorem']], 1.),
-        ([[None]], [['lorem', 'ipsum']], 1.),
-        ([['lorem']], [[]], 1),
-        ([[]], [['lorem']], 1),
-        ([['lorem', 'ipsum']], [['lorem']], 0.5),
-        ([['lorem']], [['lorem', 'ipsum']], 0.5),
-        ([['lorem']], [['lorem']], 0),
-        ([['lorem', 'ipsum']], [['lorm', 'ipsum']], 0.5),
+        ([[None]], [[]], 1.0),
+        ([[None]], [["lorem"]], 1.0),
+        ([[None]], [["lorem", "ipsum"]], 1.0),
+        ([["lorem"]], [[]], 1),
+        ([[]], [["lorem"]], 1),
+        ([["lorem", "ipsum"]], [["lorem"]], 0.5),
+        ([["lorem"]], [["lorem", "ipsum"]], 0.5),
+        ([["lorem"]], [["lorem"]], 0),
+        ([["lorem", "ipsum"]], [["lorm", "ipsum"]], 0.5),
         (
-            [['lorem', 'ipsum'], ['north', 'wind', 'and', 'sun']],
-            [['lorm', 'ipsum'], ['north', 'wind']],
-            0.5
+            [["lorem", "ipsum"], ["north", "wind", "and", "sun"]],
+            [["lorm", "ipsum"], ["north", "wind"]],
+            0.5,
         ),
         pytest.param(
-            [['lorem'], []], [[]], 0.,
+            [["lorem"], []],
+            [[]],
+            0.0,
             marks=pytest.mark.xfail(raises=ValueError),
-        )
-    ]
+        ),
+    ],
 )
 def test_word_error_rate(truth, prediction, wer):
-    np.testing.assert_equal(
-        audmetric.word_error_rate(truth, prediction),
-        wer
-    )
+    np.testing.assert_equal(audmetric.word_error_rate(truth, prediction), wer)
