@@ -7,6 +7,17 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.1 (2024/02/28)
+--------------------------
+
+* Added: ``ignore_nan`` argument
+  to ``audmetric.concordance_cc()``
+* Added: support for Python 3.12
+* Changed: speedup ``audmetric.detection_error_tradeoff()``
+* Fixed: avoid deprecation warning for ``pkg_resources``
+* Removed: support for Python 3.7
+
+
 Version 1.2.0 (2023/05/08)
 --------------------------
 
