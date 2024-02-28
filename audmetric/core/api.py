@@ -197,12 +197,8 @@ def confusion_matrix(
 
 
 def detection_error_tradeoff(
-    truth: typing.Union[
-        typing.Sequence[typing.Union[bool, int]]
-    ],
-    prediction: typing.Union[
-        typing.Sequence[typing.Union[bool, int, float]]
-    ],
+    truth: typing.Sequence[typing.Union[bool, int]],
+    prediction: typing.Sequence[typing.Union[bool, int, float]],
 ) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""Detection error tradeoff for verification experiments.
 
@@ -343,12 +339,8 @@ def edit_distance(
 
 
 def equal_error_rate(
-    truth: typing.Union[
-        typing.Sequence[typing.Union[bool, int]]
-    ],
-    prediction: typing.Union[
-        typing.Sequence[typing.Union[bool, int, float]]
-    ],
+    truth: typing.Sequence[typing.Union[bool, int]],
+    prediction: typing.Sequence[typing.Union[bool, int, float]],
 ) -> typing.Tuple[float, collections.namedtuple]:
     r"""Equal error rate for verification tasks.
 
