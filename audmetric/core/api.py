@@ -1,5 +1,4 @@
 import collections
-import operator
 import typing
 import warnings
 
@@ -198,14 +197,8 @@ def confusion_matrix(
 
 
 def detection_error_tradeoff(
-    truth: typing.Union[
-        typing.Union[bool, int],
-        typing.Sequence[typing.Union[bool, int]]
-    ],
-    prediction: typing.Union[
-        typing.Union[bool, int, float],
-        typing.Sequence[typing.Union[bool, int, float]]
-    ],
+    truth: typing.Sequence[typing.Union[bool, int]],
+    prediction: typing.Sequence[typing.Union[bool, int, float]],
 ) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""Detection error tradeoff for verification experiments.
 
@@ -228,8 +221,8 @@ def detection_error_tradeoff(
     whereas prediction values
     can also contain similarity scores, e.g. ``[0.8, 0.1, ...]``.
 
-    The implementation is identical with the one provided
-    by the pyeer_ package.
+    The implementation was inspired by pyeer.eer_stats.calculate_roc but has
+    been accelerated by using numpy-arrays instead of lists.
 
     .. _detection error tradeoff (DET): https://en.wikipedia.org/wiki/Detection_error_tradeoff
     .. _pyeer: https://github.com/manuelaguadomtz/pyeer
@@ -264,11 +257,13 @@ def detection_error_tradeoff(
     iscores_number = len(iscores)
 
     # Labeling genuine scores as 1 and impostor scores as 0
-    gscores = list(zip(gscores, [1] * gscores_number))
-    iscores = list(zip(iscores, [0] * iscores_number))
+    gscores = np.column_stack((gscores, np.ones(gscores_number, dtype=int)))
+    iscores = np.column_stack((iscores, np.zeros(iscores_number, dtype=int)))
 
     # Stacking scores
-    scores = np.array(sorted(gscores + iscores, key=operator.itemgetter(0)))
+    all_scores = np.concatenate([gscores, iscores])
+    sorted_indices = np.argsort(all_scores[:, 0])
+    scores = all_scores[sorted_indices]
     cumul = np.cumsum(scores[:, 1])
 
     # Grouping scores
@@ -344,14 +339,8 @@ def edit_distance(
 
 
 def equal_error_rate(
-    truth: typing.Union[
-        typing.Union[bool, int],
-        typing.Sequence[typing.Union[bool, int]]
-    ],
-    prediction: typing.Union[
-        typing.Union[bool, int, float],
-        typing.Sequence[typing.Union[bool, int, float]]
-    ],
+    truth: typing.Sequence[typing.Union[bool, int]],
+    prediction: typing.Sequence[typing.Union[bool, int, float]],
 ) -> typing.Tuple[float, collections.namedtuple]:
     r"""Equal error rate for verification tasks.
 

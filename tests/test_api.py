@@ -97,6 +97,81 @@ def test_accuracy(truth, prediction, labels, to_string):
 
 
 @pytest.mark.parametrize(
+    'truth, prediction, expected_fmr, expected_fnmr, expected_thresholds',
+    [
+        (
+            [1, 1, 0, 0],
+            [1, 1, 0, 0],
+            [1., 0.],
+            [0., 0.],
+            [0., 1.],
+        ),
+        (
+            [True, True, False, False],
+            [True, True, False, False],
+            [1., 0.],
+            [0., 0.],
+            [0., 1.],
+        ),
+        (
+            [True, True, False, False],
+            [1, 1, 0, 0],
+            [1., 0.],
+            [0., 0.],
+            [0., 1.],
+        ),
+        (  # similarities > 1 or < 0
+            [True, True, False, False],
+            [1.5, 1.5, -1., -1.],
+            [1., 0.],
+            [0., 0.],
+            [-1., 1.5],
+        ),
+        (  # unordered
+            [1, 0, 1, 1],
+            [0.5, 0.4, 0.8, 0.2],
+            [1., 1., 0., 0.],
+            [0., 1/3, 1/3, 2/3],
+            [0.2, 0.4, 0.5, 0.8],
+        ),
+        (  # mixed truth types
+            [1, False, 1, True],
+            [0.5, 0.4, 0.8, 0.2],
+            [1., 1., 0., 0.],
+            [0., 1/3, 1/3, 2/3],
+            [0.2, 0.4, 0.5, 0.8],
+        ),
+        # Float values not allowed in truth
+        pytest.param(
+            [1, 0.5, 0, 0],
+            [1, 1, 0, 0],
+            [1., 0.],
+            [0., 0.],
+            [0., 1.],
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+    ]
+)
+def test_detection_error_tradeoff(truth,
+                                  prediction,
+                                  expected_fmr,
+                                  expected_fnmr,
+                                  expected_thresholds):
+    ret = audmetric.detection_error_tradeoff(truth, prediction)
+    # Check return types
+    assert len(ret) == 3  # fmr, fnmr, thresholds
+    for arr in ret:
+        assert type(arr) == np.ndarray
+        for val in arr:
+            assert isinstance(val, np.floating)
+    # Check return values
+    fmr, fnmr, thresholds = ret
+    np.testing.assert_almost_equal(fmr, expected_fmr)
+    np.testing.assert_almost_equal(fnmr, expected_fnmr)
+    np.testing.assert_almost_equal(thresholds, expected_thresholds)
+
+
+@pytest.mark.parametrize(
     'truth, prediction, expected_eer, expected_threshold',
     [
         (
