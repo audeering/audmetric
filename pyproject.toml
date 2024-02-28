@@ -5,9 +5,10 @@ name = 'audmetric'
 authors = [
     {name = 'Hagen Wierstorf', email = 'hwierstorf@audeering.com'},
     {name = 'Johannes Wagner', email = 'jwagner@audeering.com'},
+    {name = 'Uwe Reichel', email = 'ureichel@audeering.com'},
+    {name = 'Maximilian Schmitt', email = 'mschmitt@audeering.com'},
     {name = 'Stephan Huber'},
     {name = 'Andreas Triantafyllopoulos'},
-    {name = 'Uwe Reichel', email = 'ureichel@audeering.com'},
 ]
 description = 'Evaluate machine-learning models'
 readme = 'README.rst'
