@@ -117,7 +117,7 @@ def concordance_cc(
         prediction = prediction[mask]
 
     if len(prediction) < 2:
-        return np.NaN
+        return np.nan
 
     length = prediction.size
     mean_y = np.mean(truth)
@@ -764,7 +764,7 @@ def pearson_cc(
         prediction = np.array(list(prediction))
 
     if len(prediction) < 2 or prediction.std() == 0:
-        return np.NaN
+        return np.nan
     else:
         return float(np.corrcoef(prediction, truth)[0][1])
 

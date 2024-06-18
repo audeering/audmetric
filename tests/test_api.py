@@ -72,7 +72,7 @@ def test_accuracy(truth, prediction, labels, to_string):
         prediction = [str(w) for w in prediction]
 
     if len(prediction) == 0:
-        accuracy = np.NaN
+        accuracy = np.nan
     else:
         if labels:
             mask = np.nonzero(
@@ -426,7 +426,7 @@ def test_mean_squared_error(value_range, num_elements):
 )
 def test_pearson_cc(truth, prediction):
     if len(prediction) < 2 or prediction.std() == 0:
-        pcc = np.NaN
+        pcc = np.nan
     else:
         pcc = np.corrcoef(list(truth), list(prediction))[0][1]
     np.testing.assert_almost_equal(
