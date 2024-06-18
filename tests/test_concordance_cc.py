@@ -20,7 +20,7 @@ def expected_ccc(truth, prediction):
         + (prediction.mean() - truth.mean()) ** 2
     )
     if denominator == 0:
-        ccc = np.NaN
+        ccc = np.nan
     else:
         r = np.corrcoef(list(prediction), list(truth))[0][1]
         numerator = 2 * r * prediction.std() * truth.std()
@@ -82,37 +82,37 @@ def test_concordance_cc(truth, prediction, ignore_nan):
             [],
             [],
             True,
-            np.NaN,
+            np.nan,
         ),
         (
             [],
             [],
             False,
-            np.NaN,
+            np.nan,
         ),
         (
             [0],
             [0],
             True,
-            np.NaN,
+            np.nan,
         ),
         (
             [0],
             [0],
             False,
-            np.NaN,
+            np.nan,
         ),
         (
-            [0, np.NaN],
-            [0, np.NaN],
+            [0, np.nan],
+            [0, np.nan],
             True,
-            np.NaN,
+            np.nan,
         ),
         (
-            [0, np.NaN],
-            [0, np.NaN],
+            [0, np.nan],
+            [0, np.nan],
             False,
-            np.NaN,
+            np.nan,
         ),
         (
             [0, 1, 2, 3],
@@ -121,40 +121,40 @@ def test_concordance_cc(truth, prediction, ignore_nan):
             expected_ccc([0, 1, 2, 3], [1, 2, 3, 4]),
         ),
         (
-            [np.NaN, 1, 2, 3],
-            [np.NaN, 2, 3, 4],
+            [np.nan, 1, 2, 3],
+            [np.nan, 2, 3, 4],
             True,
             expected_ccc([1, 2, 3], [2, 3, 4]),
         ),
         (
-            [np.NaN, 1, 2, 3],
-            [1, 2, 3, np.NaN],
+            [np.nan, 1, 2, 3],
+            [1, 2, 3, np.nan],
             True,
             expected_ccc([1, 2], [2, 3]),
         ),
         (
-            [0, np.NaN, 2, 3],
+            [0, np.nan, 2, 3],
             [1, 2, 3, 4],
             True,
             expected_ccc([0, 2, 3], [1, 3, 4]),
         ),
         (
             [0, 1, 2, 3],
-            [1, 2, np.NaN, 4],
+            [1, 2, np.nan, 4],
             True,
             expected_ccc([0, 1, 3], [1, 2, 4]),
         ),
         (
-            [np.NaN, np.NaN, 2, 3],
-            [1, 2, 3, np.NaN],
+            [np.nan, np.nan, 2, 3],
+            [1, 2, 3, np.nan],
             True,
             expected_ccc([2], [3]),
         ),
         (
-            [np.NaN, np.NaN, 2, 3],
-            [1, 2, 3, np.NaN],
+            [np.nan, np.nan, 2, 3],
+            [1, 2, 3, np.nan],
             False,
-            np.NaN,
+            np.nan,
         ),
     ],
 )

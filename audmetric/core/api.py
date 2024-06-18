@@ -117,7 +117,7 @@ def concordance_cc(
         prediction = prediction[mask]
 
     if len(prediction) < 2:
-        return np.NaN
+        return np.nan
 
     length = prediction.size
     mean_y = np.mean(truth)
@@ -656,7 +656,7 @@ def linkability(
     # Global measure using trapz numerical integration
     d_sys = np.trapz(x=bin_centers, y=d * y1)
 
-    return d_sys
+    return float(d_sys)
 
 
 def mean_absolute_error(
@@ -764,7 +764,7 @@ def pearson_cc(
         prediction = np.array(list(prediction))
 
     if len(prediction) < 2 or prediction.std() == 0:
-        return np.NaN
+        return np.nan
     else:
         return float(np.corrcoef(prediction, truth)[0][1])
 
@@ -997,7 +997,7 @@ def unweighted_average_bias(
     if denominator == 0:
         return np.nan
 
-    return bias / denominator
+    return float(bias / denominator)
 
 
 def unweighted_average_fscore(
@@ -1225,7 +1225,7 @@ def word_error_rate(
         wer += edit_distance(t, p) / n
 
     num_samples = len(truth) if len(truth) > 1 else 1
-    return wer / num_samples
+    return float(wer / num_samples)
 
 
 def _matching_scores(
