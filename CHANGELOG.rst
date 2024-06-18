@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.2 (2024/06/18)
+--------------------------
+
+* Added: support for ``numpy`` 2.0
+
+
 Version 1.2.1 (2024/02/28)
 --------------------------
 
