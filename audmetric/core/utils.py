@@ -1,11 +1,15 @@
-import typing
+from __future__ import annotations
+
+from collections.abc import Callable
+from collections.abc import Hashable
+from collections.abc import Sequence
 
 import numpy as np
 
 
 def assert_equal_length(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
+    truth: Sequence[object],
+    prediction: Sequence[object],
 ):
     r"""Assert truth and prediction have equal length."""
     if len(truth) != len(prediction):
@@ -16,9 +20,9 @@ def assert_equal_length(
 
 
 def infer_labels(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-) -> typing.List[typing.Any]:
+    truth: Sequence[object],
+    prediction: Sequence[object],
+) -> list[object]:
     r"""Infer labels from truth and prediction.
 
     It gathers all labels that are present
@@ -36,22 +40,22 @@ def infer_labels(
 
 
 def scores_per_subgroup_and_class(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    protected_variable: typing.Sequence[typing.Any],
-    metric: typing.Callable[
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    protected_variable: Sequence[object],
+    metric: Callable[
         [
-            typing.Sequence[typing.Any],
-            typing.Sequence[typing.Any],
-            typing.Optional[typing.Sequence[str]],
+            Sequence[object],
+            Sequence[object],
+            Sequence[str] | None,
             float,
         ],
-        typing.Dict[str, float],
+        dict[str, float],
     ],
-    labels: typing.Sequence[typing.Any],
-    subgroups: typing.Sequence[typing.Any],
+    labels: Sequence[object],
+    subgroups: Sequence[object],
     zero_division: float,
-) -> typing.Dict[typing.Hashable, typing.Dict]:
+) -> dict[Hashable, dict]:
     r"""Compute scores per class for each subgroup based on metric.
 
     Args:
