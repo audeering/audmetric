@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import collections
-import typing
+from collections.abc import Callable
+from collections.abc import Sequence
 import warnings
 
 import numpy as np
@@ -12,9 +15,9 @@ from audmetric.core.utils import scores_per_subgroup_and_class
 
 
 def accuracy(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Union[str, int]] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    labels: Sequence[str | int] = None,
 ) -> float:
     r"""Classification accuracy.
 
@@ -66,8 +69,8 @@ def accuracy(
 
 
 def concordance_cc(
-    truth: typing.Sequence[float],
-    prediction: typing.Sequence[float],
+    truth: Sequence[float],
+    prediction: Sequence[float],
     *,
     ignore_nan: bool = False,
 ) -> float:
@@ -137,12 +140,12 @@ def concordance_cc(
 
 
 def confusion_matrix(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    labels: Sequence[object] = None,
     *,
     normalize: bool = False,
-) -> typing.List[typing.List[typing.Union[int, float]]]:
+) -> list[list[int | float]]:
     r"""Confusion matrix.
 
     Args:
@@ -194,9 +197,9 @@ def confusion_matrix(
 
 
 def detection_error_tradeoff(
-    truth: typing.Sequence[typing.Union[bool, int]],
-    prediction: typing.Sequence[typing.Union[bool, int, float]],
-) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    truth: Sequence[bool | int],
+    prediction: Sequence[bool | int | float],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""Detection error tradeoff for verification experiments.
 
     The `detection error tradeoff (DET)`_
@@ -278,8 +281,8 @@ def detection_error_tradeoff(
 
 
 def edit_distance(
-    truth: typing.Union[str, typing.Sequence[int]],
-    prediction: typing.Union[str, typing.Sequence[int]],
+    truth: str | Sequence[int],
+    prediction: str | Sequence[int],
 ) -> int:
     r"""Edit distance between two sequences of chars or ints.
 
@@ -338,9 +341,9 @@ def edit_distance(
 
 
 def equal_error_rate(
-    truth: typing.Sequence[typing.Union[bool, int]],
-    prediction: typing.Sequence[typing.Union[bool, int, float]],
-) -> typing.Tuple[float, collections.namedtuple]:
+    truth: Sequence[bool | int],
+    prediction: Sequence[bool | int | float],
+) -> tuple[float, collections.namedtuple]:
     r"""Equal error rate for verification tasks.
 
     The equal error rate (EER) is the point
@@ -444,10 +447,8 @@ def equal_error_rate(
 
 
 def event_error_rate(
-    truth: typing.Union[str, typing.Sequence[typing.Union[str, typing.Sequence[int]]]],
-    prediction: typing.Union[
-        str, typing.Sequence[typing.Union[str, typing.Sequence[int]]]
-    ],
+    truth: str | Sequence[str | Sequence[int]],
+    prediction: (str | Sequence[str | Sequence[int]]),
 ) -> float:
     r"""Event error rate based on edit distance.
 
@@ -498,12 +499,12 @@ def event_error_rate(
 
 
 def fscore_per_class(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    labels: Sequence[object] = None,
     *,
     zero_division: float = 0,
-) -> typing.Dict[str, float]:
+) -> dict[str, float]:
     r"""F-score per class.
 
     .. math::
@@ -557,12 +558,8 @@ def fscore_per_class(
 
 
 def linkability(
-    truth: typing.Union[
-        typing.Union[bool, int], typing.Sequence[typing.Union[bool, int]]
-    ],
-    prediction: typing.Union[
-        typing.Union[bool, int, float], typing.Sequence[typing.Union[bool, int, float]]
-    ],
+    truth: (bool | int | Sequence[bool | int]),
+    prediction: (bool | int | float | Sequence[bool | int | float]),
     omega: float = 1.0,
     nbins: int = None,
 ) -> float:
@@ -660,8 +657,8 @@ def linkability(
 
 
 def mean_absolute_error(
-    truth: typing.Sequence[float],
-    prediction: typing.Sequence[float],
+    truth: Sequence[float],
+    prediction: Sequence[float],
 ) -> float:
     r"""Mean absolute error.
 
@@ -694,8 +691,8 @@ def mean_absolute_error(
 
 
 def mean_squared_error(
-    truth: typing.Sequence[float],
-    prediction: typing.Sequence[float],
+    truth: Sequence[float],
+    prediction: Sequence[float],
 ) -> float:
     r"""Mean squared error.
 
@@ -728,8 +725,8 @@ def mean_squared_error(
 
 
 def pearson_cc(
-    truth: typing.Sequence[float],
-    prediction: typing.Sequence[float],
+    truth: Sequence[float],
+    prediction: Sequence[float],
 ) -> float:
     r"""Pearson correlation coefficient.
 
@@ -770,12 +767,12 @@ def pearson_cc(
 
 
 def precision_per_class(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    labels: Sequence[object] = None,
     *,
     zero_division: float = 0,
-) -> typing.Dict[str, float]:
+) -> dict[str, float]:
     r"""Precision per class.
 
     .. math::
@@ -815,12 +812,12 @@ def precision_per_class(
 
 
 def recall_per_class(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    labels: Sequence[object] = None,
     *,
     zero_division: float = 0,
-) -> typing.Dict[str, float]:
+) -> dict[str, float]:
     r"""Recall per class.
 
     .. math::
@@ -860,23 +857,23 @@ def recall_per_class(
 
 
 def unweighted_average_bias(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    protected_variable: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    protected_variable: Sequence[object],
+    labels: Sequence[object] = None,
     *,
-    subgroups: typing.Sequence[typing.Any] = None,
-    metric: typing.Callable[
+    subgroups: Sequence[object] = None,
+    metric: Callable[
         [
-            typing.Sequence[typing.Any],
-            typing.Sequence[typing.Any],
-            typing.Optional[typing.Sequence[str]],
+            Sequence[object],
+            Sequence[object],
+            Sequence[str] | None,
         ],
-        typing.Dict[str, float],
+        dict[str, float],
     ] = fscore_per_class,
-    reduction: typing.Callable[
+    reduction: Callable[
         [
-            typing.Sequence[float],
+            Sequence[float],
         ],
         float,
     ] = np.std,
@@ -1001,9 +998,9 @@ def unweighted_average_bias(
 
 
 def unweighted_average_fscore(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    labels: Sequence[object] = None,
     *,
     zero_division: float = 0,
 ) -> float:
@@ -1045,9 +1042,9 @@ def unweighted_average_fscore(
 
 
 def unweighted_average_precision(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    labels: Sequence[object] = None,
     *,
     zero_division: float = 0,
 ) -> float:
@@ -1088,9 +1085,9 @@ def unweighted_average_precision(
 
 
 def unweighted_average_recall(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    labels: Sequence[object] = None,
     *,
     zero_division: float = 0,
 ) -> float:
@@ -1131,10 +1128,10 @@ def unweighted_average_recall(
 
 
 def weighted_confusion_error(
-    truth: typing.Sequence[typing.Any],
-    prediction: typing.Sequence[typing.Any],
-    weights: typing.Sequence[typing.Sequence[typing.Union[int, float]]],
-    labels: typing.Sequence[typing.Any] = None,
+    truth: Sequence[object],
+    prediction: Sequence[object],
+    weights: Sequence[Sequence[int | float]],
+    labels: Sequence[object] = None,
 ) -> float:
     r"""Weighted confusion error.
 
@@ -1187,8 +1184,8 @@ def weighted_confusion_error(
 
 
 def word_error_rate(
-    truth: typing.Sequence[typing.Sequence[str]],
-    prediction: typing.Sequence[typing.Sequence[str]],
+    truth: Sequence[Sequence[str]],
+    prediction: Sequence[Sequence[str]],
 ) -> float:
     r"""Word error rate based on edit distance.
 
@@ -1229,13 +1226,9 @@ def word_error_rate(
 
 
 def _matching_scores(
-    truth: typing.Union[
-        typing.Union[bool, int], typing.Sequence[typing.Union[bool, int]]
-    ],
-    prediction: typing.Union[
-        typing.Union[bool, int, float], typing.Sequence[typing.Union[bool, int, float]]
-    ],
-) -> typing.Tuple[np.ndarray, np.ndarray]:
+    truth: (bool | int | Sequence[bool | int]),
+    prediction: (bool | int | float | Sequence[bool | int | float]),
+) -> tuple[np.ndarray, np.ndarray]:
     r"""Mated and non-mated scores for verification tasks.
 
     For verification task,
@@ -1274,7 +1267,7 @@ def _matching_scores(
     """
     truth = np.array(truth)
 
-    allowed_truth_values = set([1, 0, True, False])
+    allowed_truth_values = {1, 0, True, False}
     if not set(truth).issubset(allowed_truth_values):
         raise ValueError(
             "'truth' is only allowed to contain "
