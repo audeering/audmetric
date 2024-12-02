@@ -1186,6 +1186,7 @@ def weighted_confusion_error(
 def word_error_rate(
     truth: Sequence[Sequence[str]],
     prediction: Sequence[Sequence[str]],
+    symmetric: bool = False,
 ) -> float:
     r"""Word error rate based on edit distance.
 
@@ -1217,11 +1218,18 @@ def word_error_rate(
         t = [map[i] for i in t]
         p = [map[i] for i in p]
 
-        n = max(len(t), len(p))
+        if symmetric:
+            # n = max(len(t), len(p))
+            # n = n if n > 1 else 1
+            n = len(t)
+        else:
+            n = max(len(t), len(p))
         n = n if n > 1 else 1
+
         wer += edit_distance(t, p) / n
 
     num_samples = len(truth) if len(truth) > 1 else 1
+
     return float(wer / num_samples)
 
 
