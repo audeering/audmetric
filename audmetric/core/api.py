@@ -1190,10 +1190,25 @@ def word_error_rate(
 ) -> float:
     r"""Word error rate based on edit distance.
 
+    The word error rate is computed by aggregating the mean edit distances 
+    of each (truth, prediction)-pair and averaging the aggregated score 
+    by the number of pairs.
+
+    The mean edit distance of each (truth, prediction)-pair is computed
+    as an average of the edit distance over a normalization factor n.
+    The value of n depends on the symmetric parameter:
+
+    If symmetric=False (default):
+        n is set to the reference (truth) length
+    If symmetric=True:
+        n is set to the maximum length between truth and prediction:
+        n = max(len(t), len(p))
+
     Args:
         truth: ground truth strings
         prediction: predicted strings
-        symmetric:
+        symmetric: if True, normalizes by max length of truth and prediction,
+            otherwise normalizes by truth length. Defaults to False.
 
     Returns:
         word error rate
