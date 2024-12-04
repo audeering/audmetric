@@ -1199,7 +1199,9 @@ def word_error_rate(
     The value of n depends on the symmetric parameter:
 
     If symmetric=False (default):
-        n is set to the reference (truth) length:
+        n is set to the reference (truth) length, following the Wikipedia formulation
+        where n is the number of words in the reference (N=S+D+C). This means WER can
+        be greater than 1 if the prediction sequence is longer than the reference:
 
         .. math::
 
