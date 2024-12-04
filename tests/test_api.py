@@ -992,8 +992,8 @@ def _wer_jiwer(ref, ans):
         ),
     ],
 )
-def test_word_error_rate(truth, prediction, wer):
-    np.testing.assert_equal(audmetric.word_error_rate(truth, prediction), wer)
+def test_word_error_rate_symmetric(truth, prediction, wer):
+    np.testing.assert_equal(audmetric.word_error_rate(truth, prediction, symmetric=True), wer)
 
 
 
@@ -1023,11 +1023,11 @@ def test_word_error_rate(truth, prediction, wer):
         ), #decaivated - value error
     ],
 )
-def test_word_error_rate_symmetric(truth, prediction, wer):
+def test_word_error_rate_asymmetric(truth, prediction, wer):
     """Tests for symmetric word error rate.
 
     Currently it contains the uncontroversial, i.e passing tests.
     """
     np.testing.assert_equal(
-        audmetric.word_error_rate(truth, prediction, symmetric=True), wer
+        audmetric.word_error_rate(truth, prediction, symmetric=False), wer
     )
