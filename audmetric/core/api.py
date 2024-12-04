@@ -1190,8 +1190,8 @@ def word_error_rate(
 ) -> float:
     r"""Word error rate based on edit distance.
 
-    The word error rate is computed by aggregating the mean edit distances 
-    of each (truth, prediction)-pair and averaging the aggregated score 
+    The word error rate is computed by aggregating the mean edit distances
+    of each (truth, prediction)-pair and averaging the aggregated score
     by the number of pairs.
 
     The mean edit distance of each (truth, prediction)-pair is computed
