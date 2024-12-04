@@ -953,19 +953,6 @@ def test_weighted_confusion_error(weights, num_elements, to_string):
     )
 
 
-def _wer_jiwer(ref, ans):
-    """Jiwer  Word Error Rate (WER) implementation.
-
-    Temporary wrapper during implmentation of feature
-
-    References:
-        - https://en.wikipedia.org/wiki/Word_error_rate
-    """
-    import jiwer
-
-    return jiwer.wer(" ".join(ref[0]), " ".join(ans[0]))
-
-
 @pytest.mark.parametrize(
     "truth,prediction,wer",
     [
