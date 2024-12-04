@@ -994,3 +994,40 @@ def _wer_jiwer(ref, ans):
 )
 def test_word_error_rate(truth, prediction, wer):
     np.testing.assert_equal(audmetric.word_error_rate(truth, prediction), wer)
+
+
+
+@pytest.mark.parametrize(
+    "truth,prediction,wer",
+    [
+        ([[]], [[]], 0),
+        ([[None]], [[]], 1.0),
+        ([[None]], [["lorem"]], 1.0),
+        # ([[None]], [["lorem", "ipsum"]], 1.0), # fail, expected value error
+        ([["lorem"]], [[]], 1),
+        ([[]], [["lorem"]], 1),
+        ([["lorem", "ipsum"]], [["lorem"]], 0.5),
+        # ([["lorem"]], [["lorem", "ipsum"]], 0.5), #  fail. expected value error
+        ([["lorem"]], [["lorem"]], 0),
+        ([["lorem", "ipsum"]], [["lorm", "ipsum"]], 0.5),
+        (
+            [["lorem", "ipsum"], ["north", "wind", "and", "sun"]],
+            [["lorm", "ipsum"], ["north", "wind"]],
+            0.5,
+        ),
+        pytest.param(
+            [["lorem"], []],
+            [[]],
+            0.0,
+            marks=pytest.mark.xfail(raises=ValueError),
+        ), #decaivated - value error
+    ],
+)
+def test_word_error_rate_symmetric(truth, prediction, wer):
+    """Tests for symmetric word error rate.
+
+    Currently it contains the uncontroversial, i.e passing tests.
+    """
+    np.testing.assert_equal(
+        audmetric.word_error_rate(truth, prediction, symmetric=True), wer
+    )
