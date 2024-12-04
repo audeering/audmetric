@@ -1004,11 +1004,11 @@ def test_word_error_rate_symmetric(truth, prediction, wer):
         ([[]], [[]], 0),
         ([[None]], [[]], 1.0),
         ([[None]], [["lorem"]], 1.0),
-        ([[None]], [["lorem", "ipsum"]], 2.0), # fail, expected value error
+        ([[None]], [["lorem", "ipsum"]], 2.0),
         ([["lorem"]], [[]], 1),
         ([[]], [["lorem"]], 1),
         ([["lorem", "ipsum"]], [["lorem"]], 0.5),
-        ([["lorem"]], [["lorem", "ipsum"]], 1.0), #  fail. expected value error
+        ([["lorem"]], [["lorem", "ipsum"]], 1.0),
         ([["lorem"]], [["lorem"]], 0),
         ([["lorem", "ipsum"]], [["lorm", "ipsum"]], 0.5),
         (
@@ -1021,7 +1021,7 @@ def test_word_error_rate_symmetric(truth, prediction, wer):
             [[]],
             0.0,
             marks=pytest.mark.xfail(raises=ValueError),
-        ), #decaivated - value error
+        ),
     ],
 )
 def test_word_error_rate_asymmetric(truth, prediction, wer):
