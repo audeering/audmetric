@@ -1003,11 +1003,11 @@ def test_word_error_rate(truth, prediction, wer):
         ([[]], [[]], 0),
         ([[None]], [[]], 1.0),
         ([[None]], [["lorem"]], 1.0),
-        # ([[None]], [["lorem", "ipsum"]], 1.0), # fail, expected value error
+        ([[None]], [["lorem", "ipsum"]], 2.0), # fail, expected value error
         ([["lorem"]], [[]], 1),
         ([[]], [["lorem"]], 1),
         ([["lorem", "ipsum"]], [["lorem"]], 0.5),
-        # ([["lorem"]], [["lorem", "ipsum"]], 0.5), #  fail. expected value error
+        ([["lorem"]], [["lorem", "ipsum"]], 1.0), #  fail. expected value error
         ([["lorem"]], [["lorem"]], 0),
         ([["lorem", "ipsum"]], [["lorm", "ipsum"]], 0.5),
         (
