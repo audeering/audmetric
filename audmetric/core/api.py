@@ -1196,19 +1196,18 @@ def word_error_rate(
 
     The mean edit distance of each (truth, prediction)-pair is computed
     as an average of the edit distance over a normalization factor n.
-    The value of n depends on the symmetric parameter:
-
-    If symmetric=False (default):
-        n is set to the reference (truth) length, following the Wikipedia formulation
-        where n is the number of words in the reference (N=S+D+C). This means WER can
-        be greater than 1 if the prediction sequence is longer than the reference:
+    The value of n depends on the symmetric parameter.
+    If ``symmetric`` is ``False`` (default):
+    n is set to the reference (truth) length, following the Wikipedia formulation
+    where n is the number of words in the reference (N=S+D+C). This means WER can
+    be greater than 1 if the prediction sequence is longer than the reference:
 
         .. math::
 
             n = \text{len}(t)
 
-    If symmetric=True:
-        n is set to the maximum length between truth and prediction:
+    If ``symmetric`` is ``True``:
+    n is set to the maximum length between truth and prediction:
 
         .. math::
 
