@@ -1230,11 +1230,12 @@ def word_error_rate(
         >>> prediction = [["lorm", "ipsum"], ["north", "wind"]]
         >>> word_error_rate(truth, prediction)
         0.5
-        >>> # Example showing asymmetric normalization (default)
         >>> truth = [["hello", "world"]]
         >>> prediction = [["xyz", "moon", "abc"]]
-        >>> word_error_rate(truth, prediction, symmetric=False)
+        >>> word_error_rate(truth, prediction)
         1.5
+        >>> word_error_rate(truth, prediction, symmetric=True)
+        1.0
 
     """
     assert_equal_length(truth, prediction)
