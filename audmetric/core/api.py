@@ -1199,10 +1199,18 @@ def word_error_rate(
     The value of n depends on the symmetric parameter:
 
     If symmetric=False (default):
-        n is set to the reference (truth) length
+        n is set to the reference (truth) length:
+
+        .. math::
+
+            n = \text{len}(t)
+
     If symmetric=True:
         n is set to the maximum length between truth and prediction:
-        n = max(len(t), len(p))
+
+        .. math::
+
+            n = \max(\text{len}(t), \text{len}(p))
 
     Args:
         truth: ground truth strings
@@ -1221,6 +1229,11 @@ def word_error_rate(
         >>> prediction = [["lorm", "ipsum"], ["north", "wind"]]
         >>> word_error_rate(truth, prediction)
         0.5
+        >>> # Example showing asymmetric normalization (default)
+        >>> truth = [["hello", "world"]]
+        >>> prediction = [["xyz", "moon", "abc"]]
+        >>> word_error_rate(truth, prediction, symmetric=False)
+        1.5
 
     """
     assert_equal_length(truth, prediction)
