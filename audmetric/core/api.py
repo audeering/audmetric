@@ -1217,7 +1217,7 @@ def word_error_rate(
         truth: ground truth strings
         prediction: predicted strings
         symmetric: if True, normalizes by max length of truth and prediction,
-            otherwise normalizes by truth length. Defaults to False.
+            otherwise normalizes by truth length
 
     Returns:
         word error rate
