@@ -993,8 +993,9 @@ def _wer_jiwer(ref, ans):
     ],
 )
 def test_word_error_rate_symmetric(truth, prediction, wer):
-    np.testing.assert_equal(audmetric.word_error_rate(truth, prediction, symmetric=True), wer)
-
+    np.testing.assert_equal(
+        audmetric.word_error_rate(truth, prediction, symmetric=True), wer
+    )
 
 
 @pytest.mark.parametrize(
