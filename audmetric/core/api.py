@@ -1193,6 +1193,7 @@ def word_error_rate(
     Args:
         truth: ground truth strings
         prediction: predicted strings
+        symmetric:
 
     Returns:
         word error rate
@@ -1219,11 +1220,10 @@ def word_error_rate(
         p = [map[i] for i in p]
 
         if symmetric:
-            # n = max(len(t), len(p))
-            # n = n if n > 1 else 1
-            n = len(t)
-        else:
             n = max(len(t), len(p))
+        else:
+            n = len(t)
+
         n = n if n > 1 else 1
 
         wer += edit_distance(t, p) / n
