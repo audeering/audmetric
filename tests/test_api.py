@@ -1023,5 +1023,7 @@ def test_word_error_rate_truth(truth, prediction, wer):
 
 def test_word_error_rate_invalid_norm():
     """Test that word_error_rate raises ValueError for invalid norm argument."""
-    with pytest.raises(ValueError, match=r'norm must be one of \["truth", "longest"\], got foo'):
+    with pytest.raises(
+        ValueError, match=r'norm must be one of \["truth", "longest"\], got foo'
+    ):
         audmetric.word_error_rate([[]], [[]], norm="foo")

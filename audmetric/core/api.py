@@ -1246,9 +1246,7 @@ def word_error_rate(
     assert_equal_length(truth, prediction)
 
     if norm not in ["truth", "longest"]:
-        raise ValueError(
-            f'norm must be one of ["truth", "longest"], got {norm}'
-        )
+        raise ValueError(f'norm must be one of ["truth", "longest"], got {norm}')
 
     wer = 0.0
 
