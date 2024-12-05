@@ -979,9 +979,9 @@ def test_weighted_confusion_error(weights, num_elements, to_string):
         ),
     ],
 )
-def test_word_error_rate_symmetric(truth, prediction, wer):
+def test_word_error_rate_longest(truth, prediction, wer):
     np.testing.assert_equal(
-        audmetric.word_error_rate(truth, prediction, symmetric=True), wer
+        audmetric.word_error_rate(truth, prediction, norm="longest"), wer
     )
 
 
@@ -1011,11 +1011,11 @@ def test_word_error_rate_symmetric(truth, prediction, wer):
         ),
     ],
 )
-def test_word_error_rate_asymmetric(truth, prediction, wer):
+def test_word_error_rate_truth(truth, prediction, wer):
     """Tests for symmetric word error rate.
 
     Currently it contains the uncontroversial, i.e passing tests.
     """
     np.testing.assert_equal(
-        audmetric.word_error_rate(truth, prediction, symmetric=False), wer
+        audmetric.word_error_rate(truth, prediction, norm="truth"), wer
     )

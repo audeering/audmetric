@@ -1186,7 +1186,8 @@ def weighted_confusion_error(
 def word_error_rate(
     truth: Sequence[Sequence[str]],
     prediction: Sequence[Sequence[str]],
-    symmetric: bool = False,
+    *,
+    norm: str = "truth",
 ) -> float:
     r"""Word error rate based on edit distance.
 
@@ -1198,8 +1199,8 @@ def word_error_rate(
     as the edit distance divided by a normalization factor n. This represents
     the average editing cost per sequence item.
 
-    The value of n depends on the symmetric parameter.
-    If ``symmetric`` is ``False`` (default):
+    The value of n depends on the norm parameter:
+    If ``norm`` is ``"truth"`` (default):
     n is set to the reference (truth) length, following the Wikipedia formulation
     where n is the number of words in the reference (N=S+D+C). This means WER can
     be greater than 1 if the prediction sequence is longer than the reference:
@@ -1208,7 +1209,7 @@ def word_error_rate(
 
             n = \text{len}(t)
 
-    If ``symmetric`` is ``True``:
+    If ``norm`` is ``"longest"``:
     n is set to the maximum length between truth and prediction:
 
         .. math::
@@ -1218,14 +1219,16 @@ def word_error_rate(
     Args:
         truth: ground truth strings
         prediction: predicted strings
-        symmetric: if True, normalizes by max length of truth and prediction,
-            otherwise normalizes by truth length
+        norm: normalization method, either "truth" or "longest".
+            "truth" normalizes by truth length (default),
+            "longest" normalizes by max length of truth and prediction
 
     Returns:
         word error rate
 
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
+        ValueError: if ``norm`` is not one of ["truth", "longest"]
 
     Examples:
         >>> truth = [["lorem", "ipsum"], ["north", "wind", "and", "sun"]]
@@ -1236,11 +1239,16 @@ def word_error_rate(
         >>> prediction = [["xyz", "moon", "abc"]]
         >>> word_error_rate(truth, prediction)
         1.5
-        >>> word_error_rate(truth, prediction, symmetric=True)
+        >>> word_error_rate(truth, prediction, norm="longest")
         1.0
 
     """
     assert_equal_length(truth, prediction)
+
+    if norm not in ["truth", "longest"]:
+        raise ValueError(
+            f'norm must be one of ["truth", "longest"], got {norm}'
+        )
 
     wer = 0.0
 
@@ -1251,7 +1259,7 @@ def word_error_rate(
         t = [map[i] for i in t]
         p = [map[i] for i in p]
 
-        if symmetric:
+        if norm == "longest":
             n = max(len(t), len(p))
         else:
             n = len(t)
