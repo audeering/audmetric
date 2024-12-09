@@ -1220,7 +1220,7 @@ def word_error_rate(
         truth: ground truth strings
         prediction: predicted strings
         norm: normalization method, either "truth" or "longest".
-            "truth" normalizes by truth length (default),
+            "truth" normalizes by truth length,
             "longest" normalizes by max length of truth and prediction
 
     Returns:
