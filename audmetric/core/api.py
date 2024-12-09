@@ -1228,7 +1228,7 @@ def word_error_rate(
 
     Raises:
         ValueError: if ``truth`` and ``prediction`` differ in length
-        ValueError: if ``norm`` is not one of ["truth", "longest"]
+        ValueError: if ``norm`` is not one of ``"truth"``, ``"longest"``
 
     Examples:
         >>> truth = [["lorem", "ipsum"], ["north", "wind", "and", "sun"]]
