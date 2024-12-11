@@ -1201,8 +1201,8 @@ def word_error_rate(
     of each (truth, prediction)-pair is computed
     as the edit distance divided by a normalization factor n.
     This represents the average editing cost per sequence item.
-
     The value of n depends on the ``norm`` parameter.
+    
     If ``norm`` is ``"truth"``,
     n is set to the reference (truth) length,
     following the Wikipedia formulation.
