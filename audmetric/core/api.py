@@ -1203,16 +1203,19 @@ def word_error_rate(
     This represents the average editing cost per sequence item.
 
     The value of n depends on the norm parameter:
-    If ``norm`` is ``"truth"``:
-    n is set to the reference (truth) length, following the Wikipedia formulation
-    where n is the number of words in the reference (N=S+D+C). This means WER can
-    be greater than 1 if the prediction sequence is longer than the reference:
+
+    If ``norm`` is ``"truth"``,
+    n is set to the reference (truth) length,
+    following the Wikipedia formulation.
+    Here, n is the number of words in the reference.
+    This means WER can be greater than 1
+    if the prediction sequence is longer than the reference:
 
         .. math::
 
             n = \text{len}(t)
 
-    If ``norm`` is ``"longest"``:
+    If ``norm`` is ``"longest"``,
     n is set to the maximum length between truth and prediction:
 
         .. math::
