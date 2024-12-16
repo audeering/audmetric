@@ -943,7 +943,9 @@ def unweighted_average_bias(
         ...     reduction=lambda x: x[0] - x[1],
         ... )
         -1.0
-        >>> unweighted_average_bias([0, 1], [1, 0], ["male", "female"], metric=recall_per_class)
+        >>> unweighted_average_bias(
+        ...     [0, 1], [1, 0], ["male", "female"], metric=recall_per_class
+        ... )
         nan
         >>> unweighted_average_bias(
         ...     [0, 0, 0, 0],
