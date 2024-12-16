@@ -154,7 +154,7 @@ def test_detection_error_tradeoff(
     # Check return types
     assert len(ret) == 3  # fmr, fnmr, thresholds
     for arr in ret:
-        assert type(arr) == np.ndarray
+        assert type(arr) == np.ndarray  # noqa: E721
         for val in arr:
             assert isinstance(val, np.floating)
     # Check return values
