@@ -979,5 +979,51 @@ def test_weighted_confusion_error(weights, num_elements, to_string):
         ),
     ],
 )
-def test_word_error_rate(truth, prediction, wer):
-    np.testing.assert_equal(audmetric.word_error_rate(truth, prediction), wer)
+def test_word_error_rate_longest(truth, prediction, wer):
+    np.testing.assert_equal(
+        audmetric.word_error_rate(truth, prediction, norm="longest"), wer
+    )
+
+
+@pytest.mark.parametrize(
+    "truth,prediction,wer",
+    [
+        ([[]], [[]], 0),
+        ([[None]], [[]], 1.0),
+        ([[None]], [["lorem"]], 1.0),
+        ([[None]], [["lorem", "ipsum"]], 2.0),
+        ([["lorem"]], [[]], 1),
+        ([[]], [["lorem"]], 1),
+        ([["lorem", "ipsum"]], [["lorem"]], 0.5),
+        ([["lorem"]], [["lorem", "ipsum"]], 1.0),
+        ([["lorem"]], [["lorem"]], 0),
+        ([["lorem", "ipsum"]], [["lorm", "ipsum"]], 0.5),
+        (
+            [["lorem", "ipsum"], ["north", "wind", "and", "sun"]],
+            [["lorm", "ipsum"], ["north", "wind"]],
+            0.5,
+        ),
+        pytest.param(
+            [["lorem"], []],
+            [[]],
+            0.0,
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+    ],
+)
+def test_word_error_rate_truth(truth, prediction, wer):
+    """Tests for symmetric word error rate.
+
+    Currently it contains the uncontroversial, i.e passing tests.
+    """
+    np.testing.assert_equal(
+        audmetric.word_error_rate(truth, prediction, norm="truth"), wer
+    )
+
+
+def test_word_error_rate_invalid_norm():
+    """Test that word_error_rate raises ValueError for invalid norm argument."""
+    with pytest.raises(
+        ValueError, match=r"'norm' must be one of 'truth', 'longest', got 'foo'"
+    ):
+        audmetric.word_error_rate([[]], [[]], norm="foo")
