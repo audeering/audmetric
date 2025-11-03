@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.2.2
+                v1.2.3
               </div>
             
           
@@ -168,13 +168,40 @@
 <h1>word_error_rate()<a class="headerlink" href="#word-error-rate" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.word_error_rate">
-<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">word_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#word_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.word_error_rate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">word_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'truth'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#word_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.word_error_rate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Word error rate based on edit distance.</p>
+<p>The word error rate is computed
+by aggregating the normalized edit distances
+of each (truth, prediction)-pair
+and averaging the aggregated score
+by the number of pairs.</p>
+<p>The normalized edit distance
+of each (truth, prediction)-pair is computed
+as the edit distance divided by a normalization factor n.
+This represents the average editing cost per sequence item.
+The value of n depends on the <code class="docutils literal notranslate"><span class="pre">norm</span></code> parameter.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">norm</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;truth&quot;</span></code>,
+n is set to the reference (truth) length,
+following the Wikipedia formulation.
+Here, n is the number of words in the reference.
+This means WER can be greater than 1
+if the prediction sequence is longer than the reference:</p>
+<blockquote>
+<div><div class="math">
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>n</mi><mo>=</mo><mtext>len</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">n = \text{len}(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">len</span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></span></div></div></blockquote>
+<p>If <code class="docutils literal notranslate"><span class="pre">norm</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;longest&quot;</span></code>,
+n is set to the maximum length between truth and prediction:</p>
+<blockquote>
+<div><div class="math">
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>n</mi><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mtext>len</mtext><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext>len</mtext><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">n = \max(\text{len}(t), \text{len}(p))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">max</span><span class="mopen">(</span><span class="mord text"><span class="mord">len</span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">len</span></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mclose">))</span></span></span></span></span></div></div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>truth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – ground truth strings</p></li>
 <li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – predicted strings</p></li>
+<li><p><strong>norm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – normalization method, either “truth” or “longest”.
+“truth” normalizes by truth length,
+“longest” normalizes by max length of truth and prediction</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -184,7 +211,10 @@
 <dd class="field-odd"><p>word error rate</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">truth</span></code> and <code class="docutils literal notranslate"><span class="pre">prediction</span></code> differ in length</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">truth</span></code> and <code class="docutils literal notranslate"><span class="pre">prediction</span></code> differ in length</p></li>
+<li><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">norm</span></code> is not one of <code class="docutils literal notranslate"><span class="pre">&quot;truth&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;longest&quot;</span></code></p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -192,6 +222,12 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;lorm&quot;</span><span class="p">,</span> <span class="s2">&quot;ipsum&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;north&quot;</span><span class="p">,</span> <span class="s2">&quot;wind&quot;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">word_error_rate</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
 <span class="go">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">truth</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;xyz&quot;</span><span class="p">,</span> <span class="s2">&quot;moon&quot;</span><span class="p">,</span> <span class="s2">&quot;abc&quot;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">word_error_rate</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+<span class="go">1.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">word_error_rate</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">&quot;longest&quot;</span><span class="p">)</span>
+<span class="go">1.0</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -221,7 +257,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/06/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/11/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -229,7 +265,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2024 audEERING GmbH
+      &copy; 2019-2025 audEERING GmbH
     </p>
   </div> 
 
