@@ -1,5 +1,0 @@
-pandas
-pytest
-pytest-doctestplus
-pytest-cov
-scikit-learn
