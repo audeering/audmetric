@@ -12,8 +12,7 @@ def assert_equal_length(
     r"""Assert truth and prediction have equal length."""
     if len(truth) != len(prediction):
         raise ValueError(
-            f"Truth and prediction differ in length: "
-            f"{len(truth)} != {len(prediction)}."
+            f"Truth and prediction differ in length: {len(truth)} != {len(prediction)}."
         )
 
 

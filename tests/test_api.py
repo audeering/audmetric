@@ -616,7 +616,7 @@ def test_scores_per_subgroup_and_class(
 
 
 @pytest.mark.parametrize(
-    "truth,prediction,protected_variable,labels,subgroups,metric,reduction," "expected",
+    "truth,prediction,protected_variable,labels,subgroups,metric,reduction,expected",
     [
         (
             [],
