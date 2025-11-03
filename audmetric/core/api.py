@@ -614,7 +614,9 @@ def linkability(
         >>> truth = [1, 0] * int(samples / 2)
         >>> prediction = []
         >>> for _ in range(int(samples / 2)):
-        ...     prediction.extend([np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)])
+        ...     prediction.extend(
+        ...         [np.random.uniform(0, 0.2), np.random.uniform(0.8, 1.0)]
+        ...     )
         >>> linkability(truth, prediction)
         0.9747999999999999
         >>> truth = [1, 0, 0, 0] * int(samples / 4)
@@ -1325,7 +1327,7 @@ def _matching_scores(
         raise ValueError(
             "'truth' is only allowed to contain "
             "[1, 0, True, False], "
-            'yours contains:\n'
+            "yours contains:\n"
             f"[{', '.join([str(t) for t in set(truth)])}]"
         )
 
