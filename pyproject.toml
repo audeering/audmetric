@@ -203,3 +203,24 @@ convention = 'google'
 #
 # Use setuptools_scm to get version from git
 [tool.setuptools_scm]
+
+
+# ===== DEPENDENCY GROUPS =================================================
+#
+[dependency-groups]
+dev = [
+    'audeer >=1.18.0',
+    'docutils',
+    'pandas',
+    'pytest',
+    'pytest-cov',
+    'pytest-doctestplus',
+    'scikit-learn',
+    'sphinx >=3.5.4',
+    'sphinx-audeering-theme >=1.2.1',
+    'sphinx-autodoc-typehints',
+    'sphinx-copybutton',
+    'sphinxcontrib-bibtex >=2.3.0',
+    'sphinxcontrib-katex >=0.8.6',
+    'toml',
+]
