@@ -651,7 +651,7 @@ def linkability(
     mask = [True if y2[i] == 0 and y1[i] != 0 else False for i in range(len(y1))]
     d[mask] = 1
     # Global measure using trapz numerical integration
-    d_sys = np.trapz(x=bin_centers, y=d * y1)
+    d_sys = np.trapezoid(x=bin_centers, y=d * y1)
 
     return float(d_sys)
 
