@@ -5,7 +5,12 @@ from audmetric.core.api import confusion_matrix
 from audmetric.core.api import detection_error_tradeoff
 from audmetric.core.api import edit_distance
 from audmetric.core.api import equal_error_rate
+from audmetric.core.api import event_confusion_matrix
 from audmetric.core.api import event_error_rate
+from audmetric.core.api import event_fscore_per_class
+from audmetric.core.api import event_precision_per_class
+from audmetric.core.api import event_recall_per_class
+from audmetric.core.api import event_unweighted_average_fscore
 from audmetric.core.api import fscore_per_class
 from audmetric.core.api import linkability
 from audmetric.core.api import mean_absolute_error
