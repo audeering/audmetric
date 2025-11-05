@@ -466,14 +466,13 @@ def event_confusion_matrix(
     if the predicted label is the same as the ground truth label,
     and if the onset is within the given ``onset_tolerance`` (in seconds)
     and the offset is within the given ``offset_tolerance`` (in seconds).
-
     Additionally to the ``offset_tolerance``,
     one can also specify the ``duration_tolerance``,
     to ensure that the offset occurs
     within a certain proportion of the reference event duration.
-    This allows to cover differences between very short and very long events,
-    by allowing long events to be considered correct even if their offset is
-    not within the required ``offset_tolerance``.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
 
     The resulting confusion matrix has one more row and and one more column
     than there are labels.
@@ -522,11 +521,11 @@ def event_confusion_matrix(
     Examples:
         >>> truth = pd.Series(
         ...     index=audformat.segmented_index(
-        ...         files=["f1.wav"] * 5,
-        ...         starts=[0, 0.1, 0.2, 0.3, 1.0],
-        ...         ends=[0.1, 0.2, 0.3, 0.4, 2.0],
+        ...         files=["f1.wav"] * 4,
+        ...         starts=[0, 0.1, 0.2, 0.3],
+        ...         ends=[0.1, 0.2, 0.3, 0.4],
         ...     ),
-        ...     data=["a", "a", "b", "a"],
+        ...     data=["a", "a", "b", "b"],
         ... )
         >>> prediction = pd.Series(
         ...     index=audformat.segmented_index(
@@ -602,10 +601,6 @@ def event_confusion_matrix(
                     )
                     overlap_matrix[i, j] *= offset_match
         hit_matrix *= overlap_matrix
-        # # Get mapping from predicted segment ID to matching ground truth segment ID
-        # predicted_matches = defaultdict(list)
-        # for gt_i, pred_i in zip(*hit_indices):
-        #     predicted_matches[pred_i].append(gt_i)
         # Get optimal matching between prediction and ground truth
         # when there are multiple possibilities
         graph = csr_array(hit_matrix)
@@ -736,6 +731,9 @@ def event_fscore_per_class(
     one can also specify the ``duration_tolerance``,
     to ensure that the offset occurs
     within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
 
     Args:
         truth: ground truth values/classes
@@ -793,7 +791,7 @@ def event_fscore_per_class(
         >>> event_fscore_per_class(
         ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
         ... )
-        {"a": 0.6666666666666666, "b": 0.0}
+        {'a': 0.6666666666666666, 'b': 0.0}
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -861,6 +859,9 @@ def event_precision_per_class(
     one can also specify the ``duration_tolerance``,
     to ensure that the offset occurs
     within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
 
     Args:
         truth: ground truth values/classes
@@ -914,7 +915,7 @@ def event_precision_per_class(
         >>> event_precision_per_class(
         ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
         ... )
-        {"a": 0.5, "b": 0.0}
+        {'a': 0.5, 'b': 0.0}
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
     """
@@ -971,6 +972,9 @@ def event_recall_per_class(
     one can also specify the ``duration_tolerance``,
     to ensure that the offset occurs
     within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
 
     Args:
         truth: ground truth values/classes
@@ -1024,7 +1028,7 @@ def event_recall_per_class(
         >>> event_recall_per_class(
         ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
         ... )
-        {"a": 1.0, "b": 0.0}
+        {'a': 1.0, 'b': 0.0}
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1084,6 +1088,9 @@ def event_unweighted_average_fscore(
     one can also specify the ``duration_tolerance``,
     to ensure that the offset occurs
     within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
 
     Args:
         truth: ground truth values/classes
