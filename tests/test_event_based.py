@@ -463,4 +463,6 @@ def test_sed_eval_comparison(testcase):
         assert expected_result[f"{label}.Ntp"] == n_tp
         assert expected_result[f"{label}.Nfn"] == n_fn
         assert expected_result[f"{label}.Nfp"] == n_fp
+        assert n_truth[i] == len(truth[truth == label])
+        assert n_pred[i] == len(prediction[prediction == label])
     np.testing.assert_almost_equal(uaf, expected_result["uaf"])
