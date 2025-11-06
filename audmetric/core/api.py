@@ -555,7 +555,7 @@ def event_confusion_matrix(
         labels = infer_labels(truth.values, prediction.values)
 
     # Confusion matrix of event labels + "no event" label
-    matrix = [[0 for _ in range(len(labels) + 1)] for _ in range(len(labels) + 1)]
+    cm = [[0 for _ in range(len(labels) + 1)] for _ in range(len(labels) + 1)]
 
     # Code based on 'optimal' event matching
     # at https://github.com/TUT-ARG/sed_eval/blob/0cb1b6d11ceec4fe500cc9b31079c9d8666ed6eb/sed_eval/sound_event.py#L1108
@@ -568,6 +568,8 @@ def event_confusion_matrix(
         # Matrix storing whether there is an overlap
         # between each truth segment and each predicted segment
         overlap_matrix = np.ones((n_truth, n_pred), dtype=bool)
+        # Matrix storing whether there is an overlap
+        # AND the labels are the same
         hit_matrix = np.zeros((n_truth, n_pred), dtype=bool)
         for i, ((_, start_truth, end_truth), label_truth) in enumerate(
             # file_truth.sort_index().items()
@@ -575,7 +577,6 @@ def event_confusion_matrix(
         ):
             start_truth = start_truth.total_seconds()
             end_truth = end_truth.total_seconds()
-            duration_truth = end_truth - start_truth
             for j, ((_, start_pred, end_pred), label_pred) in enumerate(
                 # file_pred.sort_index().items()
                 file_pred.items()
@@ -583,72 +584,45 @@ def event_confusion_matrix(
                 start_pred = start_pred.total_seconds()
                 end_pred = end_pred.total_seconds()
                 # Condition 1: labels are the same
-                hit_matrix[i, j] = label_truth == label_pred
-                # Condition 2: onset is within the allowed tolerance
-                if onset_tolerance is not None:
-                    overlap_matrix[i, j] *= (
-                        math.fabs(start_truth - start_pred) <= onset_tolerance
-                    )
-                # Condition 3: offset is within (absolute) offset tolerance
-                # or (if provided) within duration proportion based offset tolerance
-                if offset_tolerance is not None or duration_tolerance is not None:
-                    actual_offset_tolerance = 0
-                    if offset_tolerance is not None:
-                        actual_offset_tolerance = offset_tolerance
-                    if duration_tolerance is not None:
-                        actual_offset_tolerance = max(
-                            duration_tolerance * duration_truth, actual_offset_tolerance
-                        )
-                    offset_match = (
-                        math.fabs(end_truth - end_pred) <= actual_offset_tolerance
-                    )
-                    overlap_matrix[i, j] *= offset_match
-        hit_matrix *= overlap_matrix
-        # Get optimal matching between prediction and ground truth
-        # when there are multiple possibilities
-        graph = csr_array(hit_matrix)
-        matches = maximum_bipartite_matching(graph)
-        # Store leftover overlapping segments that have not been matched
-        leftover_overlap_matrix = overlap_matrix.copy()
-        for pred_i, truth_i in enumerate(matches):
-            if truth_i != -1:
-                truth_label = file_truth.iloc[truth_i]
-                label_index = labels.index(truth_label)
-                # Mark in leftover overlap matrix
-                # that this segment is already covered
-                leftover_overlap_matrix[truth_i, :] = False
-                leftover_overlap_matrix[:, pred_i] = False
-                # Add to respective label in total confusion matrix
-                matrix[label_index][label_index] += 1
-
-        # Get optimal matching between prediction and ground truth segments
-        # that have differing labels and that do not yet have a match
-        leftover_graph = csr_array(leftover_overlap_matrix)
-        confused_matching = maximum_bipartite_matching(leftover_graph)
-        for pred_i, truth_i in enumerate(confused_matching):
-            if truth_i != -1:
-                pred_label = file_pred.iloc[pred_i]
-                truth_label = file_truth.iloc[truth_i]
-                # Increase counter in confusion matrix for this confused match
-                matrix[labels.index(truth_label)][labels.index(pred_label)] += 1
+                label_match = label_truth == label_pred
+                # Condition 2: segments overlap in onset/offset
+                overlap_match = _segments_overlap(
+                    start_truth,
+                    end_truth,
+                    start_pred,
+                    end_pred,
+                    onset_tolerance,
+                    offset_tolerance,
+                    duration_tolerance,
+                )
+                hit_matrix[i, j] = label_match & overlap_match
+                overlap_matrix[i, j] = overlap_match
+        _match_segments_and_accumulate(
+            cm=cm,
+            hit_matrix=hit_matrix,
+            overlap_matrix=overlap_matrix,
+            truth_labels=file_truth.to_list(),
+            pred_labels=file_pred.to_list(),
+            label_to_index={label: i for i, label in enumerate(labels)},
+        )
 
     # Fill in remaining errors that have no confusions
     for i, label in enumerate(labels):
         n_label_truth = len(truth[truth == label])
         # Count any ground truth segments that have no overlapping prediction at all
-        n_missed = n_label_truth - sum(matrix[i][: len(labels)])
-        matrix[i][-1] += n_missed
+        n_missed = n_label_truth - sum(cm[i][: len(labels)])
+        cm[i][-1] += n_missed
         n_label_pred = len(prediction[prediction == label])
         # Count any predictions that have no overlap with ground truth segments
-        n_extra = n_label_pred - sum([matrix[j][i] for j in range(len(labels))])
-        matrix[-1][i] = n_extra
+        n_extra = n_label_pred - sum([cm[j][i] for j in range(len(labels))])
+        cm[-1][i] = n_extra
 
     if normalize:
-        for idx, row in enumerate(matrix):
+        for idx, row in enumerate(cm):
             if np.sum(row) != 0:
                 row_sum = float(np.sum(row))
-                matrix[idx] = [x / row_sum for x in row]
-    return matrix
+                cm[idx] = [x / row_sum for x in row]
+    return cm
 
 
 def event_error_rate(
@@ -803,7 +777,6 @@ def event_fscore_per_class(
     """
     if labels is None:
         labels = infer_labels(truth, prediction)
-
     precision = event_precision_per_class(
         truth,
         prediction,
@@ -830,7 +803,6 @@ def event_fscore_per_class(
             else:
                 fscore[label] = 0.0
         elif p * r == 0:
-            fscore[label] = 0.0
             fscore[label] = 0.0
         else:
             fscore[label] = (2 * p * r) / (p + r)
@@ -929,28 +901,16 @@ def event_precision_per_class(
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     """
-    if labels is None:
-        labels = infer_labels(truth, prediction)
-
-    matrix = np.array(
-        event_confusion_matrix(
-            truth,
-            prediction,
-            labels,
-            onset_tolerance=onset_tolerance,
-            offset_tolerance=offset_tolerance,
-            duration_tolerance=duration_tolerance,
-        )
+    return _event_metric_per_class(
+        truth,
+        prediction,
+        labels,
+        zero_division,
+        onset_tolerance,
+        offset_tolerance,
+        duration_tolerance,
+        axis=0,
     )
-    total = matrix.sum(axis=0)
-    old_settings = np.seterr(invalid="ignore")
-    precision = matrix.diagonal() / total
-    np.seterr(**old_settings)
-    precision[np.isnan(precision)] = zero_division
-
-    # The event based confusion matrix also as a row/column for the "non-event" class,
-    # so we only include metrics for the actual labels
-    return {label: float(r) for label, r in zip(labels, precision[: len(labels)])}
 
 
 def event_recall_per_class(
@@ -1045,27 +1005,16 @@ def event_recall_per_class(
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     """
-    if labels is None:
-        labels = infer_labels(truth, prediction)
-
-    matrix = np.array(
-        event_confusion_matrix(
-            truth,
-            prediction,
-            labels,
-            onset_tolerance=onset_tolerance,
-            offset_tolerance=offset_tolerance,
-            duration_tolerance=duration_tolerance,
-        )
+    return _event_metric_per_class(
+        truth,
+        prediction,
+        labels,
+        zero_division,
+        onset_tolerance,
+        offset_tolerance,
+        duration_tolerance,
+        axis=1,
     )
-    total = matrix.sum(axis=1)
-    old_settings = np.seterr(invalid="ignore")
-    recall = matrix.diagonal() / total
-    np.seterr(**old_settings)
-    recall[np.isnan(recall)] = zero_division
-    # The event based confusion matrix also has a row/column for the "non-event" class,
-    # so we only include metrics for the actual labels
-    return {label: float(r) for label, r in zip(labels, recall[: len(labels)])}
 
 
 def event_unweighted_average_fscore(
@@ -2028,3 +1977,73 @@ def _matching_scores(
     non_mated_scores = prediction[~truth]
 
     return mated_scores, non_mated_scores
+
+
+def _event_metric_per_class(
+    truth: pd.Series,
+    prediction: pd.Series,
+    labels: Sequence[object] | None,
+    zero_division: float,
+    onset_tolerance: float | None,
+    offset_tolerance: float | None,
+    duration_tolerance: float | None,
+    axis: int,  # 0=precision, 1=recall
+) -> dict[str, float]:
+    if labels is None:
+        labels = infer_labels(truth, prediction)
+    cm = np.array(
+        event_confusion_matrix(
+            truth,
+            prediction,
+            labels,
+            onset_tolerance=onset_tolerance,
+            offset_tolerance=offset_tolerance,
+            duration_tolerance=duration_tolerance,
+        )
+    )
+    totals = cm.sum(axis=axis)
+    vals = cm.diagonal() / totals
+    vals = np.nan_to_num(vals, nan=zero_division)
+    return {lab: float(vals[i]) for i, lab in enumerate(labels)}
+
+
+def _match_segments_and_accumulate(
+    cm: list[list[int]],
+    hit_matrix: np.ndarray,
+    overlap_matrix: np.ndarray,
+    truth_labels: list,
+    pred_labels: list,
+    label_to_index: dict,
+):
+    # First match correct‐label hits
+    graph = csr_array(hit_matrix)
+    matches = maximum_bipartite_matching(graph)
+    for p_i, t_i in enumerate(matches):
+        if t_i >= 0:
+            idx = label_to_index[truth_labels[t_i]]
+            cm[idx][idx] += 1
+            overlap_matrix[t_i, :] = False
+            overlap_matrix[:, p_i] = False
+
+    # Then match leftover overlaps with wrong labels
+    graph2 = csr_array(overlap_matrix)
+    for p_i, t_i in enumerate(maximum_bipartite_matching(graph2)):
+        if t_i >= 0:
+            i = label_to_index[truth_labels[t_i]]
+            j = label_to_index[pred_labels[p_i]]
+            cm[i][j] += 1
+
+
+def _segments_overlap(
+    start_t, end_t, start_p, end_p, onset_tol, offset_tol, duration_tol
+) -> bool:
+    if onset_tol is not None:
+        if math.fabs(start_t - start_p) > onset_tol:
+            return False
+    # Compute the effective offset tolerance
+    eff_off = offset_tol or 0.0
+    if duration_tol is not None:
+        eff_off = max(eff_off, duration_tol * (end_t - start_t))
+    if math.fabs(end_t - end_p) > eff_off:
+        return False
+    return True
