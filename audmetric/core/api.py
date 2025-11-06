@@ -1908,6 +1908,37 @@ def word_error_rate(
     return float(wer / num_samples)
 
 
+def _event_metric_per_class(
+    truth: pd.Series,
+    prediction: pd.Series,
+    labels: Sequence[object] | None,
+    zero_division: float,
+    onset_tolerance: float | None,
+    offset_tolerance: float | None,
+    duration_tolerance: float | None,
+    axis: int,  # 0=precision, 1=recall
+) -> dict[str, float]:
+    if labels is None:
+        labels = infer_labels(truth, prediction)
+    cm = np.array(
+        event_confusion_matrix(
+            truth,
+            prediction,
+            labels,
+            onset_tolerance=onset_tolerance,
+            offset_tolerance=offset_tolerance,
+            duration_tolerance=duration_tolerance,
+        )
+    )
+    totals = cm.sum(axis=axis)
+    vals = cm.diagonal() / totals
+    vals = np.nan_to_num(vals, nan=zero_division)
+    # The event based confusion matrix also has a row/column
+    # for the "no event" class (aka the absence of a segment)
+    # but we only return the recall/precision per class
+    return {lab: float(vals[i]) for i, lab in enumerate(labels)}
+
+
 def _matching_scores(
     truth: (bool | int | Sequence[bool | int]),
     prediction: (bool | int | float | Sequence[bool | int | float]),
@@ -1976,37 +2007,6 @@ def _matching_scores(
     non_mated_scores = prediction[~truth]
 
     return mated_scores, non_mated_scores
-
-
-def _event_metric_per_class(
-    truth: pd.Series,
-    prediction: pd.Series,
-    labels: Sequence[object] | None,
-    zero_division: float,
-    onset_tolerance: float | None,
-    offset_tolerance: float | None,
-    duration_tolerance: float | None,
-    axis: int,  # 0=precision, 1=recall
-) -> dict[str, float]:
-    if labels is None:
-        labels = infer_labels(truth, prediction)
-    cm = np.array(
-        event_confusion_matrix(
-            truth,
-            prediction,
-            labels,
-            onset_tolerance=onset_tolerance,
-            offset_tolerance=offset_tolerance,
-            duration_tolerance=duration_tolerance,
-        )
-    )
-    totals = cm.sum(axis=axis)
-    vals = cm.diagonal() / totals
-    vals = np.nan_to_num(vals, nan=zero_division)
-    # The event based confusion matrix also has a row/column
-    # for the "no event" class (aka the absence of a segment)
-    # but we only return the recall/precision per class
-    return {lab: float(vals[i]) for i, lab in enumerate(labels)}
 
 
 def _match_segments_and_accumulate(
