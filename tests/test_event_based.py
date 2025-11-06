@@ -268,7 +268,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             {"a": 0.5, "b": 0.5, "c": 0.0},
             1 / 3,
         ),
-        # Test NaN propagation when only one of recall/precision is NaN
+        # NaN propagation set to True when only one of recall/precision is NaN
         (
             pd.Series(
                 index=audformat.segmented_index(
@@ -297,6 +297,36 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             {"a": 1.0, "b": 0.0},
             {"a": 2 * 0.75 / (1.0 + 0.75), "b": np.nan},
             2 * 0.75 / (1.0 + 0.75),
+        ),
+        # NaN propagation set to False when only one of recall/precision is NaN
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 4,
+                    starts=[0, 0.1, 0.2, 0.3],
+                    ends=[0.1, 0.2, 0.3, 0.4],
+                ),
+                data=["a", "a", "a", "a"],
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 4,
+                    starts=[0.01, 0.1, 0.18, 0.3],
+                    ends=[0.11, 0.18, 0.3, 0.4],
+                ),
+                data=["a", "b", "a", "a"],
+            ),
+            None,
+            np.nan,
+            False,
+            0.025,
+            0.025,
+            0.2,
+            [[3, 1, 0], [0, 0, 0], [0, 0, 0]],
+            {"a": 0.75, "b": np.nan},
+            {"a": 1.0, "b": 0.0},
+            {"a": 2 * 0.75 / (1.0 + 0.75), "b": 0.0},
+            0.75 / (1.0 + 0.75),
         ),
     ],
 )
