@@ -310,7 +310,7 @@ def test_event_based_metrics(
         total_sum = sum(row)
         if total_sum != 0:
             for j, col in enumerate(row):
-                assert norm_confusion[i][j] == col / total_sum
+                np.testing.assert_almost_equal(norm_confusion[i][j], col / total_sum)
 
     rpc = audmetric.event_recall_per_class(
         truth,
