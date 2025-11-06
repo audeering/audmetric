@@ -15,7 +15,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
 
 @pytest.mark.parametrize(
     (
-        "truth, prediction, labels, zero_division, "
+        "truth, prediction, labels, zero_division, propagate_nans, "
         "onset_tol, offset_tol, duration_tol, "
         "expected_conf, expected_rpc, expected_ppc, expected_fpc, expected_f"
     ),
@@ -30,6 +30,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             ),
             ["label"],
             0.0,
+            False,
             0,
             0,
             0,
@@ -45,6 +46,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             pd.Series(),
             None,
             0.0,
+            False,
             0,
             0,
             0,
@@ -60,9 +62,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             pd.Series(
                 index=audformat.segmented_index(
                     files=["f1.wav"],
-                    starts=[
-                        0,
-                    ],
+                    starts=[0],
                     ends=[0.1],
                 ),
                 data=["a"],
@@ -70,17 +70,14 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             pd.Series(
                 index=audformat.segmented_index(
                     files=["f1.wav"],
-                    starts=[
-                        0,
-                    ],
-                    ends=[
-                        0.1,
-                    ],
+                    starts=[0],
+                    ends=[0.1],
                 ),
                 data=["b"],
             ),
             None,
             0.0,
+            False,
             0,
             0,
             0,
@@ -95,9 +92,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             pd.Series(
                 index=audformat.segmented_index(
                     files=["f1.wav"],
-                    starts=[
-                        0,
-                    ],
+                    starts=[0],
                     ends=[0.1],
                 ),
                 data=["a"],
@@ -105,17 +100,14 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             pd.Series(
                 index=audformat.segmented_index(
                     files=["f1.wav"],
-                    starts=[
-                        0,
-                    ],
-                    ends=[
-                        0.1,
-                    ],
+                    starts=[0],
+                    ends=[0.1],
                 ),
                 data=["b"],
             ),
             None,
             np.nan,
+            False,
             0,
             0,
             0,
@@ -145,6 +137,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             ),
             ["speech"],
             0.0,
+            False,
             0,
             0,
             0,
@@ -174,6 +167,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             ),
             ["speech"],
             0.0,
+            False,
             0.025,
             0.025,
             None,
@@ -204,6 +198,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             ),
             None,
             0.0,
+            False,
             0.025,
             0.025,
             0.2,
@@ -233,6 +228,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             ),
             None,
             0.0,
+            False,
             0.025,
             0.025,
             0.2,
@@ -262,6 +258,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             ),
             None,
             0.0,
+            False,
             0.025,
             0.025,
             0.2,
@@ -271,6 +268,36 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
             {"a": 0.5, "b": 0.5, "c": 0.0},
             1 / 3,
         ),
+        # Test NaN propagation when only one of recall/precision is NaN
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 4,
+                    starts=[0, 0.1, 0.2, 0.3],
+                    ends=[0.1, 0.2, 0.3, 0.4],
+                ),
+                data=["a", "a", "a", "a"],
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 4,
+                    starts=[0.01, 0.1, 0.18, 0.3],
+                    ends=[0.11, 0.18, 0.3, 0.4],
+                ),
+                data=["a", "b", "a", "a"],
+            ),
+            None,
+            np.nan,
+            True,
+            0.025,
+            0.025,
+            0.2,
+            [[3, 1, 0], [0, 0, 0], [0, 0, 0]],
+            {"a": 0.75, "b": np.nan},
+            {"a": 1.0, "b": 0.0},
+            {"a": 2 * 0.75 / (1.0 + 0.75), "b": np.nan},
+            2 * 0.75 / (1.0 + 0.75),
+        ),
     ],
 )
 def test_event_based_metrics(
@@ -278,6 +305,7 @@ def test_event_based_metrics(
     prediction,
     labels,
     zero_division,
+    propagate_nans,
     onset_tol,
     offset_tol,
     duration_tol,
@@ -339,6 +367,7 @@ def test_event_based_metrics(
         prediction,
         labels,
         zero_division=zero_division,
+        propagate_nans=propagate_nans,
         onset_tolerance=onset_tol,
         offset_tolerance=offset_tol,
         duration_tolerance=duration_tol,
@@ -350,6 +379,7 @@ def test_event_based_metrics(
         prediction,
         labels,
         zero_division=zero_division,
+        propagate_nans=propagate_nans,
         onset_tolerance=onset_tol,
         offset_tolerance=offset_tol,
         duration_tolerance=duration_tol,
