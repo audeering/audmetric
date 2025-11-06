@@ -460,7 +460,10 @@ def event_confusion_matrix(
     duration_tolerance: float | None = None,
     normalize: bool = False,
 ) -> list[list[int | float]]:
-    r"""Confusion matrix for events.
+    r"""Event-based confusion.
+
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
 
     Each event is considered to be correctly identified
     if the predicted label is the same as the ground truth label,
@@ -473,6 +476,7 @@ def event_confusion_matrix(
     If a prediction fulfills the ``duration_tolerance``
     but not the ``offset_tolerance`` (or vice versa),
     it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
 
     The resulting confusion matrix has one more row and and one more column
     than there are labels.
@@ -481,14 +485,11 @@ def event_confusion_matrix(
     and false negatives that have no overlapping predicted segment
     as well as false positives that have no overlapping ground truth segment.
 
-    :footcite:`Mesaros2016`
-
     .. footbibliography::
-    .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     Args:
-        truth: ground truth labels with a segmented index conform to audformat
-        prediction: predicted labels with a segmented index conform to audformat
+        truth: ground truth labels with a segmented index conform to `audformat`_
+        prediction: predicted labels with a segmented index conform to `audformat`_
         labels: included labels in preferred ordering.
             If no labels are supplied,
             they will be inferred from
@@ -516,7 +517,7 @@ def event_confusion_matrix(
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
-            do not have a segmented index conform to audformat
+            do not have a segmented index conform to `audformat`_
 
     Examples:
         >>> truth = pd.Series(
@@ -539,6 +540,8 @@ def event_confusion_matrix(
         ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
         ... )
         [[1, 1, 0], [1, 1, 0], [0, 1, 0]]
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     """
     if not audformat.is_segmented_index(truth) or not audformat.is_segmented_index(
@@ -719,10 +722,9 @@ def event_fscore_per_class(
                  {\text{true positive}_k + \frac{1}{2}
                  (\text{false positive}_k + \text{false negative}_k)}
 
-    A true positive does not only need to match the label of the ground truth,
-    but it also needs to occur in a similar time window.
-    The truth and prediction need to be :class:`pandas.Series`
-    with a segmented index conform to audformat.
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
     Each event is considered to be correctly identified
     if the predicted label is the same as the ground truth label,
     and if the onset is within the given ``onset_tolerance`` (in seconds)
@@ -734,6 +736,9 @@ def event_fscore_per_class(
     If a prediction fulfills the ``duration_tolerance``
     but not the ``offset_tolerance`` (or vice versa),
     it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    .. footbibliography::
 
     Args:
         truth: ground truth values/classes
@@ -769,7 +774,7 @@ def event_fscore_per_class(
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
-            do not have a segmented index conform to audformat
+            do not have a segmented index conform to `audformat`_
 
     Examples:
         >>> truth = pd.Series(
@@ -847,10 +852,9 @@ def event_precision_per_class(
         \text{precision}_k = \frac{\text{true positive}_k}
                  {\text{true positive}_k + \text{false positive}_k}
 
-    A true positive does not only need to match the label of the ground truth,
-    but it also needs to occur in a similar time window.
-    The truth and prediction need to be :class:`pandas.Series`
-    with a segmented index conform to audformat.
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
     Each event is considered to be correctly identified
     if the predicted label is the same as the ground truth label,
     and if the onset is within the given ``onset_tolerance`` (in seconds)
@@ -862,6 +866,9 @@ def event_precision_per_class(
     If a prediction fulfills the ``duration_tolerance``
     but not the ``offset_tolerance`` (or vice versa),
     it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    .. footbibliography::
 
     Args:
         truth: ground truth values/classes
@@ -893,7 +900,7 @@ def event_precision_per_class(
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
-            do not have a segmented index conform to audformat
+            do not have a segmented index conform to `audformat`_
 
     Examples:
         >>> truth = pd.Series(
@@ -918,6 +925,7 @@ def event_precision_per_class(
         {'a': 0.5, 'b': 0.0}
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
+
     """
     if labels is None:
         labels = infer_labels(truth, prediction)
@@ -960,10 +968,9 @@ def event_recall_per_class(
         \text{recall}_k = \frac{\text{true positive}_k}
                  {\text{true positive}_k + \text{false negative}_k}
 
-    A true positive does not only need to match the label of the ground truth,
-    but it also needs to occur in a similar time window.
-    The truth and prediction need to be :class:`pandas.Series`
-    with a segmented index conform to audformat.
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
     Each event is considered to be correctly identified
     if the predicted label is the same as the ground truth label,
     and if the onset is within the given ``onset_tolerance`` (in seconds)
@@ -975,6 +982,9 @@ def event_recall_per_class(
     If a prediction fulfills the ``duration_tolerance``
     but not the ``offset_tolerance`` (or vice versa),
     it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    .. footbibliography::
 
     Args:
         truth: ground truth values/classes
@@ -1006,7 +1016,7 @@ def event_recall_per_class(
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
-            do not have a segmented index conform to audformat
+            do not have a segmented index conform to `audformat`_
 
     Examples:
         >>> truth = pd.Series(
@@ -1076,10 +1086,9 @@ def event_unweighted_average_fscore(
                  {\text{true positive}_k + \frac{1}{2}
                  (\text{false positive}_k + \text{false negative}_k)}
 
-    A true positive does not only need to match the label of the ground truth,
-    but it also needs to occur in a similar time window.
-    The truth and prediction need to be :class:`pandas.Series`
-    with a segmented index conform to audformat.
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
     Each event is considered to be correctly identified
     if the predicted label is the same as the ground truth label,
     and if the onset is within the given ``onset_tolerance`` (in seconds)
@@ -1091,6 +1100,9 @@ def event_unweighted_average_fscore(
     If a prediction fulfills the ``duration_tolerance``
     but not the ``offset_tolerance`` (or vice versa),
     it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    .. footbibliography::
 
     Args:
         truth: ground truth values/classes
@@ -1145,6 +1157,8 @@ def event_unweighted_average_fscore(
         ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
         ... )
         0.3333333333333333
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     """
     fscore = event_fscore_per_class(
