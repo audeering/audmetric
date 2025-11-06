@@ -1,43 +1,16 @@
-import random
+import os
 
 import numpy as np
 import pandas as pd
 import pytest
-import sed_eval
 
+import audeer
 import audformat
 
 import audmetric
 
 
-def generate_random_segments(
-    n_segments, labels, file_duration, min_duration, max_duration
-):
-    starts = np.random.uniform(
-        low=0, high=file_duration - max_duration, size=n_segments
-    )
-    durations = np.random.uniform(low=min_duration, high=max_duration, size=n_segments)
-    index = audformat.segmented_index(
-        files=["f1.wav"] * n_segments,
-        starts=starts,
-        ends=starts + durations,
-    )
-    segments = pd.Series(index=index, data=random.choices(labels, k=n_segments))
-    segments.name = "label"
-    return segments
-
-
-def eventlist_from_series(series: pd.Series):
-    result = series.to_frame()
-    result.reset_index(inplace=True)
-    result.rename(
-        columns={"start": "event_onset", "end": "event_offset", "label": "event_label"},
-        inplace=True,
-    )
-    result["event_onset"] = result["event_onset"].dt.total_seconds()
-    result["event_offset"] = result["event_offset"].dt.total_seconds()
-    result = result.to_dict("records")
-    return result
+REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "event_based")
 
 
 @pytest.mark.parametrize(
@@ -384,69 +357,28 @@ def test_event_based_metrics(
     np.testing.assert_equal(uaf, expected_f)
 
 
-@pytest.mark.parametrize("n_truth", [10, 30, 100])
-@pytest.mark.parametrize("n_pred", [10, 30, 100])
-@pytest.mark.parametrize("n_labels", [1, 10])
-@pytest.mark.parametrize(
-    "onset_tol, offset_tol, duration_tol",
-    [(0.2, 0.2, 0.4), (1.0, 1.0, None), (0.2, None, None), (None, 0.2, 0.5)],
-)
-@pytest.mark.parametrize(
-    "segment_duration_max, file_duration", [(0.5, 5.0), (5.0, 30.0)]
-)
-def test_sed_eval_comparison(
-    n_truth,
-    n_pred,
-    n_labels,
-    onset_tol,
-    offset_tol,
-    duration_tol,
-    segment_duration_max,
-    file_duration,
-):
-    min_duration = 0
-    if onset_tol is not None:
-        min_duration = onset_tol
-    if offset_tol is not None:
-        min_duration = max(min_duration, offset_tol)
+@pytest.mark.parametrize("testcase", [0, 1, 2, 3, 4])
+def test_sed_eval_comparison(testcase):
+    # Test cases are generated in tests/assets/event_based
+    # using the sed-eval package
+    reference_dir = os.path.join(REFERENCE_DIR, str(testcase))
+    truth = audformat.utils.read_csv(os.path.join(reference_dir, "truth.csv"))
+    prediction = audformat.utils.read_csv(os.path.join(reference_dir, "prediction.csv"))
+    expected_result = (
+        pd.read_csv(os.path.join(reference_dir, "result.csv"), index_col=0)
+        .transpose()
+        .iloc[0]
+    )
+    expected_result = expected_result.replace({np.nan: None})
+    n_labels = int(expected_result["n_labels"])
     labels = [f"label_{i}" for i in range(n_labels)]
-
-    truth = generate_random_segments(
-        n_truth,
-        labels,
-        file_duration=file_duration,
-        min_duration=min_duration,
-        max_duration=segment_duration_max,
-    )
-    prediction = generate_random_segments(
-        n_pred,
-        labels,
-        file_duration=file_duration,
-        min_duration=min_duration,
-        max_duration=segment_duration_max,
-    )
-
-    sed_metrics = sed_eval.sound_event.EventBasedMetrics(
-        event_label_list=labels,
-        evaluate_onset=onset_tol is not None,
-        evaluate_offset=offset_tol is not None or duration_tol is not None,
-        # For sed_eval, onset_tolerance and offset_tolerance have to be the same
-        t_collar=onset_tol if onset_tol is not None else offset_tol,
-        percentage_of_length=duration_tol if duration_tol is not None else 0.0,
-        event_matching_type="optimal",
-    )
-    truth_event_list = eventlist_from_series(truth)
-    pred_event_list = eventlist_from_series(prediction)
-    sed_metrics.evaluate(
-        reference_event_list=truth_event_list, estimated_event_list=pred_event_list
-    )
     confusion = audmetric.event_confusion_matrix(
         truth,
         prediction,
         labels,
-        onset_tolerance=onset_tol,
-        offset_tolerance=offset_tol,
-        duration_tolerance=duration_tol,
+        onset_tolerance=expected_result["onset_tol"],
+        offset_tolerance=expected_result["offset_tol"],
+        duration_tolerance=expected_result["duration_tol"],
         normalize=False,
     )
     uaf = audmetric.event_unweighted_average_fscore(
@@ -455,9 +387,9 @@ def test_sed_eval_comparison(
         labels,
         zero_division=np.nan,
         propagate_nans=True,
-        onset_tolerance=onset_tol,
-        offset_tolerance=offset_tol,
-        duration_tolerance=duration_tol,
+        onset_tolerance=expected_result["onset_tol"],
+        offset_tolerance=expected_result["offset_tol"],
+        duration_tolerance=expected_result["duration_tol"],
     )
     confusion = np.array(confusion)
     n_truth = confusion.sum(axis=1)
@@ -466,13 +398,9 @@ def test_sed_eval_comparison(
         n_tp = confusion[i, i]
         n_fn = n_truth[i] - n_tp
         n_fp = n_pred[i] - n_tp
-        assert sed_metrics.class_wise[label]["Nref"] == n_truth[i]
-        assert sed_metrics.class_wise[label]["Nsys"] == n_pred[i]
-        assert sed_metrics.class_wise[label]["Ntp"] == n_tp
-        assert sed_metrics.class_wise[label]["Nfn"] == n_fn
-        assert sed_metrics.class_wise[label]["Nfp"] == n_fp
-
-    expected_uaf = sed_metrics.results_class_wise_average_metrics()["f_measure"][
-        "f_measure"
-    ]
-    assert uaf == expected_uaf
+        assert expected_result[f"{label}.Nref"] == n_truth[i]
+        assert expected_result[f"{label}.Nsys"] == n_pred[i]
+        assert expected_result[f"{label}.Ntp"] == n_tp
+        assert expected_result[f"{label}.Nfn"] == n_fn
+        assert expected_result[f"{label}.Nfp"] == n_fp
+    np.testing.assert_almost_equal(uaf, expected_result["uaf"])

@@ -76,7 +76,7 @@ addopts = '''
     --cov-report term-missing
     --cov-report xml
     --ignore=docs/
-    --ignore=tests/assests/linkability/
+    --ignore=tests/assets/linkability/
 '''
 
 
@@ -217,7 +217,6 @@ dev = [
     'pytest-cov',
     'pytest-doctestplus',
     'scikit-learn',
-    'sed-eval',
     'sphinx >=3.5.4',
     'sphinx-audeering-theme >=1.2.1',
     'sphinx-autodoc-typehints',
