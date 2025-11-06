@@ -453,10 +453,10 @@ def equal_error_rate(
 def event_confusion_matrix(
     truth: pd.Series,
     prediction: pd.Series,
-    labels: Sequence[object] = None,
+    labels: Sequence[object] | None = None,
     *,
-    onset_tolerance: float | None = 0.2,
-    offset_tolerance: float | None = 0.2,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
     duration_tolerance: float | None = None,
     normalize: bool = False,
 ) -> list[list[int | float]]:
@@ -680,12 +680,12 @@ def event_error_rate(
 def event_fscore_per_class(
     truth: pd.Series,
     prediction: pd.Series,
-    labels: Sequence[object] = None,
+    labels: Sequence[object] | None = None,
     *,
-    zero_division: float = 0,
+    zero_division: float = 0.0,
     propagate_nans: bool = False,
-    onset_tolerance: float | None = 0,
-    offset_tolerance: float | None = 0,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
     duration_tolerance: float | None = None,
 ) -> dict[str, float]:
     r"""Event-based F-score per class.
@@ -812,11 +812,11 @@ def event_fscore_per_class(
 def event_precision_per_class(
     truth: pd.Series,
     prediction: pd.Series,
-    labels: Sequence[object] = None,
+    labels: Sequence[object] | None = None,
     *,
-    zero_division: float = 0,
-    onset_tolerance: float | None = 0,
-    offset_tolerance: float | None = 0,
+    zero_division: float = 0.0,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
     duration_tolerance: float | None = None,
 ) -> dict[str, float]:
     r"""Event-based precision per class.
@@ -916,11 +916,11 @@ def event_precision_per_class(
 def event_recall_per_class(
     truth: pd.Series,
     prediction: pd.Series,
-    labels: Sequence[object] = None,
+    labels: Sequence[object] | None = None,
     *,
-    zero_division: float = 0,
-    onset_tolerance: float | None = 0,
-    offset_tolerance: float | None = 0,
+    zero_division: float = 0.0,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
     duration_tolerance: float | None = None,
 ) -> dict[str, float]:
     r"""Event-based recall per class.
@@ -1020,12 +1020,12 @@ def event_recall_per_class(
 def event_unweighted_average_fscore(
     truth: pd.Series,
     prediction: pd.Series,
-    labels: Sequence[object] = None,
+    labels: Sequence[object] | None = None,
     *,
-    zero_division: float = 0,
+    zero_division: float = 0.0,
     propagate_nans: bool = False,
-    onset_tolerance: float | None = 0,
-    offset_tolerance: float | None = 0,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
     duration_tolerance: float | None = None,
 ) -> float:
     r"""Event-based unweighted average F-score.
