@@ -37,6 +37,7 @@ dependencies = [
     'audeer >=1.1.0',
     'audformat',
     'numpy',
+    'scipy',
 ]
 # Get version dynamically from git
 # (needs setuptools_scm tools config below)
