@@ -824,11 +824,13 @@ def event_fscore_per_class(
     )
     fscore = {}
     for label, p, r in zip(labels, precision.values(), recall.values()):
-        if p * r == 0:
+        if np.isnan(p) or np.isnan(r):
+            if propagate_nans:
+                fscore[label] = np.nan
+            else:
+                fscore[label] = 0.0
+        elif p * r == 0:
             fscore[label] = 0.0
-        elif not propagate_nans and (
-            (p == 0.0 and np.isnan(r)) or (r == 0.0 and np.isnan(p))
-        ):
             fscore[label] = 0.0
         else:
             fscore[label] = (2 * p * r) / (p + r)
