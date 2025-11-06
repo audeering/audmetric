@@ -1438,9 +1438,6 @@ def precision_per_class(
     np.seterr(**old_settings)
     precision[np.isnan(precision)] = zero_division
 
-    # The event based confusion matrix also has a row/column
-    # for the "no events" class (aka the absence of a segment)
-    # so we only include metrics for the actual labels
     return {label: float(r) for label, r in zip(labels, precision)}
 
 
@@ -2006,6 +2003,9 @@ def _event_metric_per_class(
     totals = cm.sum(axis=axis)
     vals = cm.diagonal() / totals
     vals = np.nan_to_num(vals, nan=zero_division)
+    # The event based confusion matrix also has a row/column
+    # for the "no event" class (aka the absence of a segment)
+    # but we only return the recall/precision per class
     return {lab: float(vals[i]) for i, lab in enumerate(labels)}
 
 
