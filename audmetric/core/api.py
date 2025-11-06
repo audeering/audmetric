@@ -1426,6 +1426,7 @@ def precision_per_class(
     Examples:
         >>> precision_per_class([0, 0], [0, 1])
         {0: 1.0, 1: 0.0}
+
     """
     if labels is None:
         labels = infer_labels(truth, prediction)
@@ -1484,6 +1485,7 @@ def recall_per_class(
     recall = matrix.diagonal() / total
     np.seterr(**old_settings)
     recall[np.isnan(recall)] = zero_division
+
     return {label: float(r) for label, r in zip(labels, recall)}
 
 
