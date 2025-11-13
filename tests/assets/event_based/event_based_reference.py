@@ -106,7 +106,7 @@ def main():
             # if both are evaluated
             t_collar=onset_tol if onset_tol is not None else offset_tol,
             percentage_of_length=duration_tol if duration_tol is not None else 0.0,
-            event_matching_type="optimal",
+            event_matching_type="greedy",
         )
         truth_event_list = eventlist_from_series(truth)
         pred_event_list = eventlist_from_series(prediction)

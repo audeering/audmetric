@@ -6,8 +6,6 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_array
-from scipy.sparse.csgraph import maximum_bipartite_matching
 
 import audeer
 import audformat
@@ -563,30 +561,92 @@ def event_confusion_matrix(
         file_pred = prediction[
             prediction.index.get_level_values(IndexField.FILE) == file
         ]
+        # Sort index of truth and prediction to speedup the matching of segments
+        # and to get the same result regardless of the index order
+        file_truth = file_truth.sort_index()
+        file_pred = file_pred.sort_index()
+
         n_truth = len(file_truth)
         n_pred = len(file_pred)
-        # Matrix storing whether there is an overlap
-        # between each truth segment and each predicted segment
-        overlap_matrix = np.ones((n_truth, n_pred), dtype=bool)
-        # Matrix storing whether there is an overlap
-        # AND the labels are the same
-        hit_matrix = np.zeros((n_truth, n_pred), dtype=bool)
+        # Store whether each individual truth segment is identified
+        truth_correct = np.zeros(n_truth, dtype=bool)
+        # Store whether each individual predicted segment is correct
+        pred_correct = np.zeros(n_pred, dtype=bool)
+        # Find all correct matches
         for i, ((_, start_truth, end_truth), label_truth) in enumerate(
-            # file_truth.sort_index().items()
             file_truth.items()
         ):
             start_truth = start_truth.total_seconds()
             end_truth = end_truth.total_seconds()
             for j, ((_, start_pred, end_pred), label_pred) in enumerate(
-                # file_pred.sort_index().items()
                 file_pred.items()
             ):
+                # Skip segments that have already been matched
+                if pred_correct[j]:
+                    continue
+
                 start_pred = start_pred.total_seconds()
                 end_pred = end_pred.total_seconds()
+
+                # This predicted segment and all following ones cannot match
+                # if the true start time is exceeded by more than the allowed tolerance
+                # and we move on to the next ground truth segment
+                if onset_tolerance and start_truth + onset_tolerance < start_pred:
+                    break
+
                 # Condition 1: labels are the same
-                label_match = label_truth == label_pred
-                # Condition 2: segments overlap in onset/offset
-                overlap_match = _segments_overlap(
+                if label_truth == label_pred:
+                    # Condition 2: segments overlap in onset/offset
+                    if _segments_overlap(
+                        start_truth,
+                        end_truth,
+                        start_pred,
+                        end_pred,
+                        onset_tolerance,
+                        offset_tolerance,
+                        duration_tolerance,
+                    ):
+                        # Add entry to confusion matrix,
+                        # then move on to next ground truth segment
+                        label_id = labels.index(label_truth)
+                        cm[label_id][label_id] += 1
+                        truth_correct[i] = True
+                        pred_correct[j] = True
+                        break
+
+        # Indices of predicted segments without a ground truth match
+        pred_unmatched = np.nonzero(np.logical_not(pred_correct))[0]
+        # Indices of ground truth segments without a prediction match
+        truth_unmatched = np.nonzero(np.logical_not(truth_correct))[0]
+        preds_incorrect_match = np.zeros(n_pred)
+        # Find overlapping segments with incorrect labels
+        for i in truth_unmatched:
+            start_truth = file_truth.index.get_level_values(IndexField.START)[
+                i
+            ].total_seconds()
+            end_truth = file_truth.index.get_level_values(IndexField.END)[
+                i
+            ].total_seconds()
+            label_truth = file_truth.iloc[i]
+            for j in pred_unmatched:
+                # Skip predicted segments
+                # if they've already been counted as a label mismatch
+                if preds_incorrect_match[j]:
+                    continue
+                start_pred = file_pred.index.get_level_values(IndexField.START)[
+                    j
+                ].total_seconds()
+                end_pred = file_pred.index.get_level_values(IndexField.END)[
+                    j
+                ].total_seconds()
+
+                # This predicted segment and all following ones cannot match
+                # if the true start time is exceeded by more than the allowed tolerance
+                # and we move on to the next ground truth segment
+                if onset_tolerance and start_truth + onset_tolerance < start_pred:
+                    break
+                label_pred = file_pred.iloc[j]
+                if _segments_overlap(
                     start_truth,
                     end_truth,
                     start_pred,
@@ -594,17 +654,12 @@ def event_confusion_matrix(
                     onset_tolerance,
                     offset_tolerance,
                     duration_tolerance,
-                )
-                hit_matrix[i, j] = label_match & overlap_match
-                overlap_matrix[i, j] = overlap_match
-        _match_segments_and_accumulate(
-            cm=cm,
-            hit_matrix=hit_matrix,
-            overlap_matrix=overlap_matrix,
-            truth_labels=file_truth.to_list(),
-            pred_labels=file_pred.to_list(),
-            label_to_index={label: i for i, label in enumerate(labels)},
-        )
+                ):
+                    preds_incorrect_match[j] = True
+                    # Segment overlaps although the label is a mismatch
+                    # so it counts as a confused label
+                    cm[labels.index(label_truth)][labels.index(label_pred)] += 1
+                    break
 
     # Fill in remaining errors that have no confusions
     for i, label in enumerate(labels):
@@ -2007,33 +2062,6 @@ def _matching_scores(
     non_mated_scores = prediction[~truth]
 
     return mated_scores, non_mated_scores
-
-
-def _match_segments_and_accumulate(
-    cm: list[list[int]],
-    hit_matrix: np.ndarray,
-    overlap_matrix: np.ndarray,
-    truth_labels: list,
-    pred_labels: list,
-    label_to_index: dict,
-):
-    # First match correct‐label hits
-    graph = csr_array(hit_matrix)
-    matches = maximum_bipartite_matching(graph)
-    for p_i, t_i in enumerate(matches):
-        if t_i >= 0:
-            idx = label_to_index[truth_labels[t_i]]
-            cm[idx][idx] += 1
-            overlap_matrix[t_i, :] = False
-            overlap_matrix[:, p_i] = False
-
-    # Then match leftover overlaps with wrong labels
-    graph2 = csr_array(overlap_matrix)
-    for p_i, t_i in enumerate(maximum_bipartite_matching(graph2)):
-        if t_i >= 0:
-            i = label_to_index[truth_labels[t_i]]
-            j = label_to_index[pred_labels[p_i]]
-            cm[i][j] += 1
 
 
 def _segments_overlap(
