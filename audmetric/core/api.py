@@ -555,7 +555,7 @@ def event_confusion_matrix(
     # Confusion matrix of event labels + "no event" label
     cm = [[0 for _ in range(len(labels) + 1)] for _ in range(len(labels) + 1)]
 
-    # Code based on 'optimal' event matching
+    # Code based on 'greedy' event matching
     # at https://github.com/TUT-ARG/sed_eval/blob/0cb1b6d11ceec4fe500cc9b31079c9d8666ed6eb/sed_eval/sound_event.py#L1108
     for file, file_truth in truth.groupby(level=IndexField.FILE):
         file_pred = prediction[
