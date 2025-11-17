@@ -1,8 +1,20 @@
+from __future__ import annotations
+
 from collections.abc import Callable
 from collections.abc import Hashable
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 import numpy as np
+
+
+if TYPE_CHECKING:
+    import pandas as pd
+
+# Index fields for segmented index
+FILE = "file"
+START = "start"
+END = "end"
 
 
 def assert_equal_length(
@@ -34,6 +46,16 @@ def infer_labels(
 
     """
     return sorted(list(set(truth) | set(prediction)))
+
+
+def is_segmented_index(series: pd.Series):
+    """Check if index of series is conform to audformat segmented index."""
+    return (
+        len(series.index.names) == 3
+        and series.index.names[0] == FILE
+        and series.index.names[1] == START
+        and series.index.names[2] == END
+    )
 
 
 def scores_per_subgroup_and_class(

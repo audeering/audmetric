@@ -1,0 +1,16 @@
+,0
+n_labels,2.0
+onset_tol,
+offset_tol,0.2
+duration_tol,0.4
+uaf,0.40100250626566414
+label_0.Nref,7.0
+label_0.Nsys,14.0
+label_0.Ntp,4.0
+label_0.Nfn,3.0
+label_0.Nfp,10.0
+label_1.Nref,13.0
+label_1.Nsys,6.0
+label_1.Ntp,4.0
+label_1.Nfn,9.0
+label_1.Nfp,2.0

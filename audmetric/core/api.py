@@ -1,14 +1,26 @@
+from __future__ import annotations
+
 import collections
 from collections.abc import Callable
 from collections.abc import Sequence
+import math
+from typing import TYPE_CHECKING
 import warnings
 
 import numpy as np
 
+
+if TYPE_CHECKING:
+    import pandas as pd
+
 import audeer
 
+from audmetric.core.utils import END
+from audmetric.core.utils import FILE
+from audmetric.core.utils import START
 from audmetric.core.utils import assert_equal_length
 from audmetric.core.utils import infer_labels
+from audmetric.core.utils import is_segmented_index
 from audmetric.core.utils import scores_per_subgroup_and_class
 
 
@@ -444,6 +456,228 @@ def equal_error_rate(
     return eer, Stats(fmr, fnmr, thresholds, threshold)
 
 
+def event_confusion_matrix(
+    truth: pd.Series,
+    prediction: pd.Series,
+    labels: Sequence[object] | None = None,
+    *,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
+    duration_tolerance: float | None = None,
+    normalize: bool = False,
+) -> list[list[int | float]]:
+    r"""Event-based confusion.
+
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
+    Each event is considered to be correctly identified
+    if the predicted label is the same as the ground truth label,
+    and if the onset is within the given ``onset_tolerance`` (in seconds)
+    and the offset is within the given ``offset_tolerance`` (in seconds).
+    Additionally to the ``offset_tolerance``,
+    one can also specify the ``duration_tolerance``,
+    to ensure that the offset occurs
+    within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    The resulting confusion matrix has one more row and and one more column
+    than there are labels.
+    The last row/column corresponds to the absence of any event.
+    This allows to distinguish between segments that overlap but have differing labels,
+    and false negatives that have no overlapping predicted segment
+    as well as false positives that have no overlapping ground truth segment.
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth labels with a segmented index conform to `audformat`_
+        prediction: predicted labels with a segmented index conform to `audformat`_
+        labels: included labels in preferred ordering.
+            If no labels are supplied,
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
+            and ordered alphabetically
+        onset_tolerance: the onset tolerance in seconds.
+            If the predicted segment's onset does not occur within this time window
+            compared to the ground truth segment's onset,
+            it is not considered correct
+        offset_tolerance: the offset tolerance in seconds.
+            If the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct,
+            unless the ``duration_tolerance`` is specified and fulfilled
+        duration_tolerance: the duration tolerance as a measure of proportion
+            of the ground truth segment's total duration.
+            If the ``offset_tolerance`` is not fulfilled,
+            and the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct
+        normalize: normalize confusion matrix over the rows
+
+    Returns:
+        event confusion matrix
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav"] * 4,
+        ...         starts=[0, 0.1, 0.2, 0.3],
+        ...         ends=[0.1, 0.2, 0.3, 0.4],
+        ...     ),
+        ...     data=["a", "a", "b", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav"] * 4 + ["f2.wav"],
+        ...         starts=[0, 0.09, 0.2, 0.31, 0.0],
+        ...         ends=[0.1, 0.2, 0.3, 0.41, 1.0],
+        ...     ),
+        ...     data=["a", "b", "a", "b", "b"],
+        ... )
+        >>> event_confusion_matrix(
+        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
+        ... )
+        [[1, 1, 0], [1, 1, 0], [0, 1, 0]]
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    if not is_segmented_index(truth) or not is_segmented_index(prediction):
+        raise ValueError(
+            "For event-based metrics, the truth and prediction "
+            "should be a pandas Series with a segmented index conform to audformat."
+        )
+    if labels is None:
+        labels = infer_labels(truth.values, prediction.values)
+
+    # Confusion matrix of event labels + "no event" label
+    cm = [[0 for _ in range(len(labels) + 1)] for _ in range(len(labels) + 1)]
+
+    # Code based on 'greedy' event matching
+    # at https://github.com/TUT-ARG/sed_eval/blob/0cb1b6d11ceec4fe500cc9b31079c9d8666ed6eb/sed_eval/sound_event.py#L1108
+    for file, file_truth in truth.groupby(level=FILE):
+        file_pred = prediction[prediction.index.get_level_values(FILE) == file]
+        # Sort index of truth and prediction to speedup the matching of segments
+        # and to get the same result regardless of the index order
+        file_truth = file_truth.sort_index()
+        file_pred = file_pred.sort_index()
+
+        n_truth = len(file_truth)
+        n_pred = len(file_pred)
+        # Store whether each individual truth segment is identified
+        truth_correct = np.zeros(n_truth, dtype=bool)
+        # Store whether each individual predicted segment is correct
+        pred_correct = np.zeros(n_pred, dtype=bool)
+        # Find all correct matches
+        for i, ((_, start_truth, end_truth), label_truth) in enumerate(
+            file_truth.items()
+        ):
+            start_truth = start_truth.total_seconds()
+            end_truth = end_truth.total_seconds()
+            for j, ((_, start_pred, end_pred), label_pred) in enumerate(
+                file_pred.items()
+            ):
+                # Skip segments that have already been matched
+                if pred_correct[j]:
+                    continue
+
+                start_pred = start_pred.total_seconds()
+                end_pred = end_pred.total_seconds()
+
+                # This predicted segment and all following ones cannot match
+                # if the true start time is exceeded by more than the allowed tolerance
+                # and we move on to the next ground truth segment
+                if onset_tolerance and start_truth + onset_tolerance < start_pred:
+                    break
+
+                # Condition 1: labels are the same
+                if label_truth == label_pred:
+                    # Condition 2: segments overlap in onset/offset
+                    if _segments_overlap(
+                        start_truth,
+                        end_truth,
+                        start_pred,
+                        end_pred,
+                        onset_tolerance,
+                        offset_tolerance,
+                        duration_tolerance,
+                    ):
+                        # Add entry to confusion matrix,
+                        # then move on to next ground truth segment
+                        label_id = labels.index(label_truth)
+                        cm[label_id][label_id] += 1
+                        truth_correct[i] = True
+                        pred_correct[j] = True
+                        break
+
+        # Indices of predicted segments without a ground truth match
+        pred_unmatched = np.nonzero(np.logical_not(pred_correct))[0]
+        # Indices of ground truth segments without a prediction match
+        truth_unmatched = np.nonzero(np.logical_not(truth_correct))[0]
+        preds_incorrect_match = np.zeros(n_pred)
+        # Find overlapping segments with incorrect labels
+        for i in truth_unmatched:
+            start_truth = file_truth.index.get_level_values(START)[i].total_seconds()
+            end_truth = file_truth.index.get_level_values(END)[i].total_seconds()
+            label_truth = file_truth.iloc[i]
+            for j in pred_unmatched:
+                # Skip predicted segments
+                # if they've already been counted as a label mismatch
+                if preds_incorrect_match[j]:
+                    continue
+                start_pred = file_pred.index.get_level_values(START)[j].total_seconds()
+                end_pred = file_pred.index.get_level_values(END)[j].total_seconds()
+
+                # This predicted segment and all following ones cannot match
+                # if the true start time is exceeded by more than the allowed tolerance
+                # and we move on to the next ground truth segment
+                if onset_tolerance and start_truth + onset_tolerance < start_pred:
+                    break
+                label_pred = file_pred.iloc[j]
+                if _segments_overlap(
+                    start_truth,
+                    end_truth,
+                    start_pred,
+                    end_pred,
+                    onset_tolerance,
+                    offset_tolerance,
+                    duration_tolerance,
+                ):
+                    preds_incorrect_match[j] = True
+                    # Segment overlaps although the label is a mismatch
+                    # so it counts as a confused label
+                    cm[labels.index(label_truth)][labels.index(label_pred)] += 1
+                    break
+
+    # Fill in remaining errors that have no confusions
+    for i, label in enumerate(labels):
+        n_label_truth = len(truth[truth == label])
+        # Count any ground truth segments that have no overlapping prediction at all
+        n_missed = n_label_truth - sum(cm[i][: len(labels)])
+        cm[i][-1] += n_missed
+        n_label_pred = len(prediction[prediction == label])
+        # Count any predictions that have no overlap with ground truth segments
+        n_extra = n_label_pred - sum([cm[j][i] for j in range(len(labels))])
+        cm[-1][i] = n_extra
+
+    if normalize:
+        for idx, row in enumerate(cm):
+            if np.sum(row) != 0:
+                row_sum = float(np.sum(row))
+                cm[idx] = [x / row_sum for x in row]
+    return cm
+
+
 def event_error_rate(
     truth: str | Sequence[str | Sequence[int]],
     prediction: (str | Sequence[str | Sequence[int]]),
@@ -494,6 +728,463 @@ def event_error_rate(
 
     num_samples = len(truth) if len(truth) > 1 else 1
     return eer / num_samples
+
+
+def event_fscore_per_class(
+    truth: pd.Series,
+    prediction: pd.Series,
+    labels: Sequence[object] | None = None,
+    *,
+    zero_division: float = 0.0,
+    propagate_nans: bool = False,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
+    duration_tolerance: float | None = None,
+) -> dict[str, float]:
+    r"""Event-based F-score per class.
+
+    .. math::
+
+        \text{fscore}_k = \frac{\text{true positive}_k}
+                 {\text{true positive}_k + \frac{1}{2}
+                 (\text{false positive}_k + \text{false negative}_k)}
+
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
+    Each event is considered to be correctly identified
+    if the predicted label is the same as the ground truth label,
+    and if the onset is within the given ``onset_tolerance`` (in seconds)
+    and the offset is within the given ``offset_tolerance`` (in seconds).
+    Additionally to the ``offset_tolerance``,
+    one can also specify the ``duration_tolerance``,
+    to ensure that the offset occurs
+    within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth values/classes
+        prediction: predicted values/classes
+        labels: included labels in preferred ordering.
+            If no labels are supplied,
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
+            and ordered alphabetically.
+        zero_division: set the value to return when there is a zero division
+        propagate_nans: whether to set the F-score to ``NaN``
+            when recall or precision are ``NaN``.
+            If ``False``, the F-score is only set to ``NaN``
+            when both recall and precision are ``NaN``
+        onset_tolerance: the onset tolerance in seconds.
+            If the predicted segment's onset does not occur within this time window
+            compared to the ground truth segment's onset,
+            it is not considered correct
+        offset_tolerance: the offset tolerance in seconds.
+            If the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct,
+            unless the ``duration_tolerance`` is specified and fulfilled
+        duration_tolerance: the duration tolerance as a measure of proportion
+            of the ground truth segment's total duration.
+            If the ``offset_tolerance`` is not fulfilled,
+            and the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct
+
+    Returns:
+        dictionary with label as key and F-score as value
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0, 0.09],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "a"],
+        ... )
+        >>> event_fscore_per_class(
+        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
+        ... )
+        {'a': 0.6666666666666666, 'b': 0.0}
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    if labels is None:
+        labels = infer_labels(truth, prediction)
+    precision = event_precision_per_class(
+        truth,
+        prediction,
+        labels,
+        zero_division=zero_division,
+        onset_tolerance=onset_tolerance,
+        offset_tolerance=offset_tolerance,
+        duration_tolerance=duration_tolerance,
+    )
+    recall = event_recall_per_class(
+        truth,
+        prediction,
+        labels,
+        zero_division=zero_division,
+        onset_tolerance=onset_tolerance,
+        offset_tolerance=offset_tolerance,
+        duration_tolerance=duration_tolerance,
+    )
+    fscore = {}
+    for label, p, r in zip(labels, precision.values(), recall.values()):
+        if np.isnan(p) or np.isnan(r):
+            if propagate_nans:
+                fscore[label] = np.nan
+            else:
+                fscore[label] = 0.0
+        elif p * r == 0:
+            fscore[label] = 0.0
+        else:
+            fscore[label] = (2 * p * r) / (p + r)
+    return fscore
+
+
+def event_precision_per_class(
+    truth: pd.Series,
+    prediction: pd.Series,
+    labels: Sequence[object] | None = None,
+    *,
+    zero_division: float = 0.0,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
+    duration_tolerance: float | None = None,
+) -> dict[str, float]:
+    r"""Event-based precision per class.
+
+    .. math::
+
+        \text{precision}_k = \frac{\text{true positive}_k}
+                 {\text{true positive}_k + \text{false positive}_k}
+
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
+    Each event is considered to be correctly identified
+    if the predicted label is the same as the ground truth label,
+    and if the onset is within the given ``onset_tolerance`` (in seconds)
+    and the offset is within the given ``offset_tolerance`` (in seconds).
+    Additionally to the ``offset_tolerance``,
+    one can also specify the ``duration_tolerance``,
+    to ensure that the offset occurs
+    within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth values/classes
+        prediction: predicted values/classes
+        labels: included labels in preferred ordering.
+            If no labels are supplied,
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
+            and ordered alphabetically.
+        zero_division: set the value to return when there is a zero division
+        onset_tolerance: the onset tolerance in seconds.
+            If the predicted segment's onset does not occur within this time window
+            compared to the ground truth segment's onset,
+            it is not considered correct
+        offset_tolerance: the offset tolerance in seconds.
+            If the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct,
+            unless the ``duration_tolerance`` is specified and fulfilled
+        duration_tolerance: the duration tolerance as a measure of proportion
+            of the ground truth segment's total duration.
+            If the ``offset_tolerance`` is not fulfilled,
+            and the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct
+
+    Returns:
+        dictionary with label as key and precision as value
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.09],
+        ...         ends=[0.11, 0.2],
+        ...     ),
+        ...     data=["a", "a"],
+        ... )
+        >>> event_precision_per_class(
+        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
+        ... )
+        {'a': 0.5, 'b': 0.0}
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    return _event_metric_per_class(
+        truth,
+        prediction,
+        labels,
+        zero_division,
+        onset_tolerance,
+        offset_tolerance,
+        duration_tolerance,
+        axis=0,
+    )
+
+
+def event_recall_per_class(
+    truth: pd.Series,
+    prediction: pd.Series,
+    labels: Sequence[object] | None = None,
+    *,
+    zero_division: float = 0.0,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
+    duration_tolerance: float | None = None,
+) -> dict[str, float]:
+    r"""Event-based recall per class.
+
+    .. math::
+
+        \text{recall}_k = \frac{\text{true positive}_k}
+                 {\text{true positive}_k + \text{false negative}_k}
+
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
+    Each event is considered to be correctly identified
+    if the predicted label is the same as the ground truth label,
+    and if the onset is within the given ``onset_tolerance`` (in seconds)
+    and the offset is within the given ``offset_tolerance`` (in seconds).
+    Additionally to the ``offset_tolerance``,
+    one can also specify the ``duration_tolerance``,
+    to ensure that the offset occurs
+    within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth values/classes
+        prediction: predicted values/classes
+        labels: included labels in preferred ordering.
+            If no labels are supplied,
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
+            and ordered alphabetically.
+        zero_division: set the value to return when there is a zero division
+        onset_tolerance: the onset tolerance in seconds.
+            If the predicted segment's onset does not occur within this time window
+            compared to the ground truth segment's onset,
+            it is not considered correct
+        offset_tolerance: the offset tolerance in seconds.
+            If the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct,
+            unless the ``duration_tolerance`` is specified and fulfilled
+        duration_tolerance: the duration tolerance as a measure of proportion
+            of the ground truth segment's total duration.
+            If the ``offset_tolerance`` is not fulfilled,
+            and the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct
+
+    Returns:
+        dictionary with label as key and recall as value
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.09],
+        ...         ends=[0.11, 0.2],
+        ...     ),
+        ...     data=["a", "a"],
+        ... )
+        >>> event_recall_per_class(
+        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
+        ... )
+        {'a': 1.0, 'b': 0.0}
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    return _event_metric_per_class(
+        truth,
+        prediction,
+        labels,
+        zero_division,
+        onset_tolerance,
+        offset_tolerance,
+        duration_tolerance,
+        axis=1,
+    )
+
+
+def event_unweighted_average_fscore(
+    truth: pd.Series,
+    prediction: pd.Series,
+    labels: Sequence[object] | None = None,
+    *,
+    zero_division: float = 0.0,
+    propagate_nans: bool = False,
+    onset_tolerance: float | None = 0.0,
+    offset_tolerance: float | None = 0.0,
+    duration_tolerance: float | None = None,
+) -> float:
+    r"""Event-based unweighted average F-score.
+
+    .. math::
+
+        \text{UAF} = \frac{1}{K} \sum^K_{k=1}
+            \frac{\text{true positive}_k}
+                 {\text{true positive}_k + \frac{1}{2}
+                 (\text{false positive}_k + \text{false negative}_k)}
+
+    This metric compares not only the labels of prediction and ground truth,
+    but also the time windows they occur in.
+
+    Each event is considered to be correctly identified
+    if the predicted label is the same as the ground truth label,
+    and if the onset is within the given ``onset_tolerance`` (in seconds)
+    and the offset is within the given ``offset_tolerance`` (in seconds).
+    Additionally to the ``offset_tolerance``,
+    one can also specify the ``duration_tolerance``,
+    to ensure that the offset occurs
+    within a certain proportion of the reference event duration.
+    If a prediction fulfills the ``duration_tolerance``
+    but not the ``offset_tolerance`` (or vice versa),
+    it is still considered to be an overlapping segment.
+    :footcite:`Mesaros2016`
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth values/classes
+        prediction: predicted values/classes
+        labels: included labels in preferred ordering.
+            If no labels are supplied,
+            they will be inferred from
+            :math:`\{\text{prediction}, \text{truth}\}`
+            and ordered alphabetically.
+        zero_division: set the value to return when there is a zero division
+        propagate_nans: whether to set the F-score to ``NaN``
+            when recall or precision are ``NaN``.
+            If ``False``, the F-score is only set to ``NaN``
+            when both recall and precision are ``NaN``
+        onset_tolerance: the onset tolerance in seconds.
+            If the predicted segment's onset does not occur within this time window
+            compared to the ground truth segment's onset,
+            it is not considered correct
+        offset_tolerance: the offset tolerance in seconds.
+            If the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct,
+            unless the ``duration_tolerance`` is specified and fulfilled
+        duration_tolerance: the duration tolerance as a measure of proportion
+            of the ground truth segment's total duration.
+            If the ``offset_tolerance`` is not fulfilled,
+            and the predicted segment's offset does not occur within this time window
+            compared to the ground truth segment's offset,
+            it is not considered correct
+
+    Returns:
+        event-based unweighted average f-score
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0, 0.09],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "a"],
+        ... )
+        >>> event_unweighted_average_fscore(
+        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02
+        ... )
+        0.3333333333333333
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    fscore = event_fscore_per_class(
+        truth,
+        prediction,
+        labels,
+        zero_division=zero_division,
+        propagate_nans=propagate_nans,
+        onset_tolerance=onset_tolerance,
+        offset_tolerance=offset_tolerance,
+        duration_tolerance=duration_tolerance,
+    )
+    fscore = np.array(list(fscore.values()))
+    return float(np.nanmean(fscore))
 
 
 def fscore_per_class(
@@ -804,11 +1495,11 @@ def precision_per_class(
     matrix = np.array(confusion_matrix(truth, prediction, labels))
     total = matrix.sum(axis=0)
     old_settings = np.seterr(invalid="ignore")
-    recall = matrix.diagonal() / total
+    precision = matrix.diagonal() / total
     np.seterr(**old_settings)
-    recall[np.isnan(recall)] = zero_division
+    precision[np.isnan(precision)] = zero_division
 
-    return {label: float(r) for label, r in zip(labels, recall)}
+    return {label: float(r) for label, r in zip(labels, precision)}
 
 
 def recall_per_class(
@@ -1026,7 +1717,7 @@ def unweighted_average_fscore(
         zero_division: set the value to return when there is a zero division
 
     Returns:
-        unweighted average precision
+        unweighted average f-score
 
     Examples:
         >>> unweighted_average_fscore([0, 0], [0, 1])
@@ -1278,6 +1969,37 @@ def word_error_rate(
     return float(wer / num_samples)
 
 
+def _event_metric_per_class(
+    truth: pd.Series,
+    prediction: pd.Series,
+    labels: Sequence[object] | None,
+    zero_division: float,
+    onset_tolerance: float | None,
+    offset_tolerance: float | None,
+    duration_tolerance: float | None,
+    axis: int,  # 0=precision, 1=recall
+) -> dict[str, float]:
+    if labels is None:
+        labels = infer_labels(truth, prediction)
+    cm = np.array(
+        event_confusion_matrix(
+            truth,
+            prediction,
+            labels,
+            onset_tolerance=onset_tolerance,
+            offset_tolerance=offset_tolerance,
+            duration_tolerance=duration_tolerance,
+        )
+    )
+    totals = cm.sum(axis=axis)
+    vals = cm.diagonal() / totals
+    vals = np.nan_to_num(vals, nan=zero_division)
+    # The event based confusion matrix also has a row/column
+    # for the "no event" class (aka the absence of a segment)
+    # but we only return the recall/precision per class
+    return {lab: float(vals[i]) for i, lab in enumerate(labels)}
+
+
 def _matching_scores(
     truth: (bool | int | Sequence[bool | int]),
     prediction: (bool | int | float | Sequence[bool | int | float]),
@@ -1346,3 +2068,18 @@ def _matching_scores(
     non_mated_scores = prediction[~truth]
 
     return mated_scores, non_mated_scores
+
+
+def _segments_overlap(
+    start_t, end_t, start_p, end_p, onset_tol, offset_tol, duration_tol
+) -> bool:
+    if onset_tol is not None:
+        if math.fabs(start_t - start_p) > onset_tol:
+            return False
+    # Compute the effective offset tolerance
+    eff_off = offset_tol or 0.0
+    if duration_tol is not None:
+        eff_off = max(eff_off, duration_tol * (end_t - start_t))
+    if math.fabs(end_t - end_p) > eff_off:
+        return False
+    return True

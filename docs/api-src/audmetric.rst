@@ -13,7 +13,12 @@ audmetric
     detection_error_tradeoff
     edit_distance
     equal_error_rate
+    event_confusion_matrix
     event_error_rate
+    event_fscore_per_class
+    event_precision_per_class
+    event_recall_per_class
+    event_unweighted_average_fscore
     linkability
     mean_absolute_error
     mean_squared_error

@@ -51,6 +51,7 @@ documentation = 'https://audeering.github.io/audmetric/'
 [dependency-groups]
 dev = [
     'audeer >=1.18.0',
+    'audformat',
     'docutils',
     'pandas',
     'pytest',
@@ -96,7 +97,8 @@ addopts = '''
     --cov-report term-missing
     --cov-report xml
     --ignore=docs/
-    --ignore=tests/assests/linkability/
+    --ignore=tests/assets/event_based/
+    --ignore=tests/assets/linkability/
 '''
 
 
