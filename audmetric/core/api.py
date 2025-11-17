@@ -1,18 +1,26 @@
+from __future__ import annotations
+
 import collections
 from collections.abc import Callable
 from collections.abc import Sequence
 import math
+from typing import TYPE_CHECKING
 import warnings
 
 import numpy as np
-import pandas as pd
+
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 import audeer
-import audformat
-from audformat.define import IndexField
 
+from audmetric.core.utils import END
+from audmetric.core.utils import FILE
+from audmetric.core.utils import START
 from audmetric.core.utils import assert_equal_length
 from audmetric.core.utils import infer_labels
+from audmetric.core.utils import is_segmented_index
 from audmetric.core.utils import scores_per_subgroup_and_class
 
 
@@ -518,6 +526,8 @@ def event_confusion_matrix(
             do not have a segmented index conform to `audformat`_
 
     Examples:
+        >>> import pandas as pd
+        >>> import audformat
         >>> truth = pd.Series(
         ...     index=audformat.segmented_index(
         ...         files=["f1.wav"] * 4,
@@ -542,9 +552,7 @@ def event_confusion_matrix(
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     """
-    if not audformat.is_segmented_index(truth) or not audformat.is_segmented_index(
-        prediction
-    ):
+    if not is_segmented_index(truth) or not is_segmented_index(prediction):
         raise ValueError(
             "For event-based metrics, the truth and prediction "
             "should be a pandas Series with a segmented index conform to audformat."
@@ -557,10 +565,8 @@ def event_confusion_matrix(
 
     # Code based on 'greedy' event matching
     # at https://github.com/TUT-ARG/sed_eval/blob/0cb1b6d11ceec4fe500cc9b31079c9d8666ed6eb/sed_eval/sound_event.py#L1108
-    for file, file_truth in truth.groupby(level=IndexField.FILE):
-        file_pred = prediction[
-            prediction.index.get_level_values(IndexField.FILE) == file
-        ]
+    for file, file_truth in truth.groupby(level=FILE):
+        file_pred = prediction[prediction.index.get_level_values(FILE) == file]
         # Sort index of truth and prediction to speedup the matching of segments
         # and to get the same result regardless of the index order
         file_truth = file_truth.sort_index()
@@ -621,24 +627,16 @@ def event_confusion_matrix(
         preds_incorrect_match = np.zeros(n_pred)
         # Find overlapping segments with incorrect labels
         for i in truth_unmatched:
-            start_truth = file_truth.index.get_level_values(IndexField.START)[
-                i
-            ].total_seconds()
-            end_truth = file_truth.index.get_level_values(IndexField.END)[
-                i
-            ].total_seconds()
+            start_truth = file_truth.index.get_level_values(START)[i].total_seconds()
+            end_truth = file_truth.index.get_level_values(END)[i].total_seconds()
             label_truth = file_truth.iloc[i]
             for j in pred_unmatched:
                 # Skip predicted segments
                 # if they've already been counted as a label mismatch
                 if preds_incorrect_match[j]:
                     continue
-                start_pred = file_pred.index.get_level_values(IndexField.START)[
-                    j
-                ].total_seconds()
-                end_pred = file_pred.index.get_level_values(IndexField.END)[
-                    j
-                ].total_seconds()
+                start_pred = file_pred.index.get_level_values(START)[j].total_seconds()
+                end_pred = file_pred.index.get_level_values(END)[j].total_seconds()
 
                 # This predicted segment and all following ones cannot match
                 # if the true start time is exceeded by more than the allowed tolerance
@@ -806,6 +804,8 @@ def event_fscore_per_class(
             do not have a segmented index conform to `audformat`_
 
     Examples:
+        >>> import pandas as pd
+        >>> import audformat
         >>> truth = pd.Series(
         ...     index=audformat.segmented_index(
         ...         files=["f1.wav", "f1.wav"],
@@ -932,6 +932,8 @@ def event_precision_per_class(
             do not have a segmented index conform to `audformat`_
 
     Examples:
+        >>> import pandas as pd
+        >>> import audformat
         >>> truth = pd.Series(
         ...     index=audformat.segmented_index(
         ...         files=["f1.wav", "f1.wav"],
@@ -1036,6 +1038,8 @@ def event_recall_per_class(
             do not have a segmented index conform to `audformat`_
 
     Examples:
+        >>> import pandas as pd
+        >>> import audformat
         >>> truth = pd.Series(
         ...     index=audformat.segmented_index(
         ...         files=["f1.wav", "f1.wav"],
@@ -1143,6 +1147,8 @@ def event_unweighted_average_fscore(
         event-based unweighted average f-score
 
     Examples:
+        >>> import pandas as pd
+        >>> import audformat
         >>> truth = pd.Series(
         ...     index=audformat.segmented_index(
         ...         files=["f1.wav", "f1.wav"],
