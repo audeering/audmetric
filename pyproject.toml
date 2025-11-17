@@ -46,6 +46,28 @@ repository = 'https://github.com/audeering/audmetric/'
 documentation = 'https://audeering.github.io/audmetric/'
 
 
+# ===== DEPENDENCY GROUPS =================================================
+#
+[dependency-groups]
+dev = [
+    'audeer >=1.18.0',
+    'audformat',
+    'docutils',
+    'pandas',
+    'pytest',
+    'pytest-cov',
+    'pytest-doctestplus',
+    'scikit-learn',
+    'sphinx >=3.5.4',
+    'sphinx-audeering-theme >=1.2.1',
+    'sphinx-autodoc-typehints',
+    'sphinx-copybutton',
+    'sphinxcontrib-bibtex >=2.3.0',
+    'sphinxcontrib-katex >=0.8.6',
+    'toml',
+]
+
+
 # ===== BUILD-SYSTEM ======================================================
 #
 # Requirements for building the Python package
@@ -204,25 +226,3 @@ convention = 'google'
 #
 # Use setuptools_scm to get version from git
 [tool.setuptools_scm]
-
-
-# ===== DEPENDENCY GROUPS =================================================
-#
-[dependency-groups]
-dev = [
-    'audeer >=1.18.0',
-    'audformat',
-    'docutils',
-    'pandas',
-    'pytest',
-    'pytest-cov',
-    'pytest-doctestplus',
-    'scikit-learn',
-    'sphinx >=3.5.4',
-    'sphinx-audeering-theme >=1.2.1',
-    'sphinx-autodoc-typehints',
-    'sphinx-copybutton',
-    'sphinxcontrib-bibtex >=2.3.0',
-    'sphinxcontrib-katex >=0.8.6',
-    'toml',
-]
