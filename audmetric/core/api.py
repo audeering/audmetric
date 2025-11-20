@@ -2356,6 +2356,13 @@ def _segment_boundaries(segments: pd.Series) -> pd.Index:
 def _subsegment_labels(
     segments: pd.Series, starts: pd.Index, ends: pd.Index
 ) -> list[list[object]]:
+    r"""Return label lists that occur at each subsegment.
+
+    The result is a list whose elements correspond to the subsegments
+    given by the ``starts`` and ``ends`` times.
+    Each element contains the list of labels that occur
+    in ``segments`` during that subsegment.
+    """
     subsegment_labels = []
     for start, end in zip(starts, ends):
         intersection = _intersecting_segments(start, end, segments)
