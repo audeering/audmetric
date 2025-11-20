@@ -1441,10 +1441,7 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
 
     numerator = total_confusion + total_false_alarm + total_misses
     if total_duration == 0.0:
-        if numerator == 0.0:
-            return 0.0
-        else:
-            return 1.0
+        return 0.0 if numerator == 0.0 else 1.0
     else:
         return numerator / total_duration
 
