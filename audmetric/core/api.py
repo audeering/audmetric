@@ -291,17 +291,31 @@ def detection_error_tradeoff(
 
 
 def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
-    r"""Diarization error rate between truth and prediction segments.
+    r"""Diarization error rate.
 
-    Truth and prediction use different labels,
-    so they need to be aligned first.
-    This uses the 'greedy' implementation to compute the one-to-one mapping
+    .. math::
+
+        \text{DER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}
+            {\text{total}}
+
+    where :math:`\text{confusion}` is the total confusion duration,
+    :math:`\text{false alarm}` is the total duration of predictions
+    without an overlapping ground truth,
+    :math:`\text{miss}` is the total duration of ground truth
+    without an overlapping prediction,
+    and :math:`\text{total}` is the total duration of ground truth segments.
+
+    This metric is computed the same way
+    as :func:`audmetric.identification_error_rate`,
+    but first creates a one-to-one mapping between
+    truth and prediction labels.
+
+    This implementation uses the 'greedy' method
+    to compute the one-to-one mapping
     between truth and predicted labels.
     This method is faster than other implementations that optimize
     the confusion term, but may slightly over-estimate the
     diarization error rate.
-    Then, the diarization error rate is obtained
-    by the identification error rate using the mapped prediction.
     :footcite:`Bredin2017`
 
     .. footbibliography::
@@ -330,14 +344,14 @@ def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
         ... )
         >>> prediction = pd.Series(
         ...     index=audformat.segmented_index(
-        ...         files=["f1.wav", "f1.wav"],
+        ...         files=["f1.wav", "f1.wav", "f1.wav"],
         ...         starts=[0, 0.1, 0.1],
         ...         ends=[0.1, 0.15, 0.2],
         ...     ),
         ...     data=["c", "b", "c"],
         ... )
         >>> diarization_error_rate(truth, prediction)
-        0.75
+        0.5
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1305,13 +1319,19 @@ def fscore_per_class(
 
 
 def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
-    r"""Identification error rate between truth and prediction segments.
+    r"""Identification error rate.
 
     .. math::
 
-        \text{IER} = \frac{\text{confusion}+\text{false alarms}+\text{misses}}
-                 {\text{total}
+        \text{IER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}
+            {\text{total}}
 
+    where :math:`\text{confusion}` is the total confusion duration,
+    :math:`\text{false alarm}` is the total duration of predictions
+    without an overlapping ground truth,
+    :math:`\text{miss}` is the total duration of ground truth
+    without an overlapping prediction,
+    and :math:`\text{total}` is the total duration of ground truth segments.
     :footcite:`Bredin2017`
 
     .. footbibliography::
@@ -1340,14 +1360,14 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
         ... )
         >>> prediction = pd.Series(
         ...     index=audformat.segmented_index(
-        ...         files=["f1.wav", "f1.wav"],
+        ...         files=["f1.wav", "f1.wav", "f1.wav"],
         ...         starts=[0, 0.1, 0.1],
         ...         ends=[0.1, 0.15, 0.2],
         ...     ),
         ...     data=["a", "b", "a"],
         ... )
         >>> identification_error_rate(truth, prediction)
-        0.75
+        0.5
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1362,7 +1382,13 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
     total_confusion = 0
     total_misses = 0
     total_false_alarm = 0
-    for file, file_truth in truth.groupby(level=FILE):
+    files = (
+        truth.index.get_level_values(FILE)
+        .unique()
+        .union(prediction.index.get_level_values(FILE).unique())
+    )
+    for file in files:
+        file_truth = truth[truth.index.get_level_values(FILE) == file]
         file_prediction = prediction[prediction.index.get_level_values(FILE) == file]
         # Get subsegments formed by truth and prediction segment boundaries
         # Example:
@@ -1371,8 +1397,10 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
         # prediction        |--------| |-----|
         # Result:
         # starts/ends       |    | | | | |   |  |
-        boundaries = _segment_boundaries(file_truth).union(
-            _segment_boundaries(file_prediction)
+        boundaries = (
+            _segment_boundaries(file_truth)
+            .union(_segment_boundaries(file_prediction))
+            .unique()
         )
         boundaries = boundaries.sort_values()
         starts = boundaries[:-1]
@@ -1384,7 +1412,7 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
         for start, end, truth_labels, prediction_labels in zip(
             starts, ends, truth_label_lists, prediction_label_lists
         ):
-            if len(truth_label_lists) == 0 and len(prediction_label_lists) == 0:
+            if len(truth_labels) == 0 and len(prediction_labels) == 0:
                 continue
             duration = (end - start).total_seconds()
             # Overlap between truth and predicted labels in this window
@@ -2323,10 +2351,10 @@ def _overlap_duration(
 
 
 def _segment_boundaries(segments: pd.Series) -> pd.Index:
-    r"""Get segment boundaries present in the given segments."""
+    r"""Get the unique segment boundaries present in the given segments."""
     starts = segments.index.get_level_values(START)
     ends = segments.index.get_level_values(END)
-    boundaries = starts.union(ends)
+    boundaries = starts.union(ends).unique()
     boundaries = boundaries.sort_values()
     return boundaries
 

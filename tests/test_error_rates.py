@@ -147,6 +147,21 @@ def test_der(
             0.0,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
+        # Truth empty series
+        (
+            pd.Series(
+                index=audformat.segmented_index(),
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"],
+                    starts=[0],
+                    ends=[0.1],
+                ),
+                data=["a"],
+            ),
+            1.0,
+        ),
         # No overlap
         (
             pd.Series(
@@ -206,6 +221,26 @@ def test_der(
                 data=["speech"] * 4,
             ),
             0.06 / 0.4,
+        ),
+        # Partial overlap with gaps
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 3,
+                    starts=[0, 0.2, 0.3],
+                    ends=[0.1, 0.3, 0.4],
+                ),
+                data=["speech"] * 3,
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 3,
+                    starts=[0.01, 0.21, 0.3],
+                    ends=[0.1, 0.3, 0.42],
+                ),
+                data=["speech"] * 3,
+            ),
+            0.04 / 0.3,
         ),
         # Partial overlap with multiclass
         (
