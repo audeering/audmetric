@@ -290,6 +290,57 @@ def detection_error_tradeoff(
     return fmr, fnmr, thresholds
 
 
+def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
+    r"""Diarization error rate between truth and prediction segments.
+
+    Truth and prediction use different labels,
+    so they need to be aligned first.
+    This uses the 'greedy' implementation to compute the one-to-one mapping
+    between truth and predicted labels.
+    This method is faster than other implementations that optimize
+    the confusion term, but may slightly over-estimate the
+    diarization error rate.
+    Then, the diarization error rate is obtained
+    by the identification error rate using the mapped prediction.
+    :footcite:`Bredin2017`
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth labels with a segmented index conform to `audformat`_
+        prediction: predicted labels with a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0, 0.1, 0.1],
+        ...         ends=[0.1, 0.15, 0.2],
+        ...     ),
+        ...     data=["c", "b", "c"],
+        ... )
+        >>> diarization_error_rate(truth, prediction)
+        0.75
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    pred2truthlabel = _diarization_mapper(truth, prediction)
+    mapped_prediction = prediction.map(pred2truthlabel)
+
+    return identification_error_rate(truth, mapped_prediction)
+
+
 def edit_distance(
     truth: str | Sequence[int],
     prediction: str | Sequence[int],
@@ -1246,6 +1297,111 @@ def fscore_per_class(
     return fscore
 
 
+def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
+    r"""Identification error rate between truth and prediction segments.
+
+    .. math::
+
+        \text{IER} = \frac{\text{confusion}+\text{false alarms}+\text{misses}}
+                 {\text{total}
+
+
+
+    Args:
+        truth: ground truth labels with a segmented index conform to `audformat`_
+        prediction: predicted labels with a segmented index conform to `audformat`_
+
+    Returns:
+        identification error rate
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0, 0.1, 0.1],
+        ...         ends=[0.1, 0.15, 0.2],
+        ...     ),
+        ...     data=["a", "b", "a"],
+        ... )
+        >>> identification_error_rate(truth, prediction)
+        0.75
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    total_duration = 0
+    total_confusion = 0
+    total_misses = 0
+    total_false_alarm = 0
+    for file, file_truth in truth.groupby(level=FILE):
+        file_prediction = prediction[prediction.index.get_level_values(FILE) == file]
+        # Get subsegments formed by truth and prediction segment boundaries
+        # Example:
+        # truth             |------|     |------|
+        #                        |ooo|
+        # prediction        |--------| |-----|
+        # Result:
+        # starts/ends       |    | | | | |   |  |
+        boundaries = _segment_boundaries(file_truth).union(
+            _segment_boundaries(file_prediction)
+        )
+        boundaries = boundaries.sort_values()
+        starts = boundaries[:-1]
+        ends = boundaries[1:]
+        # List of (unique) labels that occur in this window in the truth
+        truth_label_lists = _subsegment_labels(file_truth, starts, ends)
+        # List of (unique) labels that occur in this window in the prediction
+        prediction_label_lists = _subsegment_labels(file_prediction, starts, ends)
+        for start, end, truth_labels, prediction_labels in zip(
+            starts, ends, truth_label_lists, prediction_label_lists
+        ):
+            if len(truth_label_lists) == 0 and len(prediction_label_lists) == 0:
+                continue
+            duration = (end - start).total_seconds()
+            # Overlap between truth and predicted labels in this window
+            correct_labels = [lab for lab in truth_labels if lab in prediction_labels]
+            # Unmatched truth labels in this window
+            extra_truth_labels = [
+                lab for lab in truth_labels if lab not in correct_labels
+            ]
+            # Unmatched predicted labels in this window
+            extra_pred_labels = [
+                lab for lab in prediction_labels if lab not in correct_labels
+            ]
+            n_confusion = min(len(extra_truth_labels), len(extra_pred_labels))
+            n_false_alarm = 0
+            n_misses = 0
+            # More unmatched prediction labels than truth labels -> add to false alarms
+            if len(extra_pred_labels) > len(extra_truth_labels):
+                n_false_alarm = len(extra_pred_labels) - len(extra_truth_labels)
+            # More unmatched truth labels than prediction labels -> add to misses
+            elif len(extra_truth_labels) > len(extra_pred_labels):
+                n_misses = len(extra_truth_labels) - len(extra_pred_labels)
+            total_confusion += duration * n_confusion
+            total_false_alarm += duration * n_false_alarm
+            total_misses += duration * n_misses
+            total_duration += duration * len(truth_labels)
+
+    numerator = total_confusion + total_false_alarm + total_misses
+    if total_duration == 0.0:
+        if numerator == 0.0:
+            return 0.0
+        else:
+            return 1.0
+    else:
+        return numerator / total_duration
+
+
 def linkability(
     truth: (bool | int | Sequence[bool | int]),
     prediction: (bool | int | float | Sequence[bool | int | float]),
@@ -2068,6 +2224,103 @@ def _matching_scores(
     non_mated_scores = prediction[~truth]
 
     return mated_scores, non_mated_scores
+
+
+def _cooccurrence(
+    truth: pd.Series, truth_labels: list, prediction: pd.Series, prediction_labels: list
+) -> np.ndarray:
+    r"""Get the cooccurance duration of the labels given in truth and prediction."""
+    truth_label2index = {label: i for i, label in enumerate(truth_labels)}
+    prediction_label2index = {label: i for i, label in enumerate(prediction_labels)}
+    matrix = np.zeros((len(truth_labels), len(prediction_labels)))
+    for (file, start, end), label in truth.items():
+        file_predictions = prediction[(prediction.index.get_level_values(FILE) == file)]
+        intersecting = _intersecting_segments(start, end, file_predictions)
+        for (_, other_start, other_end), other_label in intersecting.items():
+            shared_duration = _overlap_duration(
+                start, end, other_start, other_end
+            ).total_seconds()
+            matrix[truth_label2index[label], prediction_label2index[other_label]] += (
+                shared_duration
+            )
+    return matrix
+
+
+def _diarization_mapper(
+    truth: pd.Series, prediction: pd.Series
+) -> dict[object, object]:
+    r"""Return a mapping from prediction label to truth label based on cooccurrence.
+
+    Based on code at https://github.com/pyannote/pyannote-metrics/blob/d785d78fcbce89c890a957b7f90f17ac41b0fc21/src/pyannote/metrics/matcher.py#L172
+
+    """
+    truth_labels = sorted(truth.unique())
+    n_truth = len(truth)
+    prediction_labels = sorted(prediction.unique())
+    n_pred = len(prediction)
+    cooccurrence = _cooccurrence(truth, truth_labels, prediction, prediction_labels)
+    mapping = {}
+    for _ in range(min(n_truth, n_pred)):
+        # Indices of the maximal elements of coocurrence
+        i_truth, i_pred = np.unravel_index(np.argmax(cooccurrence), cooccurrence.shape)
+        if cooccurrence[i_truth, i_pred] > 0:
+            mapping[prediction_labels[i_pred]] = truth_labels[i_truth]
+            # Since these two labels have been matched,
+            # we set their entries in the coocurrence matrix to zero
+            cooccurrence[i_truth, :] = 0.0
+            cooccurrence[:, i_pred] = 0.0
+            continue
+        break
+    return mapping
+
+
+def _intersecting_segments(
+    start: pd.Timedelta, end: pd.Timedelta, other_segments: pd.Series
+) -> pd.Series:
+    r"""Return segments that intersect with the given start and end."""
+    other_segments = other_segments.sort_index()
+    intersecting = other_segments[
+        (
+            (start < other_segments.index.get_level_values(START))
+            & (other_segments.index.get_level_values(START) < end)
+        )
+        | (
+            (start > other_segments.index.get_level_values(START))
+            & (start < other_segments.index.get_level_values(END))
+        )
+        | (start == other_segments.index.get_level_values(START))
+    ]
+    return intersecting
+
+
+def _overlap_duration(
+    start: pd.Timedelta,
+    end: pd.Timedelta,
+    other_start: pd.Timedelta,
+    other_end: pd.Timedelta,
+) -> pd.Timedelta:
+    r"""Duration of overlap between two time windows."""
+    return min(end, other_end) - max(start, other_start)
+
+
+def _segment_boundaries(segments: pd.Series) -> pd.Index:
+    r"""Get segment boundaries present in the given segments."""
+    starts = segments.index.get_level_values(START)
+    ends = segments.index.get_level_values(END)
+    boundaries = starts.union(ends)
+    boundaries = boundaries.sort_values()
+    return boundaries
+
+
+def _subsegment_labels(
+    segments: pd.Series, starts: pd.Index, ends: pd.Index
+) -> list[list[object]]:
+    subsegment_labels = []
+    for start, end in zip(starts, ends):
+        intersection = _intersecting_segments(start, end, segments)
+        labels = sorted(intersection.unique())
+        subsegment_labels.append(labels)
+    return subsegment_labels
 
 
 def _segments_overlap(
