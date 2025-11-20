@@ -310,6 +310,13 @@ def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
         truth: ground truth labels with a segmented index conform to `audformat`_
         prediction: predicted labels with a segmented index conform to `audformat`_
 
+    Returns:
+        diarization error rate
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
     Examples:
         >>> import pandas as pd
         >>> import audformat
@@ -1305,7 +1312,9 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
         \text{IER} = \frac{\text{confusion}+\text{false alarms}+\text{misses}}
                  {\text{total}
 
+    :footcite:`Bredin2017`
 
+    .. footbibliography::
 
     Args:
         truth: ground truth labels with a segmented index conform to `audformat`_
@@ -1313,6 +1322,10 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
 
     Returns:
         identification error rate
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
 
     Examples:
         >>> import pandas as pd
@@ -1339,6 +1352,12 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     """
+    if not is_segmented_index(truth) or not is_segmented_index(prediction):
+        raise ValueError(
+            "The truth and prediction "
+            "should be a pandas Series with a segmented index conform to audformat."
+        )
+
     total_duration = 0
     total_confusion = 0
     total_misses = 0
