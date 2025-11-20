@@ -2319,9 +2319,9 @@ def _diarization_mapper(
 def _intersecting_segments(
     start: pd.Timedelta, end: pd.Timedelta, other_segments: pd.Series
 ) -> pd.Series:
-    r"""Return segments that intersect with the given start and end."""
+    r"""Return sorted segments that intersect with the given start and end."""
     other_segments = other_segments.sort_index()
-    intersecting = other_segments[
+    return other_segments[
         (
             (start < other_segments.index.get_level_values(START))
             & (other_segments.index.get_level_values(START) < end)
@@ -2332,7 +2332,6 @@ def _intersecting_segments(
         )
         | (start == other_segments.index.get_level_values(START))
     ]
-    return intersecting
 
 
 def _overlap_duration(
