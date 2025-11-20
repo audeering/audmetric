@@ -2284,9 +2284,7 @@ def _cooccurrence(
         file_predictions = prediction[(prediction.index.get_level_values(FILE) == file)]
         intersecting = _intersecting_segments(start, end, file_predictions)
         for (_, other_start, other_end), other_label in intersecting.items():
-            shared_duration = _overlap_duration(
-                start, end, other_start, other_end
-            ).total_seconds()
+            shared_duration = _overlap_duration(start, end, other_start, other_end)
             matrix[truth_label2index[label], prediction_label2index[other_label]] += (
                 shared_duration
             )
@@ -2345,9 +2343,9 @@ def _overlap_duration(
     end: pd.Timedelta,
     other_start: pd.Timedelta,
     other_end: pd.Timedelta,
-) -> pd.Timedelta:
-    r"""Duration of overlap between two time windows."""
-    return min(end, other_end) - max(start, other_start)
+) -> float:
+    r"""Duration of overlap between two time windows in seconds."""
+    return max(0.0, (min(end, other_end) - max(start, other_start)).total_seconds())
 
 
 def _segment_boundaries(segments: pd.Series) -> pd.Index:
