@@ -356,8 +356,19 @@ def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     """
+    # Map prediction and truth labels to unique names
+    # to avoid confusion when there is an overlap
+    pred_labels = prediction.unique()
+    unique_pred_mapper = {label: f"p{i}" for i, label in enumerate(pred_labels)}
+    prediction = prediction.map(unique_pred_mapper)
+    truth_labels = truth.unique()
+    unique_truth_mapper = {label: f"t{i}" for i, label in enumerate(truth_labels)}
+    truth = truth.map(unique_truth_mapper)
+
+    # Now map from prediction label to truth label,
+    # leaving prediction labels without a match as is
     pred2truthlabel = _diarization_mapper(truth, prediction)
-    mapped_prediction = prediction.map(pred2truthlabel)
+    mapped_prediction = prediction.replace(pred2truthlabel)
 
     return identification_error_rate(truth, mapped_prediction)
 
