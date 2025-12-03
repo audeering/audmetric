@@ -133,6 +133,26 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
             ),
             0.5,
         ),
+        # Prediction with two extra labels on one segment
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2,
+                    starts=[0, 0.1],
+                    ends=[0.1, 0.2],
+                ),
+                data=["a", "b"],
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 4,
+                    starts=[0, 0.1, 0.1, 0.1],
+                    ends=[0.1, 0.2, 0.2, 0.2],
+                ),
+                data=["a", "b", "c", "d"],
+            ),
+            1.0,
+        ),
     ],
 )
 def test_der(
