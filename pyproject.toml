@@ -97,6 +97,7 @@ addopts = '''
     --cov-report term-missing
     --cov-report xml
     --ignore=docs/
+    --ignore=tests/assets/error_rates/
     --ignore=tests/assets/event_based/
     --ignore=tests/assets/linkability/
 '''

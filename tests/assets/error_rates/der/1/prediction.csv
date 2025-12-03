@@ -1,0 +1,5 @@
+file,start,end,label
+f1.wav,0 days 00:00:38.745118381,0 days 00:00:43.060634012,pred_label_0
+f1.wav,0 days 00:00:51.943520766,0 days 00:00:56.778146438,pred_label_0
+f1.wav,0 days 00:00:01.024143531,0 days 00:00:05.774287846,pred_label_1
+f1.wav,0 days 00:00:55.440540258,0 days 00:00:59.859108822,pred_label_1
