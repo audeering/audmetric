@@ -305,6 +305,10 @@ def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
     without an overlapping prediction,
     and :math:`\text{total}` is the total duration of ground truth segments.
 
+    The diarization error rate can used
+    when the labels are not known by the prediction model,
+    e.g. for the task of speaker diarization on unknown speakers.
+
     This metric is computed the same way
     as :func:`audmetric.identification_error_rate`,
     but first creates a one-to-one mapping between
@@ -348,7 +352,7 @@ def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
         ...         starts=[0, 0.1, 0.1],
         ...         ends=[0.1, 0.15, 0.2],
         ...     ),
-        ...     data=["c", "b", "c"],
+        ...     data=["0", "1", "0"],
         ... )
         >>> diarization_error_rate(truth, prediction)
         0.5
@@ -1344,6 +1348,10 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
     without an overlapping prediction,
     and :math:`\text{total}` is the total duration of ground truth segments.
     :footcite:`Bredin2017`
+
+    The identification error rate should be used
+    when the labels are known by the prediction model.
+    If this isn't the case, consider using `:audmetric:diarization_error_rate`.
 
     .. footbibliography::
 
