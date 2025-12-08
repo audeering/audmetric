@@ -290,7 +290,9 @@ def detection_error_tradeoff(
     return fmr, fnmr, thresholds
 
 
-def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
+def diarization_error_rate(
+    truth: pd.Series, prediction: pd.Series, num_workers: int = 1
+) -> float:
     r"""Diarization error rate.
 
     .. math::
@@ -327,6 +329,7 @@ def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
     Args:
         truth: ground truth labels with a segmented index conform to `audformat`_
         prediction: predicted labels with a segmented index conform to `audformat`_
+        num_workers: number of threads or 1 for sequential processing
 
     Returns:
         diarization error rate
@@ -374,7 +377,7 @@ def diarization_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
     pred2truthlabel = _diarization_mapper(truth, prediction)
     mapped_prediction = prediction.replace(pred2truthlabel)
 
-    return identification_error_rate(truth, mapped_prediction)
+    return identification_error_rate(truth, mapped_prediction, num_workers=num_workers)
 
 
 def edit_distance(
@@ -1333,7 +1336,11 @@ def fscore_per_class(
     return fscore
 
 
-def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
+def identification_error_rate(
+    truth: pd.Series,
+    prediction: pd.Series,
+    num_workers: int = 1,
+) -> float:
     r"""Identification error rate.
 
     .. math::
@@ -1351,13 +1358,14 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
 
     The identification error rate should be used
     when the labels are known by the prediction model.
-    If this isn't the case, consider using `:audmetric:diarization_error_rate`.
+    If this isn't the case, consider using :func:`audmetric.diarization_error_rate`.
 
     .. footbibliography::
 
     Args:
         truth: ground truth labels with a segmented index conform to `audformat`_
         prediction: predicted labels with a segmented index conform to `audformat`_
+        num_workers: number of threads or 1 for sequential processing
 
     Returns:
         identification error rate
@@ -1406,7 +1414,12 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
         .unique()
         .union(prediction.index.get_level_values(FILE).unique())
     )
-    for file in files:
+
+    def _file_ier(file):
+        file_duration = 0
+        file_confusion = 0
+        file_misses = 0
+        file_false_alarm = 0
         file_truth = truth[truth.index.get_level_values(FILE) == file]
         file_prediction = prediction[prediction.index.get_level_values(FILE) == file]
         # Get subsegments formed by truth and prediction segment boundaries
@@ -1453,10 +1466,24 @@ def identification_error_rate(truth: pd.Series, prediction: pd.Series) -> float:
             # More unmatched truth labels than prediction labels -> add to misses
             elif len(extra_truth_labels) > len(extra_pred_labels):
                 n_misses = len(extra_truth_labels) - len(extra_pred_labels)
-            total_confusion += duration * n_confusion
-            total_false_alarm += duration * n_false_alarm
-            total_misses += duration * n_misses
-            total_duration += duration * len(truth_labels)
+            file_confusion += duration * n_confusion
+            file_false_alarm += duration * n_false_alarm
+            file_misses += duration * n_misses
+            file_duration += duration * len(truth_labels)
+        return file_confusion, file_false_alarm, file_misses, file_duration
+
+    if len(files) > 0:
+        results = audeer.run_tasks(
+            _file_ier,
+            params=[((fn,), {}) for fn in files],
+            num_workers=num_workers,
+        )
+        total_confusion, total_false_alarm, total_misses, total_duration = [
+            sum(x) for x in zip(*results)
+        ]
+
+    else:
+        total_confusion = total_false_alarm = total_misses = total_duration = 0.0
 
     numerator = total_confusion + total_false_alarm + total_misses
     if total_duration == 0.0:
