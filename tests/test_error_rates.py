@@ -166,6 +166,10 @@ def test_der(
     )
     np.testing.assert_almost_equal(der, expected_der)
 
+    # Check multiprocessing gives same result
+    multi_der = audmetric.diarization_error_rate(truth, prediction, num_workers=10)
+    np.testing.assert_almost_equal(multi_der, expected_der)
+
 
 @pytest.mark.parametrize(
     ("truth, prediction, expected_ier"),
@@ -334,6 +338,9 @@ def test_ier(
         prediction,
     )
     np.testing.assert_almost_equal(ier, expected_ier)
+    # Check multiprocessing gives same result
+    multi_ier = audmetric.identification_error_rate(truth, prediction, num_workers=10)
+    np.testing.assert_almost_equal(multi_ier, expected_ier)
 
 
 @pytest.mark.parametrize("testcase", [0, 1, 2, 3, 4])
@@ -351,6 +358,9 @@ def test_pyannote_ier(testcase):
     expected_result = expected_result.replace({np.nan: None})
     ier = audmetric.identification_error_rate(truth, prediction)
     np.testing.assert_almost_equal(ier, expected_result["ier"], decimal=5)
+    # Check multiprocessing gives same result
+    multi_ier = audmetric.identification_error_rate(truth, prediction, num_workers=10)
+    np.testing.assert_almost_equal(multi_ier, expected_result["ier"], decimal=5)
 
 
 @pytest.mark.parametrize("testcase", [0, 1, 2, 3, 4])
@@ -368,3 +378,6 @@ def test_pyannote_der(testcase):
     expected_result = expected_result.replace({np.nan: None})
     der = audmetric.diarization_error_rate(truth, prediction)
     np.testing.assert_almost_equal(der, expected_result["der"], decimal=5)
+    # Check multiprocessing gives same result
+    multi_der = audmetric.diarization_error_rate(truth, prediction, num_workers=10)
+    np.testing.assert_almost_equal(multi_der, expected_result["der"], decimal=5)
