@@ -1475,7 +1475,7 @@ def identification_error_rate(
     if len(files) > 0:
         results = audeer.run_tasks(
             _file_ier,
-            params=[((fn,), {}) for fn in files],
+            params=[((file,), {}) for file in files],
             num_workers=num_workers,
         )
         total_confusion, total_false_alarm, total_misses, total_duration = [
