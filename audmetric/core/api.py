@@ -293,6 +293,8 @@ def detection_error_tradeoff(
 def diarization_error_rate(
     truth: pd.Series,
     prediction: pd.Series,
+    *,
+    individual_file_mapping: bool = False,
     num_workers: int = 1,
     multiprocessing: bool = False,
 ) -> float:
@@ -332,6 +334,9 @@ def diarization_error_rate(
     Args:
         truth: ground truth labels with a segmented index conform to `audformat`_
         prediction: predicted labels with a segmented index conform to `audformat`_
+        individual_file_mapping: whether to create the mapping
+            between truth and prediction labels individually for each file.
+            If ``False``, all segments are taken into account to compute the mapping
         num_workers: number of threads or 1 for sequential processing
         multiprocessing: use multiprocessing instead of multithreading
     Returns:
@@ -381,10 +386,28 @@ def diarization_error_rate(
     unique_truth_mapper = {label: f"t{i}" for i, label in enumerate(truth_labels)}
     truth = truth.map(unique_truth_mapper)
 
+    # If mapping should be computed individually for each file,
+    # add a unique prefix to each label based on the file
+    if individual_file_mapping:
+        files = set(prediction.index.get_level_values(FILE).unique()).union(
+            truth.index.get_level_values(FILE).unique()
+        )
+        unique_file_prefix = {file: f"f{i}" for i, file in enumerate(files)}
+        prediction_file_ids = prediction.reset_index()[FILE].map(unique_file_prefix)
+        prediction_file_ids.index = prediction.index
+        prediction = prediction_file_ids + prediction
+        truth_file_ids = truth.reset_index()[FILE].map(unique_file_prefix)
+        truth_file_ids.index = truth.index
+        truth = truth_file_ids + truth
+
     # Now map from prediction label to truth label,
     # leaving prediction labels without a match as is
     pred2truthlabel = _diarization_mapper(
-        truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
+        truth,
+        prediction,
+        individual_file_mapping=individual_file_mapping,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
     )
     mapped_prediction = prediction.replace(pred2truthlabel)
 
@@ -1355,6 +1378,7 @@ def fscore_per_class(
 def identification_error_rate(
     truth: pd.Series,
     prediction: pd.Series,
+    *,
     num_workers: int = 1,
     multiprocessing: bool = False,
 ) -> float:
@@ -2283,15 +2307,13 @@ def _matching_scores(
 
 def _cooccurrence(
     truth: pd.Series,
-    truth_labels: list,
     prediction: pd.Series,
-    prediction_labels: list,
+    truth_label2index: dict[str, int],
+    prediction_label2index: dict[str, int],
     num_workers: int = 1,
     multiprocessing: bool = False,
 ) -> np.ndarray:
     r"""Get the cooccurance duration of the labels given in truth and prediction."""
-    truth_label2index = {label: i for i, label in enumerate(truth_labels)}
-    prediction_label2index = {label: i for i, label in enumerate(prediction_labels)}
     files = truth.index.get_level_values(FILE).unique()
 
     if len(files) > 0:
@@ -2314,12 +2336,13 @@ def _cooccurrence(
         )
         return sum(results)
     else:
-        return np.zeros((len(truth_labels), len(prediction_labels)))
+        return np.zeros((len(truth_label2index), len(prediction_label2index)))
 
 
 def _diarization_mapper(
     truth: pd.Series,
     prediction: pd.Series,
+    individual_file_mapping: bool = False,
     num_workers: int = 1,
     multiprocessing: bool = False,
 ) -> dict[object, object]:
@@ -2332,26 +2355,58 @@ def _diarization_mapper(
     n_truth = len(truth)
     prediction_labels = sorted(prediction.unique())
     n_pred = len(prediction)
-    cooccurrence = _cooccurrence(
-        truth,
-        truth_labels,
-        prediction,
-        prediction_labels,
-        num_workers=num_workers,
-        multiprocessing=multiprocessing,
-    )
-    mapping = {}
-    for _ in range(min(n_truth, n_pred)):
-        # Indices of the maximal elements of coocurrence
-        i_truth, i_pred = np.unravel_index(np.argmax(cooccurrence), cooccurrence.shape)
-        if cooccurrence[i_truth, i_pred] > 0:
-            mapping[prediction_labels[i_pred]] = truth_labels[i_truth]
-            # Since these two labels have been matched,
-            # we set their entries in the coocurrence matrix to zero
-            cooccurrence[i_truth, :] = 0.0
-            cooccurrence[:, i_pred] = 0.0
-            continue
-        break
+    truth_label2index = {label: i for i, label in enumerate(truth_labels)}
+    prediction_label2index = {label: i for i, label in enumerate(prediction_labels)}
+    if individual_file_mapping:
+        # In case mappings should be done for each file individually,
+        # call this function for each file separately.
+        # Then merge the resulting dictionaries.
+        files = truth.index.get_level_values(FILE).unique()
+        file_mappings = audeer.run_tasks(
+            _diarization_mapper,
+            params=[
+                (
+                    (
+                        truth[truth.index.get_level_values(FILE) == file],
+                        prediction[prediction.index.get_level_values(FILE) == file],
+                    ),
+                    {"individual_file_mapping": False},
+                )
+                for file in files
+            ],
+            num_workers=num_workers,
+            multiprocessing=multiprocessing,
+        )
+        # Labels don't overlap between files,
+        # so we don't have overlapping keys in the resulting mappings
+        # and we can combine the result by updating the dictionary
+        mapping = {}
+        for file_mapping in file_mappings:
+            mapping.update(file_mapping)
+
+    else:
+        cooccurrence = _cooccurrence(
+            truth,
+            prediction,
+            truth_label2index,
+            prediction_label2index,
+            num_workers=num_workers,
+            multiprocessing=multiprocessing,
+        )
+        mapping = {}
+        for _ in range(min(n_truth, n_pred)):
+            # Indices of the maximal elements of coocurrence
+            i_truth, i_pred = np.unravel_index(
+                np.argmax(cooccurrence), cooccurrence.shape
+            )
+            if cooccurrence[i_truth, i_pred] > 0:
+                mapping[prediction_labels[i_pred]] = truth_labels[i_truth]
+                # Since these two labels have been matched,
+                # we set their entries in the coocurrence matrix to zero
+                cooccurrence[i_truth, :] = 0.0
+                cooccurrence[:, i_pred] = 0.0
+                continue
+            break
     return mapping
 
 

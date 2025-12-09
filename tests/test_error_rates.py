@@ -160,9 +160,83 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
 )
 def test_der(truth, prediction, expected_der, num_workers, multiprocessing):
     der = audmetric.diarization_error_rate(
-        truth, prediction, num_workers, multiprocessing
+        truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
     )
     np.testing.assert_almost_equal(der, expected_der)
+
+
+@pytest.mark.parametrize(
+    ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
+)
+@pytest.mark.parametrize(
+    ("truth, prediction, expected_der_individual, expected_der_overall"),
+    [
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2 + ["f2.wav"] * 2,
+                    starts=[0, 0.1, 0, 0.1],
+                    ends=[0.1, 0.2, 0.1, 0.2],
+                ),
+                data=["0", "1", "0", "1"],
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2 + ["f2.wav"] * 2,
+                    starts=[0, 0.1, 0, 0.1],
+                    ends=[0.1, 0.2, 0.1, 0.2],
+                ),
+                data=["a", "b", "c", "d"],
+            ),
+            0.0,
+            0.5,
+        ),
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2 + ["f2.wav"] * 2 + ["f3.wav"],
+                    starts=[0, 0.1, 0, 0.1, 0],
+                    ends=[0.1, 0.2, 0.1, 0.2, 0.1],
+                ),
+                data=["0", "1", "0", "1", "0"],
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2 + ["f2.wav"] * 2 + ["f3.wav"] * 2,
+                    starts=[0, 0.1, 0, 0.1, 0, 0.1],
+                    ends=[0.1, 0.2, 0.1, 0.2, 0.1, 0.2],
+                ),
+                data=["a", "b", "c", "d", "a", "b"],
+            ),
+            0.1 / 0.5,
+            0.3 / 0.5,
+        ),
+    ],
+)
+def test_der_individual_file_mapping(
+    truth,
+    prediction,
+    expected_der_individual,
+    expected_der_overall,
+    num_workers,
+    multiprocessing,
+):
+    der_individual = audmetric.diarization_error_rate(
+        truth,
+        prediction,
+        individual_file_mapping=True,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    np.testing.assert_almost_equal(der_individual, expected_der_individual)
+    der_overall = audmetric.diarization_error_rate(
+        truth,
+        prediction,
+        individual_file_mapping=False,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    np.testing.assert_almost_equal(der_overall, expected_der_overall)
 
 
 @pytest.mark.parametrize(
@@ -327,7 +401,7 @@ def test_der(truth, prediction, expected_der, num_workers, multiprocessing):
 )
 def test_ier(truth, prediction, expected_ier, num_workers, multiprocessing):
     ier = audmetric.identification_error_rate(
-        truth, prediction, num_workers, multiprocessing
+        truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
     )
     np.testing.assert_almost_equal(ier, expected_ier)
 
