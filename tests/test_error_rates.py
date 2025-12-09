@@ -14,6 +14,9 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
 
 
 @pytest.mark.parametrize(
+    ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
+)
+@pytest.mark.parametrize(
     ("truth, prediction, expected_der"),
     [
         # Empty series
@@ -155,22 +158,16 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
         ),
     ],
 )
-def test_der(
-    truth,
-    prediction,
-    expected_der,
-):
+def test_der(truth, prediction, expected_der, num_workers, multiprocessing):
     der = audmetric.diarization_error_rate(
-        truth,
-        prediction,
+        truth, prediction, num_workers, multiprocessing
     )
     np.testing.assert_almost_equal(der, expected_der)
 
-    # Check multiprocessing gives same result
-    multi_der = audmetric.diarization_error_rate(truth, prediction, num_workers=10)
-    np.testing.assert_almost_equal(multi_der, expected_der)
 
-
+@pytest.mark.parametrize(
+    ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
+)
 @pytest.mark.parametrize(
     ("truth, prediction, expected_ier"),
     [
@@ -328,23 +325,18 @@ def test_der(
         ),
     ],
 )
-def test_ier(
-    truth,
-    prediction,
-    expected_ier,
-):
+def test_ier(truth, prediction, expected_ier, num_workers, multiprocessing):
     ier = audmetric.identification_error_rate(
-        truth,
-        prediction,
+        truth, prediction, num_workers, multiprocessing
     )
     np.testing.assert_almost_equal(ier, expected_ier)
-    # Check multiprocessing gives same result
-    multi_ier = audmetric.identification_error_rate(truth, prediction, num_workers=10)
-    np.testing.assert_almost_equal(multi_ier, expected_ier)
 
 
+@pytest.mark.parametrize(
+    ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
+)
 @pytest.mark.parametrize("testcase", [0, 1, 2, 3, 4])
-def test_pyannote_ier(testcase):
+def test_pyannote_ier(testcase, num_workers, multiprocessing):
     # Test cases are generated in tests/assets/error_rates/ier
     # using pyannote
     reference_dir = os.path.join(REFERENCE_DIR, "ier", str(testcase))
@@ -356,15 +348,17 @@ def test_pyannote_ier(testcase):
         .iloc[0]
     )
     expected_result = expected_result.replace({np.nan: None})
-    ier = audmetric.identification_error_rate(truth, prediction)
+    ier = audmetric.identification_error_rate(
+        truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
+    )
     np.testing.assert_almost_equal(ier, expected_result["ier"], decimal=5)
-    # Check multiprocessing gives same result
-    multi_ier = audmetric.identification_error_rate(truth, prediction, num_workers=10)
-    np.testing.assert_almost_equal(multi_ier, expected_result["ier"], decimal=5)
 
 
+@pytest.mark.parametrize(
+    ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
+)
 @pytest.mark.parametrize("testcase", [0, 1, 2, 3, 4])
-def test_pyannote_der(testcase):
+def test_pyannote_der(testcase, num_workers, multiprocessing):
     # Test cases are generated in tests/assets/error_rates/der
     # using pyannote
     reference_dir = os.path.join(REFERENCE_DIR, "der", str(testcase))
@@ -376,8 +370,7 @@ def test_pyannote_der(testcase):
         .iloc[0]
     )
     expected_result = expected_result.replace({np.nan: None})
-    der = audmetric.diarization_error_rate(truth, prediction)
+    der = audmetric.diarization_error_rate(
+        truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
+    )
     np.testing.assert_almost_equal(der, expected_result["der"], decimal=5)
-    # Check multiprocessing gives same result
-    multi_der = audmetric.diarization_error_rate(truth, prediction, num_workers=10)
-    np.testing.assert_almost_equal(multi_der, expected_result["der"], decimal=5)
