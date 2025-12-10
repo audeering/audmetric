@@ -77,15 +77,15 @@ def test_accuracy(truth, prediction, labels, to_string):
         truth = [str(w) for w in truth]
         prediction = [str(w) for w in prediction]
 
+    if labels:
+        mask = np.nonzero(
+            np.logical_and(np.isin(truth, labels), np.isin(prediction, labels))
+        )
+        truth = truth[mask]
+        prediction = prediction[mask]
     if len(prediction) == 0:
         accuracy = np.nan
     else:
-        if labels:
-            mask = np.nonzero(
-                np.logical_and(np.isin(truth, labels), np.isin(prediction, labels))
-            )
-            truth = truth[mask]
-            prediction = prediction[mask]
         accuracy = sklearn.metrics.accuracy_score(
             list(truth),
             list(prediction),
