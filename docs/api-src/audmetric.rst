@@ -11,6 +11,7 @@ audmetric
     concordance_cc
     confusion_matrix
     detection_error_tradeoff
+    diarization_error_rate
     edit_distance
     equal_error_rate
     event_confusion_matrix
@@ -19,6 +20,7 @@ audmetric
     event_precision_per_class
     event_recall_per_class
     event_unweighted_average_fscore
+    identification_error_rate
     linkability
     mean_absolute_error
     mean_squared_error
