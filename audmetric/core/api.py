@@ -376,9 +376,6 @@ def diarization_error_rate(
             "The truth and prediction "
             "should be a pandas Series with a segmented index conform to audformat."
         )
-    # Warn user if there are no common files
-    _check_common_files(truth, prediction)
-
     # Map prediction and truth labels to unique names
     # to avoid confusion when there is an overlap
     pred_labels = prediction.unique()
@@ -1448,8 +1445,6 @@ def identification_error_rate(
             "The truth and prediction "
             "should be a pandas Series with a segmented index conform to audformat."
         )
-    # Warn user if there are no common files
-    _check_common_files(truth, prediction)
 
     files = (
         truth.index.get_level_values(FILE)
@@ -1481,9 +1476,14 @@ def identification_error_rate(
 
     numerator = total_confusion + total_false_alarm + total_misses
     if total_duration == 0.0:
-        return 0.0 if numerator == 0.0 else 1.0
+        ier = 0.0 if numerator == 0.0 else 1.0
     else:
-        return numerator / total_duration
+        ier = numerator / total_duration
+    if ier > 1.0:
+        # In this case it is possible that there is no overlap between files
+        # So we warn the user if there are no common files
+        _check_common_files(truth, prediction)
+    return ier
 
 
 def linkability(
