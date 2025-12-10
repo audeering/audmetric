@@ -448,3 +448,39 @@ def test_pyannote_der(testcase, num_workers, multiprocessing):
         truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
     )
     np.testing.assert_almost_equal(der, expected_result["der"], decimal=5)
+
+
+@pytest.mark.parametrize(
+    ("truth, prediction, expected_der, expected_ier"),
+    [
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"],
+                    starts=[0],
+                    ends=[0.1],
+                ),
+                data=["a"],
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f2.wav"],
+                    starts=[0],
+                    ends=[0.1],
+                ),
+                data=["b"],
+            ),
+            2.0,
+            2.0,
+        ),
+    ],
+)
+def test_no_common_files(truth, prediction, expected_der, expected_ier):
+    expected_warning = "There are no common files shared between truth and prediction."
+    with pytest.warns(UserWarning, match=expected_warning):
+        der = audmetric.diarization_error_rate(truth, prediction)
+    np.testing.assert_almost_equal(der, expected_der)
+
+    with pytest.warns(UserWarning, match=expected_warning):
+        ier = audmetric.identification_error_rate(truth, prediction)
+    np.testing.assert_almost_equal(ier, expected_ier)

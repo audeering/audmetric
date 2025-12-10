@@ -376,6 +376,8 @@ def diarization_error_rate(
             "The truth and prediction "
             "should be a pandas Series with a segmented index conform to audformat."
         )
+    # Warn user if there are no common files
+    _check_common_files(truth, prediction)
 
     # Map prediction and truth labels to unique names
     # to avoid confusion when there is an overlap
@@ -1446,6 +1448,9 @@ def identification_error_rate(
             "The truth and prediction "
             "should be a pandas Series with a segmented index conform to audformat."
         )
+    # Warn user if there are no common files
+    _check_common_files(truth, prediction)
+
     files = (
         truth.index.get_level_values(FILE)
         .unique()
@@ -2303,6 +2308,24 @@ def _matching_scores(
     non_mated_scores = prediction[~truth]
 
     return mated_scores, non_mated_scores
+
+
+def _check_common_files(truth: pd.Series, prediction: pd.Series):
+    r"""Warn the user if there are no common files between truth and prediction."""
+    if (
+        len(truth) > 0
+        and len(
+            truth.index.get_level_values(FILE)
+            .unique()
+            .intersection(prediction.index.get_level_values(FILE).unique())
+        )
+        == 0
+    ):
+        warnings.warn(
+            message="There are no common files shared between truth and prediction.",
+            category=UserWarning,
+            stacklevel=2,
+        )
 
 
 def _cooccurrence(
