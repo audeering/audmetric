@@ -46,6 +46,12 @@ import audmetric
             False,
         ),
         (
+            np.array([0]),
+            np.array([0]),
+            [1],
+            False,
+        ),
+        (
             np.zeros(10),
             np.zeros(10),
             None,
