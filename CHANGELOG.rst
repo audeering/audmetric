@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.3.0 (2025/12/11)
+--------------------------
+
+* Added: ``audmetric.diarization_error_rate()``
+* Added: ``audmetric.identification_error_rate()``
+* Added: Event-based metrics ``audmetric.event_confusion_matrix()``,
+  ``audmetric.event_fscore_per_class()``, ``audmetric.event_precision_per_class()``,
+  ``audmetric.event_recall_per_class()``, ``audmetric_event_unweighted_average_fscore()``
+
+
 Version 1.2.3 (2025/11/03)
 --------------------------
 
