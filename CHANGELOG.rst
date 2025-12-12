@@ -7,7 +7,7 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
-Version 1.3.0 (2025/12/11)
+Version 1.3.0 (2025/12/12)
 --------------------------
 
 * Added: ``audmetric.diarization_error_rate()``
