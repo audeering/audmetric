@@ -1,0 +1,6 @@
+﻿event\_fscore\_per\_class\(\)
+=============================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.event_fscore_per_class

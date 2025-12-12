@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>diarization_error_rate() &mdash; Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="edit_distance()" href="audmetric.edit_distance.html" />
+    <link rel="prev" title="detection_error_tradeoff()" href="audmetric.detection_error_tradeoff.html" />
+    
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../index.html">
+          
+            <img src="../_static/images/audeering.png" class="logo" alt="audEERING"/>
+          
+          
+            <span> audmetric</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="audmetric.html">audmetric</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audmetric.accuracy.html">accuracy()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.concordance_cc.html">concordance_cc()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.confusion_matrix.html">confusion_matrix()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.detection_error_tradeoff.html">detection_error_tradeoff()</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">diarization_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.edit_distance.html">edit_distance()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.equal_error_rate.html">equal_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.event_confusion_matrix.html">event_confusion_matrix()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.event_error_rate.html">event_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.event_fscore_per_class.html">event_fscore_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.event_precision_per_class.html">event_precision_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.event_recall_per_class.html">event_recall_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.event_unweighted_average_fscore.html">event_unweighted_average_fscore()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.identification_error_rate.html">identification_error_rate()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.linkability.html">linkability()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.mean_absolute_error.html">mean_absolute_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.mean_squared_error.html">mean_squared_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.pearson_cc.html">pearson_cc()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.fscore_per_class.html">fscore_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.precision_per_class.html">precision_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.recall_per_class.html">recall_per_class()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_bias.html">unweighted_average_bias()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_fscore.html">unweighted_average_fscore()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_precision.html">unweighted_average_precision()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.unweighted_average_recall.html">unweighted_average_recall()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.weighted_confusion_error.html">weighted_confusion_error()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.word_error_rate.html">word_error_rate()</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="audmetric.utils.html">audmetric.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">audmetric</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="audmetric.html">audmetric</a> &raquo;</li>
+      <li>diarization_error_rate()</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/audeering/audmetric/" class="fa fa-github"> GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="diarization-error-rate">
+<h1>diarization_error_rate()<a class="headerlink" href="#diarization-error-rate" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="audmetric.diarization_error_rate">
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">diarization_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">individual_file_mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocessing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#diarization_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.diarization_error_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Diarization error rate.</p>
+<div class="math">
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>DER</mtext><mo>=</mo><mfrac><mrow><mtext>confusion</mtext><mo>+</mo><mtext>false alarm</mtext><mo>+</mo><mtext>miss</mtext></mrow><mtext>total</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{DER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}
+    {\text{total}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">DER</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">total</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">confusion</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord text"><span class="mord">false alarm</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord text"><span class="mord">miss</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div><p>where <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>confusion</mtext></mrow><annotation encoding="application/x-tex">\text{confusion}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">confusion</span></span></span></span></span></span> is the total confusion duration,
+<span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>false alarm</mtext></mrow><annotation encoding="application/x-tex">\text{false alarm}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">false alarm</span></span></span></span></span></span> is the total duration of predictions
+without an overlapping ground truth,
+<span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>miss</mtext></mrow><annotation encoding="application/x-tex">\text{miss}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord text"><span class="mord">miss</span></span></span></span></span></span> is the total duration of ground truth
+without an overlapping prediction,
+and <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>total</mtext></mrow><annotation encoding="application/x-tex">\text{total}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">total</span></span></span></span></span></span> is the total duration of ground truth segments.</p>
+<p>The diarization error rate can used
+when the labels are not known by the prediction model,
+e.g. for the task of speaker diarization on unknown speakers.</p>
+<p>This metric is computed the same way
+as <a class="reference internal" href="audmetric.identification_error_rate.html#audmetric.identification_error_rate" title="audmetric.identification_error_rate"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmetric.identification_error_rate()</span></code></a>,
+but first creates a one-to-one mapping between
+truth and prediction labels.</p>
+<p>This implementation uses the ‘greedy’ method
+to compute the one-to-one mapping
+between truth and predicted labels.
+This method is faster than other implementations that optimize
+the confusion term, but may slightly over-estimate the
+diarization error rate.
+<a class="footnote-reference brackets" href="#footcite-bredin2017" id="id1">1</a></p>
+<div class="docutils container" id="id2">
+<dl class="footnote brackets">
+<dt class="label" id="footcite-bredin2017"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Hervé Bredin. pyannote.metrics: a toolkit for reproducible evaluation, diagnostic, and error analysis of speaker diarization systems. In <em>Interspeech 2017, 18th Annual Conference of the International Speech Communication Association</em>. Stockholm, Sweden, August 2017.</p>
+</dd>
+</dl>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>truth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – ground truth labels with a segmented index conform to <a class="reference external" href="https://audeering.github.io/audformat/data-format.html">audformat</a></p></li>
+<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>) – predicted labels with a segmented index conform to <a class="reference external" href="https://audeering.github.io/audformat/data-format.html">audformat</a></p></li>
+<li><p><strong>individual_file_mapping</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to create the mapping
+between truth and prediction labels individually for each file.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, all segments are taken into account to compute the mapping</p></li>
+<li><p><strong>num_workers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of threads or 1 for sequential processing</p></li>
+<li><p><strong>multiprocessing</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – use multiprocessing instead of multithreading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>diarization error rate</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">truth</span></code> or <code class="docutils literal notranslate"><span class="pre">prediction</span></code>
+    do not have a segmented index conform to <a class="reference external" href="https://audeering.github.io/audformat/data-format.html">audformat</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">audformat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">truth</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">index</span><span class="o">=</span><span class="n">audformat</span><span class="o">.</span><span class="n">segmented_index</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;f1.wav&quot;</span><span class="p">,</span> <span class="s2">&quot;f1.wav&quot;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">starts</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">ends</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">),</span>
+<span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">index</span><span class="o">=</span><span class="n">audformat</span><span class="o">.</span><span class="n">segmented_index</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;f1.wav&quot;</span><span class="p">,</span> <span class="s2">&quot;f1.wav&quot;</span><span class="p">,</span> <span class="s2">&quot;f1.wav&quot;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">starts</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">ends</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">),</span>
+<span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">diarization_error_rate</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+<span class="go">0.5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="audmetric.edit_distance.html" class="btn btn-neutral float-right" title="edit_distance()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="audmetric.detection_error_tradeoff.html" class="btn btn-neutral float-left" title="detection_error_tradeoff()" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2019-2025 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

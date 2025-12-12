@@ -1,0 +1,6 @@
+﻿diarization\_error\_rate\(\)
+============================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.diarization_error_rate

@@ -1,0 +1,6 @@
+﻿event\_precision\_per\_class\(\)
+================================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.event_precision_per_class

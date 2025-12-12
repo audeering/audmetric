@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.2.3
+                v1.3.0
               </div>
             
           
@@ -140,17 +140,29 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audmetric.core.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">audmetric.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">END</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audmetric.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">FILE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audmetric.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">START</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmetric.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">assert_equal_length</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmetric.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_labels</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audmetric.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_segmented_index</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmetric.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">scores_per_subgroup_and_class</span>
 
 
@@ -420,6 +432,134 @@
     <span class="k">return</span> <span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span></div>
 
 
+<div class="viewcode-block" id="diarization_error_rate"><a class="viewcode-back" href="../../../api/audmetric.diarization_error_rate.html#audmetric.diarization_error_rate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">diarization_error_rate</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">individual_file_mapping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">multiprocessing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Diarization error rate.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{DER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}</span>
+<span class="sd">            {\text{total}}</span>
+
+<span class="sd">    where :math:`\text{confusion}` is the total confusion duration,</span>
+<span class="sd">    :math:`\text{false alarm}` is the total duration of predictions</span>
+<span class="sd">    without an overlapping ground truth,</span>
+<span class="sd">    :math:`\text{miss}` is the total duration of ground truth</span>
+<span class="sd">    without an overlapping prediction,</span>
+<span class="sd">    and :math:`\text{total}` is the total duration of ground truth segments.</span>
+
+<span class="sd">    The diarization error rate can used</span>
+<span class="sd">    when the labels are not known by the prediction model,</span>
+<span class="sd">    e.g. for the task of speaker diarization on unknown speakers.</span>
+
+<span class="sd">    This metric is computed the same way</span>
+<span class="sd">    as :func:`audmetric.identification_error_rate`,</span>
+<span class="sd">    but first creates a one-to-one mapping between</span>
+<span class="sd">    truth and prediction labels.</span>
+
+<span class="sd">    This implementation uses the &#39;greedy&#39; method</span>
+<span class="sd">    to compute the one-to-one mapping</span>
+<span class="sd">    between truth and predicted labels.</span>
+<span class="sd">    This method is faster than other implementations that optimize</span>
+<span class="sd">    the confusion term, but may slightly over-estimate the</span>
+<span class="sd">    diarization error rate.</span>
+<span class="sd">    :footcite:`Bredin2017`</span>
+
+<span class="sd">    .. footbibliography::</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth labels with a segmented index conform to `audformat`_</span>
+<span class="sd">        prediction: predicted labels with a segmented index conform to `audformat`_</span>
+<span class="sd">        individual_file_mapping: whether to create the mapping</span>
+<span class="sd">            between truth and prediction labels individually for each file.</span>
+<span class="sd">            If ``False``, all segments are taken into account to compute the mapping</span>
+<span class="sd">        num_workers: number of threads or 1 for sequential processing</span>
+<span class="sd">        multiprocessing: use multiprocessing instead of multithreading</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        diarization error rate</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` or ``prediction``</span>
+<span class="sd">            do not have a segmented index conform to `audformat`_</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; import audformat</span>
+<span class="sd">        &gt;&gt;&gt; truth = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0.0, 0.1],</span>
+<span class="sd">        ...         ends=[0.1, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;b&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; prediction = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0, 0.1, 0.1],</span>
+<span class="sd">        ...         ends=[0.1, 0.15, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;0&quot;, &quot;1&quot;, &quot;0&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; diarization_error_rate(truth, prediction)</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    .. _audformat: https://audeering.github.io/audformat/data-format.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_segmented_index</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_segmented_index</span><span class="p">(</span><span class="n">prediction</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The truth and prediction &quot;</span>
+            <span class="s2">&quot;should be a pandas Series with a segmented index conform to audformat.&quot;</span>
+        <span class="p">)</span>
+    <span class="c1"># Map prediction and truth labels to unique names</span>
+    <span class="c1"># to avoid confusion when there is an overlap</span>
+    <span class="n">pred_labels</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">unique_pred_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;p</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pred_labels</span><span class="p">)}</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_pred_mapper</span><span class="p">)</span>
+    <span class="n">truth_labels</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">unique_truth_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;t</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">truth_labels</span><span class="p">)}</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_truth_mapper</span><span class="p">)</span>
+
+    <span class="c1"># If mapping should be computed individually for each file,</span>
+    <span class="c1"># add a unique prefix to each label based on the file</span>
+    <span class="k">if</span> <span class="n">individual_file_mapping</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
+            <span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">unique_file_prefix</span> <span class="o">=</span> <span class="p">{</span><span class="n">file</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;f</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">)}</span>
+        <span class="n">prediction_file_ids</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">FILE</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_file_prefix</span><span class="p">)</span>
+        <span class="n">prediction_file_ids</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction_file_ids</span> <span class="o">+</span> <span class="n">prediction</span>
+        <span class="n">truth_file_ids</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">FILE</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_file_prefix</span><span class="p">)</span>
+        <span class="n">truth_file_ids</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">truth</span> <span class="o">=</span> <span class="n">truth_file_ids</span> <span class="o">+</span> <span class="n">truth</span>
+
+    <span class="c1"># Now map from prediction label to truth label,</span>
+    <span class="c1"># leaving prediction labels without a match as is</span>
+    <span class="n">pred2truthlabel</span> <span class="o">=</span> <span class="n">_diarization_mapper</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">individual_file_mapping</span><span class="o">=</span><span class="n">individual_file_mapping</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">multiprocessing</span><span class="o">=</span><span class="n">multiprocessing</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">mapped_prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pred2truthlabel</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">identification_error_rate</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">mapped_prediction</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">multiprocessing</span><span class="o">=</span><span class="n">multiprocessing</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="edit_distance"><a class="viewcode-back" href="../../../api/audmetric.edit_distance.html#audmetric.edit_distance">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">edit_distance</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -586,6 +726,228 @@
     <span class="k">return</span> <span class="n">eer</span><span class="p">,</span> <span class="n">Stats</span><span class="p">(</span><span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="event_confusion_matrix"><a class="viewcode-back" href="../../../api/audmetric.event_confusion_matrix.html#audmetric.event_confusion_matrix">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_confusion_matrix</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">onset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">offset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">duration_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Event-based confusion.</span>
+
+<span class="sd">    This metric compares not only the labels of prediction and ground truth,</span>
+<span class="sd">    but also the time windows they occur in.</span>
+
+<span class="sd">    Each event is considered to be correctly identified</span>
+<span class="sd">    if the predicted label is the same as the ground truth label,</span>
+<span class="sd">    and if the onset is within the given ``onset_tolerance`` (in seconds)</span>
+<span class="sd">    and the offset is within the given ``offset_tolerance`` (in seconds).</span>
+<span class="sd">    Additionally to the ``offset_tolerance``,</span>
+<span class="sd">    one can also specify the ``duration_tolerance``,</span>
+<span class="sd">    to ensure that the offset occurs</span>
+<span class="sd">    within a certain proportion of the reference event duration.</span>
+<span class="sd">    If a prediction fulfills the ``duration_tolerance``</span>
+<span class="sd">    but not the ``offset_tolerance`` (or vice versa),</span>
+<span class="sd">    it is still considered to be an overlapping segment.</span>
+<span class="sd">    :footcite:`Mesaros2016`</span>
+
+<span class="sd">    The resulting confusion matrix has one more row and and one more column</span>
+<span class="sd">    than there are labels.</span>
+<span class="sd">    The last row/column corresponds to the absence of any event.</span>
+<span class="sd">    This allows to distinguish between segments that overlap but have differing labels,</span>
+<span class="sd">    and false negatives that have no overlapping predicted segment</span>
+<span class="sd">    as well as false positives that have no overlapping ground truth segment.</span>
+
+<span class="sd">    .. footbibliography::</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth labels with a segmented index conform to `audformat`_</span>
+<span class="sd">        prediction: predicted labels with a segmented index conform to `audformat`_</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically</span>
+<span class="sd">        onset_tolerance: the onset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s onset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s onset,</span>
+<span class="sd">            it is not considered correct</span>
+<span class="sd">        offset_tolerance: the offset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct,</span>
+<span class="sd">            unless the ``duration_tolerance`` is specified and fulfilled</span>
+<span class="sd">        duration_tolerance: the duration tolerance as a measure of proportion</span>
+<span class="sd">            of the ground truth segment&#39;s total duration.</span>
+<span class="sd">            If the ``offset_tolerance`` is not fulfilled,</span>
+<span class="sd">            and the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct</span>
+<span class="sd">        normalize: normalize confusion matrix over the rows</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        event confusion matrix</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` or ``prediction``</span>
+<span class="sd">            do not have a segmented index conform to `audformat`_</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; import audformat</span>
+<span class="sd">        &gt;&gt;&gt; truth = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;] * 4,</span>
+<span class="sd">        ...         starts=[0, 0.1, 0.2, 0.3],</span>
+<span class="sd">        ...         ends=[0.1, 0.2, 0.3, 0.4],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;b&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; prediction = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;] * 4 + [&quot;f2.wav&quot;],</span>
+<span class="sd">        ...         starts=[0, 0.09, 0.2, 0.31, 0.0],</span>
+<span class="sd">        ...         ends=[0.1, 0.2, 0.3, 0.41, 1.0],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;b&quot;, &quot;a&quot;, &quot;b&quot;, &quot;b&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; event_confusion_matrix(</span>
+<span class="sd">        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02</span>
+<span class="sd">        ... )</span>
+<span class="sd">        [[1, 1, 0], [1, 1, 0], [0, 1, 0]]</span>
+
+<span class="sd">    .. _audformat: https://audeering.github.io/audformat/data-format.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_segmented_index</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_segmented_index</span><span class="p">(</span><span class="n">prediction</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;For event-based metrics, the truth and prediction &quot;</span>
+            <span class="s2">&quot;should be a pandas Series with a segmented index conform to audformat.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">prediction</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="c1"># Confusion matrix of event labels + &quot;no event&quot; label</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+    <span class="c1"># Code based on &#39;greedy&#39; event matching</span>
+    <span class="c1"># at https://github.com/TUT-ARG/sed_eval/blob/0cb1b6d11ceec4fe500cc9b31079c9d8666ed6eb/sed_eval/sound_event.py#L1108</span>
+    <span class="k">for</span> <span class="n">file</span><span class="p">,</span> <span class="n">file_truth</span> <span class="ow">in</span> <span class="n">truth</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">FILE</span><span class="p">):</span>
+        <span class="n">file_pred</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span> <span class="o">==</span> <span class="n">file</span><span class="p">]</span>
+        <span class="c1"># Sort index of truth and prediction to speedup the matching of segments</span>
+        <span class="c1"># and to get the same result regardless of the index order</span>
+        <span class="n">file_truth</span> <span class="o">=</span> <span class="n">file_truth</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+        <span class="n">file_pred</span> <span class="o">=</span> <span class="n">file_pred</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+
+        <span class="n">n_truth</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_truth</span><span class="p">)</span>
+        <span class="n">n_pred</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_pred</span><span class="p">)</span>
+        <span class="c1"># Store whether each individual truth segment is identified</span>
+        <span class="n">truth_correct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_truth</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="c1"># Store whether each individual predicted segment is correct</span>
+        <span class="n">pred_correct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_pred</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="c1"># Find all correct matches</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">_</span><span class="p">,</span> <span class="n">start_truth</span><span class="p">,</span> <span class="n">end_truth</span><span class="p">),</span> <span class="n">label_truth</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="n">file_truth</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="n">start_truth</span> <span class="o">=</span> <span class="n">start_truth</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="n">end_truth</span> <span class="o">=</span> <span class="n">end_truth</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">((</span><span class="n">_</span><span class="p">,</span> <span class="n">start_pred</span><span class="p">,</span> <span class="n">end_pred</span><span class="p">),</span> <span class="n">label_pred</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="n">file_pred</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="c1"># Skip segments that have already been matched</span>
+                <span class="k">if</span> <span class="n">pred_correct</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">start_pred</span> <span class="o">=</span> <span class="n">start_pred</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+                <span class="n">end_pred</span> <span class="o">=</span> <span class="n">end_pred</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+                <span class="c1"># This predicted segment and all following ones cannot match</span>
+                <span class="c1"># if the true start time is exceeded by more than the allowed tolerance</span>
+                <span class="c1"># and we move on to the next ground truth segment</span>
+                <span class="k">if</span> <span class="n">onset_tolerance</span> <span class="ow">and</span> <span class="n">start_truth</span> <span class="o">+</span> <span class="n">onset_tolerance</span> <span class="o">&lt;</span> <span class="n">start_pred</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="c1"># Condition 1: labels are the same</span>
+                <span class="k">if</span> <span class="n">label_truth</span> <span class="o">==</span> <span class="n">label_pred</span><span class="p">:</span>
+                    <span class="c1"># Condition 2: segments overlap in onset/offset</span>
+                    <span class="k">if</span> <span class="n">_segments_overlap</span><span class="p">(</span>
+                        <span class="n">start_truth</span><span class="p">,</span>
+                        <span class="n">end_truth</span><span class="p">,</span>
+                        <span class="n">start_pred</span><span class="p">,</span>
+                        <span class="n">end_pred</span><span class="p">,</span>
+                        <span class="n">onset_tolerance</span><span class="p">,</span>
+                        <span class="n">offset_tolerance</span><span class="p">,</span>
+                        <span class="n">duration_tolerance</span><span class="p">,</span>
+                    <span class="p">):</span>
+                        <span class="c1"># Add entry to confusion matrix,</span>
+                        <span class="c1"># then move on to next ground truth segment</span>
+                        <span class="n">label_id</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">label_truth</span><span class="p">)</span>
+                        <span class="n">cm</span><span class="p">[</span><span class="n">label_id</span><span class="p">][</span><span class="n">label_id</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">truth_correct</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">pred_correct</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+
+        <span class="c1"># Indices of predicted segments without a ground truth match</span>
+        <span class="n">pred_unmatched</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">pred_correct</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Indices of ground truth segments without a prediction match</span>
+        <span class="n">truth_unmatched</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">truth_correct</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">preds_incorrect_match</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_pred</span><span class="p">)</span>
+        <span class="c1"># Find overlapping segments with incorrect labels</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">truth_unmatched</span><span class="p">:</span>
+            <span class="n">start_truth</span> <span class="o">=</span> <span class="n">file_truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">START</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="n">end_truth</span> <span class="o">=</span> <span class="n">file_truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">END</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="n">label_truth</span> <span class="o">=</span> <span class="n">file_truth</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">pred_unmatched</span><span class="p">:</span>
+                <span class="c1"># Skip predicted segments</span>
+                <span class="c1"># if they&#39;ve already been counted as a label mismatch</span>
+                <span class="k">if</span> <span class="n">preds_incorrect_match</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="n">start_pred</span> <span class="o">=</span> <span class="n">file_pred</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">START</span><span class="p">)[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+                <span class="n">end_pred</span> <span class="o">=</span> <span class="n">file_pred</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">END</span><span class="p">)[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+                <span class="c1"># This predicted segment and all following ones cannot match</span>
+                <span class="c1"># if the true start time is exceeded by more than the allowed tolerance</span>
+                <span class="c1"># and we move on to the next ground truth segment</span>
+                <span class="k">if</span> <span class="n">onset_tolerance</span> <span class="ow">and</span> <span class="n">start_truth</span> <span class="o">+</span> <span class="n">onset_tolerance</span> <span class="o">&lt;</span> <span class="n">start_pred</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">label_pred</span> <span class="o">=</span> <span class="n">file_pred</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">_segments_overlap</span><span class="p">(</span>
+                    <span class="n">start_truth</span><span class="p">,</span>
+                    <span class="n">end_truth</span><span class="p">,</span>
+                    <span class="n">start_pred</span><span class="p">,</span>
+                    <span class="n">end_pred</span><span class="p">,</span>
+                    <span class="n">onset_tolerance</span><span class="p">,</span>
+                    <span class="n">offset_tolerance</span><span class="p">,</span>
+                    <span class="n">duration_tolerance</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="n">preds_incorrect_match</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="c1"># Segment overlaps although the label is a mismatch</span>
+                    <span class="c1"># so it counts as a confused label</span>
+                    <span class="n">cm</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">label_truth</span><span class="p">)][</span><span class="n">labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">label_pred</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+
+    <span class="c1"># Fill in remaining errors that have no confusions</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+        <span class="n">n_label_truth</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">[</span><span class="n">truth</span> <span class="o">==</span> <span class="n">label</span><span class="p">])</span>
+        <span class="c1"># Count any ground truth segments that have no overlapping prediction at all</span>
+        <span class="n">n_missed</span> <span class="o">=</span> <span class="n">n_label_truth</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)])</span>
+        <span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">n_missed</span>
+        <span class="n">n_label_pred</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="n">prediction</span> <span class="o">==</span> <span class="n">label</span><span class="p">])</span>
+        <span class="c1"># Count any predictions that have no overlap with ground truth segments</span>
+        <span class="n">n_extra</span> <span class="o">=</span> <span class="n">n_label_pred</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">cm</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">))])</span>
+        <span class="n">cm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_extra</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cm</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">row_sum</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                <span class="n">cm</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">/</span> <span class="n">row_sum</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">cm</span></div>
+
+
 <div class="viewcode-block" id="event_error_rate"><a class="viewcode-back" href="../../../api/audmetric.event_error_rate.html#audmetric.event_error_rate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]),</span>
@@ -636,6 +998,463 @@
 
     <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">eer</span> <span class="o">/</span> <span class="n">num_samples</span></div>
+
+
+<div class="viewcode-block" id="event_fscore_per_class"><a class="viewcode-back" href="../../../api/audmetric.event_fscore_per_class.html#audmetric.event_fscore_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_fscore_per_class</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">propagate_nans</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">onset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">offset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">duration_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Event-based F-score per class.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{fscore}_k = \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \frac{1}{2}</span>
+<span class="sd">                 (\text{false positive}_k + \text{false negative}_k)}</span>
+
+<span class="sd">    This metric compares not only the labels of prediction and ground truth,</span>
+<span class="sd">    but also the time windows they occur in.</span>
+
+<span class="sd">    Each event is considered to be correctly identified</span>
+<span class="sd">    if the predicted label is the same as the ground truth label,</span>
+<span class="sd">    and if the onset is within the given ``onset_tolerance`` (in seconds)</span>
+<span class="sd">    and the offset is within the given ``offset_tolerance`` (in seconds).</span>
+<span class="sd">    Additionally to the ``offset_tolerance``,</span>
+<span class="sd">    one can also specify the ``duration_tolerance``,</span>
+<span class="sd">    to ensure that the offset occurs</span>
+<span class="sd">    within a certain proportion of the reference event duration.</span>
+<span class="sd">    If a prediction fulfills the ``duration_tolerance``</span>
+<span class="sd">    but not the ``offset_tolerance`` (or vice versa),</span>
+<span class="sd">    it is still considered to be an overlapping segment.</span>
+<span class="sd">    :footcite:`Mesaros2016`</span>
+
+<span class="sd">    .. footbibliography::</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+<span class="sd">        propagate_nans: whether to set the F-score to ``NaN``</span>
+<span class="sd">            when recall or precision are ``NaN``.</span>
+<span class="sd">            If ``False``, the F-score is only set to ``NaN``</span>
+<span class="sd">            when both recall and precision are ``NaN``</span>
+<span class="sd">        onset_tolerance: the onset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s onset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s onset,</span>
+<span class="sd">            it is not considered correct</span>
+<span class="sd">        offset_tolerance: the offset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct,</span>
+<span class="sd">            unless the ``duration_tolerance`` is specified and fulfilled</span>
+<span class="sd">        duration_tolerance: the duration tolerance as a measure of proportion</span>
+<span class="sd">            of the ground truth segment&#39;s total duration.</span>
+<span class="sd">            If the ``offset_tolerance`` is not fulfilled,</span>
+<span class="sd">            and the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dictionary with label as key and F-score as value</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` or ``prediction``</span>
+<span class="sd">            do not have a segmented index conform to `audformat`_</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; import audformat</span>
+<span class="sd">        &gt;&gt;&gt; truth = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0.0, 0.1],</span>
+<span class="sd">        ...         ends=[0.1, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;b&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; prediction = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0, 0.09],</span>
+<span class="sd">        ...         ends=[0.1, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;a&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; event_fscore_per_class(</span>
+<span class="sd">        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02</span>
+<span class="sd">        ... )</span>
+<span class="sd">        {&#39;a&#39;: 0.6666666666666666, &#39;b&#39;: 0.0}</span>
+
+<span class="sd">    .. _audformat: https://audeering.github.io/audformat/data-format.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">event_precision_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">zero_division</span><span class="p">,</span>
+        <span class="n">onset_tolerance</span><span class="o">=</span><span class="n">onset_tolerance</span><span class="p">,</span>
+        <span class="n">offset_tolerance</span><span class="o">=</span><span class="n">offset_tolerance</span><span class="p">,</span>
+        <span class="n">duration_tolerance</span><span class="o">=</span><span class="n">duration_tolerance</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">event_recall_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">zero_division</span><span class="p">,</span>
+        <span class="n">onset_tolerance</span><span class="o">=</span><span class="n">onset_tolerance</span><span class="p">,</span>
+        <span class="n">offset_tolerance</span><span class="o">=</span><span class="n">offset_tolerance</span><span class="p">,</span>
+        <span class="n">duration_tolerance</span><span class="o">=</span><span class="n">duration_tolerance</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fscore</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">precision</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">recall</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">propagate_nans</span><span class="p">:</span>
+                <span class="n">fscore</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fscore</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">elif</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fscore</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fscore</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fscore</span></div>
+
+
+<div class="viewcode-block" id="event_precision_per_class"><a class="viewcode-back" href="../../../api/audmetric.event_precision_per_class.html#audmetric.event_precision_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_precision_per_class</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">onset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">offset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">duration_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Event-based precision per class.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{precision}_k = \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \text{false positive}_k}</span>
+
+<span class="sd">    This metric compares not only the labels of prediction and ground truth,</span>
+<span class="sd">    but also the time windows they occur in.</span>
+
+<span class="sd">    Each event is considered to be correctly identified</span>
+<span class="sd">    if the predicted label is the same as the ground truth label,</span>
+<span class="sd">    and if the onset is within the given ``onset_tolerance`` (in seconds)</span>
+<span class="sd">    and the offset is within the given ``offset_tolerance`` (in seconds).</span>
+<span class="sd">    Additionally to the ``offset_tolerance``,</span>
+<span class="sd">    one can also specify the ``duration_tolerance``,</span>
+<span class="sd">    to ensure that the offset occurs</span>
+<span class="sd">    within a certain proportion of the reference event duration.</span>
+<span class="sd">    If a prediction fulfills the ``duration_tolerance``</span>
+<span class="sd">    but not the ``offset_tolerance`` (or vice versa),</span>
+<span class="sd">    it is still considered to be an overlapping segment.</span>
+<span class="sd">    :footcite:`Mesaros2016`</span>
+
+<span class="sd">    .. footbibliography::</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+<span class="sd">        onset_tolerance: the onset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s onset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s onset,</span>
+<span class="sd">            it is not considered correct</span>
+<span class="sd">        offset_tolerance: the offset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct,</span>
+<span class="sd">            unless the ``duration_tolerance`` is specified and fulfilled</span>
+<span class="sd">        duration_tolerance: the duration tolerance as a measure of proportion</span>
+<span class="sd">            of the ground truth segment&#39;s total duration.</span>
+<span class="sd">            If the ``offset_tolerance`` is not fulfilled,</span>
+<span class="sd">            and the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dictionary with label as key and precision as value</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` or ``prediction``</span>
+<span class="sd">            do not have a segmented index conform to `audformat`_</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; import audformat</span>
+<span class="sd">        &gt;&gt;&gt; truth = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0.0, 0.1],</span>
+<span class="sd">        ...         ends=[0.1, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;b&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; prediction = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0.0, 0.09],</span>
+<span class="sd">        ...         ends=[0.11, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;a&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; event_precision_per_class(</span>
+<span class="sd">        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02</span>
+<span class="sd">        ... )</span>
+<span class="sd">        {&#39;a&#39;: 0.5, &#39;b&#39;: 0.0}</span>
+
+<span class="sd">    .. _audformat: https://audeering.github.io/audformat/data-format.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_event_metric_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="p">,</span>
+        <span class="n">onset_tolerance</span><span class="p">,</span>
+        <span class="n">offset_tolerance</span><span class="p">,</span>
+        <span class="n">duration_tolerance</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="event_recall_per_class"><a class="viewcode-back" href="../../../api/audmetric.event_recall_per_class.html#audmetric.event_recall_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_recall_per_class</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">onset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">offset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">duration_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Event-based recall per class.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{recall}_k = \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \text{false negative}_k}</span>
+
+<span class="sd">    This metric compares not only the labels of prediction and ground truth,</span>
+<span class="sd">    but also the time windows they occur in.</span>
+
+<span class="sd">    Each event is considered to be correctly identified</span>
+<span class="sd">    if the predicted label is the same as the ground truth label,</span>
+<span class="sd">    and if the onset is within the given ``onset_tolerance`` (in seconds)</span>
+<span class="sd">    and the offset is within the given ``offset_tolerance`` (in seconds).</span>
+<span class="sd">    Additionally to the ``offset_tolerance``,</span>
+<span class="sd">    one can also specify the ``duration_tolerance``,</span>
+<span class="sd">    to ensure that the offset occurs</span>
+<span class="sd">    within a certain proportion of the reference event duration.</span>
+<span class="sd">    If a prediction fulfills the ``duration_tolerance``</span>
+<span class="sd">    but not the ``offset_tolerance`` (or vice versa),</span>
+<span class="sd">    it is still considered to be an overlapping segment.</span>
+<span class="sd">    :footcite:`Mesaros2016`</span>
+
+<span class="sd">    .. footbibliography::</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+<span class="sd">        onset_tolerance: the onset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s onset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s onset,</span>
+<span class="sd">            it is not considered correct</span>
+<span class="sd">        offset_tolerance: the offset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct,</span>
+<span class="sd">            unless the ``duration_tolerance`` is specified and fulfilled</span>
+<span class="sd">        duration_tolerance: the duration tolerance as a measure of proportion</span>
+<span class="sd">            of the ground truth segment&#39;s total duration.</span>
+<span class="sd">            If the ``offset_tolerance`` is not fulfilled,</span>
+<span class="sd">            and the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dictionary with label as key and recall as value</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` or ``prediction``</span>
+<span class="sd">            do not have a segmented index conform to `audformat`_</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; import audformat</span>
+<span class="sd">        &gt;&gt;&gt; truth = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0.0, 0.1],</span>
+<span class="sd">        ...         ends=[0.1, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;b&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; prediction = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0.0, 0.09],</span>
+<span class="sd">        ...         ends=[0.11, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;a&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; event_recall_per_class(</span>
+<span class="sd">        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02</span>
+<span class="sd">        ... )</span>
+<span class="sd">        {&#39;a&#39;: 1.0, &#39;b&#39;: 0.0}</span>
+
+<span class="sd">    .. _audformat: https://audeering.github.io/audformat/data-format.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_event_metric_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="p">,</span>
+        <span class="n">onset_tolerance</span><span class="p">,</span>
+        <span class="n">offset_tolerance</span><span class="p">,</span>
+        <span class="n">duration_tolerance</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="event_unweighted_average_fscore"><a class="viewcode-back" href="../../../api/audmetric.event_unweighted_average_fscore.html#audmetric.event_unweighted_average_fscore">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_unweighted_average_fscore</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">propagate_nans</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">onset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">offset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">duration_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Event-based unweighted average F-score.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{UAF} = \frac{1}{K} \sum^K_{k=1}</span>
+<span class="sd">            \frac{\text{true positive}_k}</span>
+<span class="sd">                 {\text{true positive}_k + \frac{1}{2}</span>
+<span class="sd">                 (\text{false positive}_k + \text{false negative}_k)}</span>
+
+<span class="sd">    This metric compares not only the labels of prediction and ground truth,</span>
+<span class="sd">    but also the time windows they occur in.</span>
+
+<span class="sd">    Each event is considered to be correctly identified</span>
+<span class="sd">    if the predicted label is the same as the ground truth label,</span>
+<span class="sd">    and if the onset is within the given ``onset_tolerance`` (in seconds)</span>
+<span class="sd">    and the offset is within the given ``offset_tolerance`` (in seconds).</span>
+<span class="sd">    Additionally to the ``offset_tolerance``,</span>
+<span class="sd">    one can also specify the ``duration_tolerance``,</span>
+<span class="sd">    to ensure that the offset occurs</span>
+<span class="sd">    within a certain proportion of the reference event duration.</span>
+<span class="sd">    If a prediction fulfills the ``duration_tolerance``</span>
+<span class="sd">    but not the ``offset_tolerance`` (or vice versa),</span>
+<span class="sd">    it is still considered to be an overlapping segment.</span>
+<span class="sd">    :footcite:`Mesaros2016`</span>
+
+<span class="sd">    .. footbibliography::</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth values/classes</span>
+<span class="sd">        prediction: predicted values/classes</span>
+<span class="sd">        labels: included labels in preferred ordering.</span>
+<span class="sd">            If no labels are supplied,</span>
+<span class="sd">            they will be inferred from</span>
+<span class="sd">            :math:`\{\text{prediction}, \text{truth}\}`</span>
+<span class="sd">            and ordered alphabetically.</span>
+<span class="sd">        zero_division: set the value to return when there is a zero division</span>
+<span class="sd">        propagate_nans: whether to set the F-score to ``NaN``</span>
+<span class="sd">            when recall or precision are ``NaN``.</span>
+<span class="sd">            If ``False``, the F-score is only set to ``NaN``</span>
+<span class="sd">            when both recall and precision are ``NaN``</span>
+<span class="sd">        onset_tolerance: the onset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s onset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s onset,</span>
+<span class="sd">            it is not considered correct</span>
+<span class="sd">        offset_tolerance: the offset tolerance in seconds.</span>
+<span class="sd">            If the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct,</span>
+<span class="sd">            unless the ``duration_tolerance`` is specified and fulfilled</span>
+<span class="sd">        duration_tolerance: the duration tolerance as a measure of proportion</span>
+<span class="sd">            of the ground truth segment&#39;s total duration.</span>
+<span class="sd">            If the ``offset_tolerance`` is not fulfilled,</span>
+<span class="sd">            and the predicted segment&#39;s offset does not occur within this time window</span>
+<span class="sd">            compared to the ground truth segment&#39;s offset,</span>
+<span class="sd">            it is not considered correct</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        event-based unweighted average f-score</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; import audformat</span>
+<span class="sd">        &gt;&gt;&gt; truth = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0.0, 0.1],</span>
+<span class="sd">        ...         ends=[0.1, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;b&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; prediction = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0, 0.09],</span>
+<span class="sd">        ...         ends=[0.1, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;a&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; event_unweighted_average_fscore(</span>
+<span class="sd">        ...     truth, prediction, onset_tolerance=0.02, offset_tolerance=0.02</span>
+<span class="sd">        ... )</span>
+<span class="sd">        0.3333333333333333</span>
+
+<span class="sd">    .. _audformat: https://audeering.github.io/audformat/data-format.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fscore</span> <span class="o">=</span> <span class="n">event_fscore_per_class</span><span class="p">(</span>
+        <span class="n">truth</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">zero_division</span><span class="o">=</span><span class="n">zero_division</span><span class="p">,</span>
+        <span class="n">propagate_nans</span><span class="o">=</span><span class="n">propagate_nans</span><span class="p">,</span>
+        <span class="n">onset_tolerance</span><span class="o">=</span><span class="n">onset_tolerance</span><span class="p">,</span>
+        <span class="n">offset_tolerance</span><span class="o">=</span><span class="n">offset_tolerance</span><span class="p">,</span>
+        <span class="n">duration_tolerance</span><span class="o">=</span><span class="n">duration_tolerance</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fscore</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fscore</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">fscore</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="fscore_per_class"><a class="viewcode-back" href="../../../api/audmetric.fscore_per_class.html#audmetric.fscore_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">fscore_per_class</span><span class="p">(</span>
@@ -695,6 +1514,118 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fscore</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fscore</span></div>
+
+
+<div class="viewcode-block" id="identification_error_rate"><a class="viewcode-back" href="../../../api/audmetric.identification_error_rate.html#audmetric.identification_error_rate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">identification_error_rate</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">multiprocessing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Identification error rate.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \text{IER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}</span>
+<span class="sd">            {\text{total}}</span>
+
+<span class="sd">    where :math:`\text{confusion}` is the total confusion duration,</span>
+<span class="sd">    :math:`\text{false alarm}` is the total duration of predictions</span>
+<span class="sd">    without an overlapping ground truth,</span>
+<span class="sd">    :math:`\text{miss}` is the total duration of ground truth</span>
+<span class="sd">    without an overlapping prediction,</span>
+<span class="sd">    and :math:`\text{total}` is the total duration of ground truth segments.</span>
+<span class="sd">    :footcite:`Bredin2017`</span>
+
+<span class="sd">    The identification error rate should be used</span>
+<span class="sd">    when the labels are known by the prediction model.</span>
+<span class="sd">    If this isn&#39;t the case, consider using :func:`audmetric.diarization_error_rate`.</span>
+
+<span class="sd">    .. footbibliography::</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        truth: ground truth labels with a segmented index conform to `audformat`_</span>
+<span class="sd">        prediction: predicted labels with a segmented index conform to `audformat`_</span>
+<span class="sd">        num_workers: number of threads or 1 for sequential processing</span>
+<span class="sd">        multiprocessing: use multiprocessing instead of multithreading</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        identification error rate</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``truth`` or ``prediction``</span>
+<span class="sd">            do not have a segmented index conform to `audformat`_</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; import audformat</span>
+<span class="sd">        &gt;&gt;&gt; truth = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0.0, 0.1],</span>
+<span class="sd">        ...         ends=[0.1, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;b&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; prediction = pd.Series(</span>
+<span class="sd">        ...     index=audformat.segmented_index(</span>
+<span class="sd">        ...         files=[&quot;f1.wav&quot;, &quot;f1.wav&quot;, &quot;f1.wav&quot;],</span>
+<span class="sd">        ...         starts=[0, 0.1, 0.1],</span>
+<span class="sd">        ...         ends=[0.1, 0.15, 0.2],</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     data=[&quot;a&quot;, &quot;b&quot;, &quot;a&quot;],</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; identification_error_rate(truth, prediction)</span>
+<span class="sd">        0.5</span>
+
+<span class="sd">    .. _audformat: https://audeering.github.io/audformat/data-format.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_segmented_index</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_segmented_index</span><span class="p">(</span><span class="n">prediction</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The truth and prediction &quot;</span>
+            <span class="s2">&quot;should be a pandas Series with a segmented index conform to audformat.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+            <span class="n">_file_ier</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">truth</span><span class="p">[</span><span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span> <span class="o">==</span> <span class="n">file</span><span class="p">],</span>
+                        <span class="n">prediction</span><span class="p">[</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span> <span class="o">==</span> <span class="n">file</span><span class="p">],</span>
+                    <span class="p">),</span>
+                    <span class="p">{},</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span>
+            <span class="p">],</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">multiprocessing</span><span class="o">=</span><span class="n">multiprocessing</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">total_confusion</span><span class="p">,</span> <span class="n">total_false_alarm</span><span class="p">,</span> <span class="n">total_misses</span><span class="p">,</span> <span class="n">total_duration</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">total_confusion</span> <span class="o">=</span> <span class="n">total_false_alarm</span> <span class="o">=</span> <span class="n">total_misses</span> <span class="o">=</span> <span class="n">total_duration</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">numerator</span> <span class="o">=</span> <span class="n">total_confusion</span> <span class="o">+</span> <span class="n">total_false_alarm</span> <span class="o">+</span> <span class="n">total_misses</span>
+    <span class="k">if</span> <span class="n">total_duration</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">ier</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">numerator</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ier</span> <span class="o">=</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">total_duration</span>
+    <span class="k">if</span> <span class="n">ier</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="c1"># In this case it is possible that there is no overlap between files</span>
+        <span class="c1"># So we warn the user if there are no common files</span>
+        <span class="n">_check_common_files</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ier</span></div>
 
 
 <div class="viewcode-block" id="linkability"><a class="viewcode-back" href="../../../api/audmetric.linkability.html#audmetric.linkability">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">linkability</span><span class="p">(</span>
@@ -946,11 +1877,11 @@
     <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>
     <span class="n">total</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">old_settings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-    <span class="n">recall</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span> <span class="o">/</span> <span class="n">total</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span> <span class="o">/</span> <span class="n">total</span>
     <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="o">**</span><span class="n">old_settings</span><span class="p">)</span>
-    <span class="n">recall</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">recall</span><span class="p">)]</span> <span class="o">=</span> <span class="n">zero_division</span>
+    <span class="n">precision</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">precision</span><span class="p">)]</span> <span class="o">=</span> <span class="n">zero_division</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">recall</span><span class="p">)}</span></div>
+    <span class="k">return</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">precision</span><span class="p">)}</span></div>
 
 
 <div class="viewcode-block" id="recall_per_class"><a class="viewcode-back" href="../../../api/audmetric.recall_per_class.html#audmetric.recall_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">recall_per_class</span><span class="p">(</span>
@@ -1168,7 +2099,7 @@
 <span class="sd">        zero_division: set the value to return when there is a zero division</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        unweighted average precision</span>
+<span class="sd">        unweighted average f-score</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; unweighted_average_fscore([0, 0], [0, 1])</span>
@@ -1420,6 +2351,37 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">wer</span> <span class="o">/</span> <span class="n">num_samples</span><span class="p">)</span></div>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_event_metric_per_class</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">zero_division</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">onset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">offset_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">duration_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># 0=precision, 1=recall</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="n">event_confusion_matrix</span><span class="p">(</span>
+            <span class="n">truth</span><span class="p">,</span>
+            <span class="n">prediction</span><span class="p">,</span>
+            <span class="n">labels</span><span class="p">,</span>
+            <span class="n">onset_tolerance</span><span class="o">=</span><span class="n">onset_tolerance</span><span class="p">,</span>
+            <span class="n">offset_tolerance</span><span class="o">=</span><span class="n">offset_tolerance</span><span class="p">,</span>
+            <span class="n">duration_tolerance</span><span class="o">=</span><span class="n">duration_tolerance</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">totals</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span> <span class="o">/</span> <span class="n">totals</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="n">zero_division</span><span class="p">)</span>
+    <span class="c1"># The event based confusion matrix also has a row/column</span>
+    <span class="c1"># for the &quot;no event&quot; class (aka the absence of a segment)</span>
+    <span class="c1"># but we only return the recall/precision per class</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">lab</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">lab</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">)}</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_matching_scores</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="p">(</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]),</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="p">(</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]),</span>
@@ -1488,6 +2450,281 @@
     <span class="n">non_mated_scores</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="o">~</span><span class="n">truth</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">mated_scores</span><span class="p">,</span> <span class="n">non_mated_scores</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_common_files</span><span class="p">(</span><span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Warn the user if there are no common files between truth and prediction.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="p">)</span>
+        <span class="o">==</span> <span class="mi">0</span>
+    <span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;There are no common files shared between truth and prediction.&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_cooccurrence</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">truth_label2index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">prediction_label2index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">multiprocessing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the cooccurance duration of the labels given in truth and prediction.&quot;&quot;&quot;</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+            <span class="n">_file_cooccurrence</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">truth</span><span class="p">[</span><span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span> <span class="o">==</span> <span class="n">file</span><span class="p">],</span>
+                        <span class="n">prediction</span><span class="p">[</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span> <span class="o">==</span> <span class="n">file</span><span class="p">],</span>
+                        <span class="n">truth_label2index</span><span class="p">,</span>
+                        <span class="n">prediction_label2index</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="p">{},</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span>
+            <span class="p">],</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">multiprocessing</span><span class="o">=</span><span class="n">multiprocessing</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">truth_label2index</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction_label2index</span><span class="p">)))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_diarization_mapper</span><span class="p">(</span>
+    <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">individual_file_mapping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">multiprocessing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a mapping from prediction label to truth label based on cooccurrence.</span>
+
+<span class="sd">    Based on code at https://github.com/pyannote/pyannote-metrics/blob/d785d78fcbce89c890a957b7f90f17ac41b0fc21/src/pyannote/metrics/matcher.py#L172</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">truth_labels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">truth</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="n">n_truth</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+    <span class="n">prediction_labels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="n">n_pred</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">truth_label2index</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">truth_labels</span><span class="p">)}</span>
+    <span class="n">prediction_label2index</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prediction_labels</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="n">individual_file_mapping</span><span class="p">:</span>
+        <span class="c1"># In case mappings should be done for each file individually,</span>
+        <span class="c1"># call this function for each file separately.</span>
+        <span class="c1"># Then merge the resulting dictionaries.</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="n">file_mappings</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+            <span class="n">_diarization_mapper</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">truth</span><span class="p">[</span><span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span> <span class="o">==</span> <span class="n">file</span><span class="p">],</span>
+                        <span class="n">prediction</span><span class="p">[</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span> <span class="o">==</span> <span class="n">file</span><span class="p">],</span>
+                    <span class="p">),</span>
+                    <span class="p">{</span><span class="s2">&quot;individual_file_mapping&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span>
+            <span class="p">],</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">multiprocessing</span><span class="o">=</span><span class="n">multiprocessing</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Labels don&#39;t overlap between files,</span>
+        <span class="c1"># so we don&#39;t have overlapping keys in the resulting mappings</span>
+        <span class="c1"># and we can combine the result by updating the dictionary</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">file_mapping</span> <span class="ow">in</span> <span class="n">file_mappings</span><span class="p">:</span>
+            <span class="n">mapping</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">file_mapping</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cooccurrence</span> <span class="o">=</span> <span class="n">_cooccurrence</span><span class="p">(</span>
+            <span class="n">truth</span><span class="p">,</span>
+            <span class="n">prediction</span><span class="p">,</span>
+            <span class="n">truth_label2index</span><span class="p">,</span>
+            <span class="n">prediction_label2index</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">multiprocessing</span><span class="o">=</span><span class="n">multiprocessing</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">n_truth</span><span class="p">,</span> <span class="n">n_pred</span><span class="p">)):</span>
+            <span class="c1"># Indices of the maximal elements of coocurrence</span>
+            <span class="n">i_truth</span><span class="p">,</span> <span class="n">i_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">cooccurrence</span><span class="p">),</span> <span class="n">cooccurrence</span><span class="o">.</span><span class="n">shape</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">cooccurrence</span><span class="p">[</span><span class="n">i_truth</span><span class="p">,</span> <span class="n">i_pred</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mapping</span><span class="p">[</span><span class="n">prediction_labels</span><span class="p">[</span><span class="n">i_pred</span><span class="p">]]</span> <span class="o">=</span> <span class="n">truth_labels</span><span class="p">[</span><span class="n">i_truth</span><span class="p">]</span>
+                <span class="c1"># Since these two labels have been matched,</span>
+                <span class="c1"># we set their entries in the coocurrence matrix to zero</span>
+                <span class="n">cooccurrence</span><span class="p">[</span><span class="n">i_truth</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">cooccurrence</span><span class="p">[:,</span> <span class="n">i_pred</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">continue</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">mapping</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_file_cooccurrence</span><span class="p">(</span>
+    <span class="n">file_truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">file_prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">truth_label2index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">prediction_label2index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cooccurance duration of the labels in truth and prediction for one file.&quot;&quot;&quot;</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">truth_label2index</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction_label2index</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">file_truth</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">intersecting</span> <span class="o">=</span> <span class="n">_intersecting_segments</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">file_prediction</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">other_start</span><span class="p">,</span> <span class="n">other_end</span><span class="p">),</span> <span class="n">other_label</span> <span class="ow">in</span> <span class="n">intersecting</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">shared_duration</span> <span class="o">=</span> <span class="n">_overlap_duration</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">other_start</span><span class="p">,</span> <span class="n">other_end</span><span class="p">)</span>
+            <span class="n">matrix</span><span class="p">[</span><span class="n">truth_label2index</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">prediction_label2index</span><span class="p">[</span><span class="n">other_label</span><span class="p">]]</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">shared_duration</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">matrix</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_file_ier</span><span class="p">(</span>
+    <span class="n">file_truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">file_prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute IER relevant components for one file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_truth: true segments of one file</span>
+<span class="sd">        file_prediction: predicted segments of one file</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple of confusion, false alarm, misses, total duration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_confusion</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">file_false_alarm</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">file_misses</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">file_duration</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># Get subsegments formed by truth and prediction segment boundaries</span>
+    <span class="c1"># Example:</span>
+    <span class="c1"># truth             |------|     |------|</span>
+    <span class="c1">#                        |ooo|</span>
+    <span class="c1"># prediction        |--------| |-----|</span>
+    <span class="c1"># Result:</span>
+    <span class="c1"># starts/ends       |    | | | | |   |  |</span>
+    <span class="n">boundaries</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">_segment_boundaries</span><span class="p">(</span><span class="n">file_truth</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">_segment_boundaries</span><span class="p">(</span><span class="n">file_prediction</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">boundaries</span> <span class="o">=</span> <span class="n">boundaries</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">boundaries</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ends</span> <span class="o">=</span> <span class="n">boundaries</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="c1"># List of (unique) labels that occur in this window in the truth</span>
+    <span class="n">truth_label_lists</span> <span class="o">=</span> <span class="n">_subsegment_labels</span><span class="p">(</span><span class="n">file_truth</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)</span>
+    <span class="c1"># List of (unique) labels that occur in this window in the prediction</span>
+    <span class="n">prediction_label_lists</span> <span class="o">=</span> <span class="n">_subsegment_labels</span><span class="p">(</span><span class="n">file_prediction</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">truth_labels</span><span class="p">,</span> <span class="n">prediction_labels</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">truth_label_lists</span><span class="p">,</span> <span class="n">prediction_label_lists</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth_labels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction_labels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+        <span class="c1"># Overlap between truth and predicted labels in this window</span>
+        <span class="n">correct_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">lab</span> <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">truth_labels</span> <span class="k">if</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">prediction_labels</span><span class="p">]</span>
+        <span class="c1"># Unmatched truth labels in this window</span>
+        <span class="n">extra_truth_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">lab</span> <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">truth_labels</span> <span class="k">if</span> <span class="n">lab</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">correct_labels</span><span class="p">]</span>
+        <span class="c1"># Unmatched predicted labels in this window</span>
+        <span class="n">extra_pred_labels</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">lab</span> <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">prediction_labels</span> <span class="k">if</span> <span class="n">lab</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">correct_labels</span>
+        <span class="p">]</span>
+        <span class="n">n_confusion</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">extra_truth_labels</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_pred_labels</span><span class="p">))</span>
+        <span class="n">n_false_alarm</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n_misses</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># More unmatched prediction labels than truth labels -&gt; add to false alarms</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_pred_labels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_truth_labels</span><span class="p">):</span>
+            <span class="n">n_false_alarm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_pred_labels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_truth_labels</span><span class="p">)</span>
+        <span class="c1"># More unmatched truth labels than prediction labels -&gt; add to misses</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_truth_labels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_pred_labels</span><span class="p">):</span>
+            <span class="n">n_misses</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_truth_labels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_pred_labels</span><span class="p">)</span>
+        <span class="n">file_confusion</span> <span class="o">+=</span> <span class="n">duration</span> <span class="o">*</span> <span class="n">n_confusion</span>
+        <span class="n">file_false_alarm</span> <span class="o">+=</span> <span class="n">duration</span> <span class="o">*</span> <span class="n">n_false_alarm</span>
+        <span class="n">file_misses</span> <span class="o">+=</span> <span class="n">duration</span> <span class="o">*</span> <span class="n">n_misses</span>
+        <span class="n">file_duration</span> <span class="o">+=</span> <span class="n">duration</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth_labels</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">file_confusion</span><span class="p">,</span> <span class="n">file_false_alarm</span><span class="p">,</span> <span class="n">file_misses</span><span class="p">,</span> <span class="n">file_duration</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_intersecting_segments</span><span class="p">(</span>
+    <span class="n">start</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">,</span> <span class="n">other_segments</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return sorted segments that intersect with the given start and end.&quot;&quot;&quot;</span>
+    <span class="n">other_segments</span> <span class="o">=</span> <span class="n">other_segments</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">other_segments</span><span class="p">[</span>
+        <span class="p">(</span>
+            <span class="p">(</span><span class="n">start</span> <span class="o">&lt;</span> <span class="n">other_segments</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">START</span><span class="p">))</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">other_segments</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">START</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="o">|</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">other_segments</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">START</span><span class="p">))</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">start</span> <span class="o">&lt;</span> <span class="n">other_segments</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">END</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="o">|</span> <span class="p">(</span><span class="n">start</span> <span class="o">==</span> <span class="n">other_segments</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">START</span><span class="p">))</span>
+    <span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_overlap_duration</span><span class="p">(</span>
+    <span class="n">start</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">,</span>
+    <span class="n">end</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">,</span>
+    <span class="n">other_start</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">,</span>
+    <span class="n">other_end</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Duration of overlap between two time windows in seconds.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">other_end</span><span class="p">)</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">other_start</span><span class="p">))</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_segment_boundaries</span><span class="p">(</span><span class="n">segments</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the unique segment boundaries present in the given segments.&quot;&quot;&quot;</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">START</span><span class="p">)</span>
+    <span class="n">ends</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">END</span><span class="p">)</span>
+    <span class="n">boundaries</span> <span class="o">=</span> <span class="n">starts</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">ends</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">boundaries</span> <span class="o">=</span> <span class="n">boundaries</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">boundaries</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_subsegment_labels</span><span class="p">(</span>
+    <span class="n">segments</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">starts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span> <span class="n">ends</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">object</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return label lists that occur at each subsegment.</span>
+
+<span class="sd">    The result is a list whose elements correspond to the subsegments</span>
+<span class="sd">    given by the ``starts`` and ``ends`` times.</span>
+<span class="sd">    Each element contains the list of labels that occur</span>
+<span class="sd">    in ``segments`` during that subsegment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">subsegment_labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">):</span>
+        <span class="n">intersection</span> <span class="o">=</span> <span class="n">_intersecting_segments</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">segments</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">intersection</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">subsegment_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">subsegment_labels</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_segments_overlap</span><span class="p">(</span>
+    <span class="n">start_t</span><span class="p">,</span> <span class="n">end_t</span><span class="p">,</span> <span class="n">start_p</span><span class="p">,</span> <span class="n">end_p</span><span class="p">,</span> <span class="n">onset_tol</span><span class="p">,</span> <span class="n">offset_tol</span><span class="p">,</span> <span class="n">duration_tol</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">onset_tol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">start_t</span> <span class="o">-</span> <span class="n">start_p</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">onset_tol</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="c1"># Compute the effective offset tolerance</span>
+    <span class="n">eff_off</span> <span class="o">=</span> <span class="n">offset_tol</span> <span class="ow">or</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="n">duration_tol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">eff_off</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">eff_off</span><span class="p">,</span> <span class="n">duration_tol</span> <span class="o">*</span> <span class="p">(</span><span class="n">end_t</span> <span class="o">-</span> <span class="n">start_t</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">end_t</span> <span class="o">-</span> <span class="n">end_p</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">eff_off</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
 
            </div>
@@ -1503,7 +2740,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/11/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

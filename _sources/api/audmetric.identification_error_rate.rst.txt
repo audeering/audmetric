@@ -1,0 +1,6 @@
+﻿identification\_error\_rate\(\)
+===============================
+
+.. currentmodule:: audmetric
+
+.. autofunction:: audmetric.identification_error_rate
