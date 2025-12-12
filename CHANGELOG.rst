@@ -15,7 +15,6 @@ Version 1.3.0 (2025/12/12)
 * Added: event-based metrics ``audmetric.event_confusion_matrix()``,
   ``audmetric.event_fscore_per_class()``, ``audmetric.event_precision_per_class()``,
   ``audmetric.event_recall_per_class()``, ``audmetric.event_unweighted_average_fscore()``
-* Fixed: prevent error in test for accuracy metric
 
 
 Version 1.2.3 (2025/11/03)
