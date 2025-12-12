@@ -12,7 +12,7 @@ Version 1.3.0 (2025/12/12)
 
 * Added: ``audmetric.diarization_error_rate()``
 * Added: ``audmetric.identification_error_rate()``
-* Added: Event-based metrics ``audmetric.event_confusion_matrix()``,
+* Added: event-based metrics ``audmetric.event_confusion_matrix()``,
   ``audmetric.event_fscore_per_class()``, ``audmetric.event_precision_per_class()``,
   ``audmetric.event_recall_per_class()``, ``audmetric.event_unweighted_average_fscore()``
 * Fixed: prevent error in test for accuracy metric
