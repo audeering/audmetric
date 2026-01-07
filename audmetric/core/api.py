@@ -380,10 +380,10 @@ def diarization_error_rate(
     # to avoid confusion when there is an overlap
     pred_labels = prediction.unique()
     unique_pred_mapper = {label: f"p{i}" for i, label in enumerate(pred_labels)}
-    prediction = prediction.map(unique_pred_mapper)
+    prediction = prediction.astype("str").map(unique_pred_mapper)
     truth_labels = truth.unique()
     unique_truth_mapper = {label: f"t{i}" for i, label in enumerate(truth_labels)}
-    truth = truth.map(unique_truth_mapper)
+    truth = truth.astype("str").map(unique_truth_mapper)
 
     # If mapping should be computed individually for each file,
     # add a unique prefix to each label based on the file
