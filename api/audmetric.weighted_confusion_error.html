@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>weighted_confusion_error() &mdash; Documentation</title>
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                v1.3.0
+                v1.3.1
               </div>
             
           
@@ -171,11 +172,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="weighted-confusion-error">
-<h1>weighted_confusion_error()<a class="headerlink" href="#weighted-confusion-error" title="Permalink to this heading">¶</a></h1>
+  <section id="weighted-confusion-error">
+<h1>weighted_confusion_error()<a class="headerlink" href="#weighted-confusion-error" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.weighted_confusion_error">
-<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">weighted_confusion_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#weighted_confusion_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.weighted_confusion_error" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">weighted_confusion_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#weighted_confusion_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.weighted_confusion_error" title="Link to this definition">¶</a></dt>
 <dd><p>Weighted confusion error.</p>
 <p>Computes the normalized confusion matrix, applies given weights to each
 cell and sums them up. Weights are expected as positive numbers and
@@ -184,25 +185,25 @@ the more costly will be the error. A weight of 0 means that the cell
 is not taken into account for the error, this is usually the case for the
 diagonal as it holds correctly classified samples.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>truth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>]) – ground truth values/classes</p></li>
-<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>]) – predicted values/classes</p></li>
-<li><p><strong>weights</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – weights applied to the confusion matrix.
+<li><p><strong>truth</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>]</span>) – ground truth values/classes</p></li>
+<li><p><strong>prediction</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>]</span>) – predicted values/classes</p></li>
+<li><p><strong>weights</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</span>) – weights applied to the confusion matrix.
 Expected as a list of lists in the following form
 (r=row, c=column):
 <code class="docutils literal notranslate"><span class="pre">[[w_r0_c0,</span> <span class="pre">...,</span> <span class="pre">w_r0_cN],</span> <span class="pre">...,</span> <span class="pre">[w_rN_c0,</span> <span class="pre">...,</span> <span class="pre">w_rN_cN]]</span></code></p></li>
-<li><p><strong>labels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>]) – included labels in preferred ordering.
+<li><p><strong>labels</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>]</span>) – included labels in preferred ordering.
 If no labels are supplied,
 they will be inferred from
 <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">{</mo><mtext>prediction</mtext><mo separator="true">,</mo><mtext>truth</mtext><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\{\text{prediction}, \text{truth}\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord text"><span class="mord">prediction</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">truth</span></span><span class="mclose">}</span></span></span></span></span>
 and ordered alphabetically.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>weighted confusion error</p>
 </dd>
 </dl>
@@ -217,7 +218,7 @@ and ordered alphabetically.</p></li>
 </div>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
@@ -242,7 +243,7 @@ and ordered alphabetically.</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/01/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -250,7 +251,7 @@ and ordered alphabetically.</p></li>
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2025 audEERING GmbH
+      &copy; 2019-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -274,14 +275,11 @@ and ordered alphabetically.</p></li>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
     
 
   

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>equal_error_rate() &mdash; Documentation</title>
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                v1.3.0
+                v1.3.1
               </div>
             
           
@@ -171,11 +172,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="equal-error-rate">
-<h1>equal_error_rate()<a class="headerlink" href="#equal-error-rate" title="Permalink to this heading">¶</a></h1>
+  <section id="equal-error-rate">
+<h1>equal_error_rate()<a class="headerlink" href="#equal-error-rate" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmetric.equal_error_rate">
-<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">equal_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#equal_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.equal_error_rate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">equal_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#equal_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.equal_error_rate" title="Link to this definition">¶</a></dt>
 <dd><p>Equal error rate for verification tasks.</p>
 <p>The equal error rate (EER) is the point
 where false non-match rate (FNMR)
@@ -188,7 +189,7 @@ how often an impostor was verified as the enrolled speaker.</p>
 <p>In practice the score distribution is not continuous
 and an interval is returned instead.
 The EER value will be set as the midpoint
-of this interval:<a class="footnote-reference brackets" href="#footcite-maio2002" id="id1">1</a></p>
+of this interval:<a class="footnote-reference brackets" href="#footcite-maio2002" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
 <div class="math">
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>EER</mtext><mo>=</mo><mfrac><mrow><mi>min</mi><mo>⁡</mo><mo stretchy="false">(</mo><mtext>FNMR</mtext><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo><mo separator="true">,</mo><mtext>FMR</mtext><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>+</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mtext>FNMR</mtext><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo><mo separator="true">,</mo><mtext>FMR</mtext><mo stretchy="false">[</mo><mi>t</mi><mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">\text{EER} = \frac{
     \min(\text{FNMR}[t], \text{FMR}[t])
@@ -200,23 +201,24 @@ can also contain similarity scores, e.g. <code class="docutils literal notransla
 <p>The implementation is identical with the one provided
 by the <a class="reference external" href="https://github.com/manuelaguadomtz/pyeer">pyeer</a> package.</p>
 <div class="docutils container" id="id2">
-<dl class="footnote brackets">
-<dt class="label" id="footcite-maio2002"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>D. Maio, D. Maltoni, R. Cappelli, J. L. Wayman, and A. K. Jain. Fvc2000: fingerprint verification competition. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 24:402–412, 2002. <a class="reference external" href="https://doi.org/10.1109/34.990140">doi:10.1109/34.990140</a>.</p>
-</dd>
-</dl>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-maio2002" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>D. Maio, D. Maltoni, R. Cappelli, J. L. Wayman, and A. K. Jain. Fvc2000: fingerprint verification competition. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 24:402–412, 2002. <a class="reference external" href="https://doi.org/10.1109/34.990140">doi:10.1109/34.990140</a>.</p>
+</aside>
+</aside>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>truth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – ground truth classes</p></li>
-<li><p><strong>prediction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – predicted classes or similarity scores</p></li>
+<li><p><strong>truth</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span>) – ground truth classes</p></li>
+<li><p><strong>prediction</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – predicted classes or similarity scores</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">namedtuple</span></code>]</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">namedtuple</span></code>]</span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
 <li><p>equal error rate (EER)</p></li>
 <li><p>namedtuple containing
@@ -229,7 +231,7 @@ corresponding to the returned EER</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">truth</span></code> contains values
     different from <code class="docutils literal notranslate"><span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">True,</span> <span class="pre">False</span></code></p>
 </dd>
@@ -246,7 +248,7 @@ corresponding to the returned EER</p></li>
 </div>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
@@ -271,7 +273,7 @@ corresponding to the returned EER</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/01/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -279,7 +281,7 @@ corresponding to the returned EER</p></li>
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2025 audEERING GmbH
+      &copy; 2019-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -303,14 +305,11 @@ corresponding to the returned EER</p></li>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
     
 
   

@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.3.0
+                v1.3.1
               </div>
             
           
@@ -166,7 +166,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmetric.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">scores_per_subgroup_and_class</span>
 
 
-<div class="viewcode-block" id="accuracy"><a class="viewcode-back" href="../../../api/audmetric.accuracy.html#audmetric.accuracy">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">accuracy</span><span class="p">(</span>
+<div class="viewcode-block" id="accuracy">
+<a class="viewcode-back" href="../../../api/audmetric.accuracy.html#audmetric.accuracy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">accuracy</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -220,7 +222,10 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">prediction</span> <span class="o">==</span> <span class="n">truth</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="concordance_cc"><a class="viewcode-back" href="../../../api/audmetric.concordance_cc.html#audmetric.concordance_cc">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">concordance_cc</span><span class="p">(</span>
+
+<div class="viewcode-block" id="concordance_cc">
+<a class="viewcode-back" href="../../../api/audmetric.concordance_cc.html#audmetric.concordance_cc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">concordance_cc</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
@@ -291,7 +296,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">ccc</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="confusion_matrix"><a class="viewcode-back" href="../../../api/audmetric.confusion_matrix.html#audmetric.confusion_matrix">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix</span><span class="p">(</span>
+
+<div class="viewcode-block" id="confusion_matrix">
+<a class="viewcode-back" href="../../../api/audmetric.confusion_matrix.html#audmetric.confusion_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -348,7 +356,10 @@
     <span class="k">return</span> <span class="n">matrix</span></div>
 
 
-<div class="viewcode-block" id="detection_error_tradeoff"><a class="viewcode-back" href="../../../api/audmetric.detection_error_tradeoff.html#audmetric.detection_error_tradeoff">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">detection_error_tradeoff</span><span class="p">(</span>
+
+<div class="viewcode-block" id="detection_error_tradeoff">
+<a class="viewcode-back" href="../../../api/audmetric.detection_error_tradeoff.html#audmetric.detection_error_tradeoff">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">detection_error_tradeoff</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
@@ -432,7 +443,10 @@
     <span class="k">return</span> <span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span></div>
 
 
-<div class="viewcode-block" id="diarization_error_rate"><a class="viewcode-back" href="../../../api/audmetric.diarization_error_rate.html#audmetric.diarization_error_rate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">diarization_error_rate</span><span class="p">(</span>
+
+<div class="viewcode-block" id="diarization_error_rate">
+<a class="viewcode-back" href="../../../api/audmetric.diarization_error_rate.html#audmetric.diarization_error_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diarization_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -518,12 +532,35 @@
             <span class="s2">&quot;The truth and prediction &quot;</span>
             <span class="s2">&quot;should be a pandas Series with a segmented index conform to audformat.&quot;</span>
         <span class="p">)</span>
+    <span class="c1"># Save the labels before casting to string</span>
+    <span class="c1"># so we can later check if the number of labels changed</span>
+    <span class="n">before_pred_labels</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">before_truth_labels</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+
+    <span class="c1"># Cast to string first to prevent errors when renaming the labels</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span>
+    <span class="n">truth</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span>
+
+    <span class="n">pred_labels</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">truth_labels</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">before_pred_labels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred_labels</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">before_truth_labels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span>
+        <span class="n">truth_labels</span>
+    <span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;After casting the input labels to string, &quot;</span>
+            <span class="s2">&quot;there are fewer unique labels than before. &quot;</span>
+            <span class="s2">&quot;Labels that have the same string representation &quot;</span>
+            <span class="s2">&quot;are treated as equal, even if they differ in type. &quot;</span>
+            <span class="s2">&quot;If this is not desired, &quot;</span>
+            <span class="s2">&quot;adjust the labels of the series accordingly.&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+
     <span class="c1"># Map prediction and truth labels to unique names</span>
     <span class="c1"># to avoid confusion when there is an overlap</span>
-    <span class="n">pred_labels</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
     <span class="n">unique_pred_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;p</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pred_labels</span><span class="p">)}</span>
     <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_pred_mapper</span><span class="p">)</span>
-    <span class="n">truth_labels</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
     <span class="n">unique_truth_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;t</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">truth_labels</span><span class="p">)}</span>
     <span class="n">truth</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_truth_mapper</span><span class="p">)</span>
 
@@ -560,7 +597,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="edit_distance"><a class="viewcode-back" href="../../../api/audmetric.edit_distance.html#audmetric.edit_distance">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">edit_distance</span><span class="p">(</span>
+
+<div class="viewcode-block" id="edit_distance">
+<a class="viewcode-back" href="../../../api/audmetric.edit_distance.html#audmetric.edit_distance">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">edit_distance</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -620,7 +660,10 @@
     <span class="k">return</span> <span class="n">m1</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)]</span></div>
 
 
-<div class="viewcode-block" id="equal_error_rate"><a class="viewcode-back" href="../../../api/audmetric.equal_error_rate.html#audmetric.equal_error_rate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">equal_error_rate</span><span class="p">(</span>
+
+<div class="viewcode-block" id="equal_error_rate">
+<a class="viewcode-back" href="../../../api/audmetric.equal_error_rate.html#audmetric.equal_error_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">equal_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">]:</span>
@@ -726,7 +769,10 @@
     <span class="k">return</span> <span class="n">eer</span><span class="p">,</span> <span class="n">Stats</span><span class="p">(</span><span class="n">fmr</span><span class="p">,</span> <span class="n">fnmr</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="event_confusion_matrix"><a class="viewcode-back" href="../../../api/audmetric.event_confusion_matrix.html#audmetric.event_confusion_matrix">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_confusion_matrix</span><span class="p">(</span>
+
+<div class="viewcode-block" id="event_confusion_matrix">
+<a class="viewcode-back" href="../../../api/audmetric.event_confusion_matrix.html#audmetric.event_confusion_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">event_confusion_matrix</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -948,7 +994,10 @@
     <span class="k">return</span> <span class="n">cm</span></div>
 
 
-<div class="viewcode-block" id="event_error_rate"><a class="viewcode-back" href="../../../api/audmetric.event_error_rate.html#audmetric.event_error_rate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_error_rate</span><span class="p">(</span>
+
+<div class="viewcode-block" id="event_error_rate">
+<a class="viewcode-back" href="../../../api/audmetric.event_error_rate.html#audmetric.event_error_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">event_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -1000,7 +1049,10 @@
     <span class="k">return</span> <span class="n">eer</span> <span class="o">/</span> <span class="n">num_samples</span></div>
 
 
-<div class="viewcode-block" id="event_fscore_per_class"><a class="viewcode-back" href="../../../api/audmetric.event_fscore_per_class.html#audmetric.event_fscore_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_fscore_per_class</span><span class="p">(</span>
+
+<div class="viewcode-block" id="event_fscore_per_class">
+<a class="viewcode-back" href="../../../api/audmetric.event_fscore_per_class.html#audmetric.event_fscore_per_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">event_fscore_per_class</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1134,7 +1186,10 @@
     <span class="k">return</span> <span class="n">fscore</span></div>
 
 
-<div class="viewcode-block" id="event_precision_per_class"><a class="viewcode-back" href="../../../api/audmetric.event_precision_per_class.html#audmetric.event_precision_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_precision_per_class</span><span class="p">(</span>
+
+<div class="viewcode-block" id="event_precision_per_class">
+<a class="viewcode-back" href="../../../api/audmetric.event_precision_per_class.html#audmetric.event_precision_per_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">event_precision_per_class</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1240,7 +1295,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="event_recall_per_class"><a class="viewcode-back" href="../../../api/audmetric.event_recall_per_class.html#audmetric.event_recall_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_recall_per_class</span><span class="p">(</span>
+
+<div class="viewcode-block" id="event_recall_per_class">
+<a class="viewcode-back" href="../../../api/audmetric.event_recall_per_class.html#audmetric.event_recall_per_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">event_recall_per_class</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1346,7 +1404,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="event_unweighted_average_fscore"><a class="viewcode-back" href="../../../api/audmetric.event_unweighted_average_fscore.html#audmetric.event_unweighted_average_fscore">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">event_unweighted_average_fscore</span><span class="p">(</span>
+
+<div class="viewcode-block" id="event_unweighted_average_fscore">
+<a class="viewcode-back" href="../../../api/audmetric.event_unweighted_average_fscore.html#audmetric.event_unweighted_average_fscore">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">event_unweighted_average_fscore</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1457,7 +1518,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">fscore</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="fscore_per_class"><a class="viewcode-back" href="../../../api/audmetric.fscore_per_class.html#audmetric.fscore_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">fscore_per_class</span><span class="p">(</span>
+
+<div class="viewcode-block" id="fscore_per_class">
+<a class="viewcode-back" href="../../../api/audmetric.fscore_per_class.html#audmetric.fscore_per_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fscore_per_class</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1516,7 +1580,10 @@
     <span class="k">return</span> <span class="n">fscore</span></div>
 
 
-<div class="viewcode-block" id="identification_error_rate"><a class="viewcode-back" href="../../../api/audmetric.identification_error_rate.html#audmetric.identification_error_rate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">identification_error_rate</span><span class="p">(</span>
+
+<div class="viewcode-block" id="identification_error_rate">
+<a class="viewcode-back" href="../../../api/audmetric.identification_error_rate.html#audmetric.identification_error_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">identification_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -1628,7 +1695,10 @@
     <span class="k">return</span> <span class="n">ier</span></div>
 
 
-<div class="viewcode-block" id="linkability"><a class="viewcode-back" href="../../../api/audmetric.linkability.html#audmetric.linkability">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">linkability</span><span class="p">(</span>
+
+<div class="viewcode-block" id="linkability">
+<a class="viewcode-back" href="../../../api/audmetric.linkability.html#audmetric.linkability">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">linkability</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="p">(</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]),</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="p">(</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]),</span>
     <span class="n">omega</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
@@ -1729,7 +1799,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">d_sys</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mean_absolute_error"><a class="viewcode-back" href="../../../api/audmetric.mean_absolute_error.html#audmetric.mean_absolute_error">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">mean_absolute_error</span><span class="p">(</span>
+
+<div class="viewcode-block" id="mean_absolute_error">
+<a class="viewcode-back" href="../../../api/audmetric.mean_absolute_error.html#audmetric.mean_absolute_error">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mean_absolute_error</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -1763,7 +1836,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">truth</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="mean_squared_error"><a class="viewcode-back" href="../../../api/audmetric.mean_squared_error.html#audmetric.mean_squared_error">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">mean_squared_error</span><span class="p">(</span>
+
+<div class="viewcode-block" id="mean_squared_error">
+<a class="viewcode-back" href="../../../api/audmetric.mean_squared_error.html#audmetric.mean_squared_error">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mean_squared_error</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -1797,7 +1873,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">truth</span> <span class="o">-</span> <span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="pearson_cc"><a class="viewcode-back" href="../../../api/audmetric.pearson_cc.html#audmetric.pearson_cc">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">pearson_cc</span><span class="p">(</span>
+
+<div class="viewcode-block" id="pearson_cc">
+<a class="viewcode-back" href="../../../api/audmetric.pearson_cc.html#audmetric.pearson_cc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pearson_cc</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -1839,7 +1918,10 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">truth</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="precision_per_class"><a class="viewcode-back" href="../../../api/audmetric.precision_per_class.html#audmetric.precision_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">precision_per_class</span><span class="p">(</span>
+
+<div class="viewcode-block" id="precision_per_class">
+<a class="viewcode-back" href="../../../api/audmetric.precision_per_class.html#audmetric.precision_per_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">precision_per_class</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1884,7 +1966,10 @@
     <span class="k">return</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">precision</span><span class="p">)}</span></div>
 
 
-<div class="viewcode-block" id="recall_per_class"><a class="viewcode-back" href="../../../api/audmetric.recall_per_class.html#audmetric.recall_per_class">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">recall_per_class</span><span class="p">(</span>
+
+<div class="viewcode-block" id="recall_per_class">
+<a class="viewcode-back" href="../../../api/audmetric.recall_per_class.html#audmetric.recall_per_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">recall_per_class</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1929,7 +2014,10 @@
     <span class="k">return</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">recall</span><span class="p">)}</span></div>
 
 
-<div class="viewcode-block" id="unweighted_average_bias"><a class="viewcode-back" href="../../../api/audmetric.unweighted_average_bias.html#audmetric.unweighted_average_bias">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">unweighted_average_bias</span><span class="p">(</span>
+
+<div class="viewcode-block" id="unweighted_average_bias">
+<a class="viewcode-back" href="../../../api/audmetric.unweighted_average_bias.html#audmetric.unweighted_average_bias">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unweighted_average_bias</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">protected_variable</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
@@ -2072,7 +2160,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">bias</span> <span class="o">/</span> <span class="n">denominator</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="unweighted_average_fscore"><a class="viewcode-back" href="../../../api/audmetric.unweighted_average_fscore.html#audmetric.unweighted_average_fscore">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">unweighted_average_fscore</span><span class="p">(</span>
+
+<div class="viewcode-block" id="unweighted_average_fscore">
+<a class="viewcode-back" href="../../../api/audmetric.unweighted_average_fscore.html#audmetric.unweighted_average_fscore">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unweighted_average_fscore</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2116,7 +2207,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">fscore</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="unweighted_average_precision"><a class="viewcode-back" href="../../../api/audmetric.unweighted_average_precision.html#audmetric.unweighted_average_precision">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">unweighted_average_precision</span><span class="p">(</span>
+
+<div class="viewcode-block" id="unweighted_average_precision">
+<a class="viewcode-back" href="../../../api/audmetric.unweighted_average_precision.html#audmetric.unweighted_average_precision">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unweighted_average_precision</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2159,7 +2253,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">precision</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="unweighted_average_recall"><a class="viewcode-back" href="../../../api/audmetric.unweighted_average_recall.html#audmetric.unweighted_average_recall">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">unweighted_average_recall</span><span class="p">(</span>
+
+<div class="viewcode-block" id="unweighted_average_recall">
+<a class="viewcode-back" href="../../../api/audmetric.unweighted_average_recall.html#audmetric.unweighted_average_recall">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unweighted_average_recall</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">labels</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2202,7 +2299,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">recall</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="weighted_confusion_error"><a class="viewcode-back" href="../../../api/audmetric.weighted_confusion_error.html#audmetric.weighted_confusion_error">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">weighted_confusion_error</span><span class="p">(</span>
+
+<div class="viewcode-block" id="weighted_confusion_error">
+<a class="viewcode-back" href="../../../api/audmetric.weighted_confusion_error.html#audmetric.weighted_confusion_error">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">weighted_confusion_error</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span>
     <span class="n">weights</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]],</span>
@@ -2258,7 +2358,10 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weighted_cm</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="word_error_rate"><a class="viewcode-back" href="../../../api/audmetric.word_error_rate.html#audmetric.word_error_rate">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">word_error_rate</span><span class="p">(</span>
+
+<div class="viewcode-block" id="word_error_rate">
+<a class="viewcode-back" href="../../../api/audmetric.word_error_rate.html#audmetric.word_error_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">word_error_rate</span><span class="p">(</span>
     <span class="n">truth</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="n">prediction</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2349,6 +2452,7 @@
     <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span>
 
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">wer</span> <span class="o">/</span> <span class="n">num_samples</span><span class="p">)</span></div>
+
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_event_metric_per_class</span><span class="p">(</span>
@@ -2740,7 +2844,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/01/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -2748,7 +2852,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2025 audEERING GmbH
+      &copy; 2019-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -2772,14 +2876,11 @@
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
     
 
   
