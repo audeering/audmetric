@@ -376,14 +376,18 @@ def diarization_error_rate(
             "The truth and prediction "
             "should be a pandas Series with a segmented index conform to audformat."
         )
+    # Cast to string first to prevent errors when renaming the labels
+    prediction = prediction.astype("str")
+    truth = truth.astype("str")
+
     # Map prediction and truth labels to unique names
     # to avoid confusion when there is an overlap
     pred_labels = prediction.unique()
     unique_pred_mapper = {label: f"p{i}" for i, label in enumerate(pred_labels)}
-    prediction = prediction.astype("str").map(unique_pred_mapper)
+    prediction = prediction.map(unique_pred_mapper)
     truth_labels = truth.unique()
     unique_truth_mapper = {label: f"t{i}" for i, label in enumerate(truth_labels)}
-    truth = truth.astype("str").map(unique_truth_mapper)
+    truth = truth.map(unique_truth_mapper)
 
     # If mapping should be computed individually for each file,
     # add a unique prefix to each label based on the file
