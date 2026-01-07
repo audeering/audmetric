@@ -376,12 +376,35 @@ def diarization_error_rate(
             "The truth and prediction "
             "should be a pandas Series with a segmented index conform to audformat."
         )
+    # Save the labels before casting to string
+    # so we can later check if the number of labels changed
+    before_pred_labels = prediction.unique()
+    before_truth_labels = truth.unique()
+
+    # Cast to string first to prevent errors when renaming the labels
+    prediction = prediction.astype("str")
+    truth = truth.astype("str")
+
+    pred_labels = prediction.unique()
+    truth_labels = truth.unique()
+
+    if len(before_pred_labels) > len(pred_labels) or len(before_truth_labels) > len(
+        truth_labels
+    ):
+        warnings.warn(
+            "After casting the input labels to string, "
+            "there are fewer unique labels than before. "
+            "Labels that have the same string representation "
+            "are treated as equal, even if they differ in type. "
+            "If this is not desired, "
+            "adjust the labels of the series accordingly.",
+            category=UserWarning,
+        )
+
     # Map prediction and truth labels to unique names
     # to avoid confusion when there is an overlap
-    pred_labels = prediction.unique()
     unique_pred_mapper = {label: f"p{i}" for i, label in enumerate(pred_labels)}
     prediction = prediction.map(unique_pred_mapper)
-    truth_labels = truth.unique()
     unique_truth_mapper = {label: f"t{i}" for i, label in enumerate(truth_labels)}
     truth = truth.map(unique_truth_mapper)
 
