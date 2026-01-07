@@ -211,6 +211,29 @@ def test_der(truth, prediction, expected_der, num_workers, multiprocessing):
             0.1 / 0.5,
             0.3 / 0.5,
         ),
+        # Categorical dtype
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav", "f2.wav"],
+                    starts=[0, 0],
+                    ends=[0.1, 0.1],
+                ),
+                data=["a", "a"],
+                dtype=pd.CategoricalDtype(categories=["a"]),
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav", "f2.wav"],
+                    starts=[0, 0],
+                    ends=[0.1, 0.1],
+                ),
+                data=["b", "c"],
+                dtype=pd.CategoricalDtype(categories=["b", "c"]),
+            ),
+            0.0,
+            0.5,
+        ),
     ],
 )
 def test_der_individual_file_mapping(
