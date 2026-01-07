@@ -166,6 +166,68 @@ def test_der(truth, prediction, expected_der, num_workers, multiprocessing):
 
 
 @pytest.mark.parametrize(
+    ("truth, prediction, expected"),
+    [
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2,
+                    starts=[0, 0.1],
+                    ends=[0.1, 0.2],
+                ),
+                data=["a"] * 2,
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2,
+                    starts=[0, 0.1],
+                    ends=[0.1, 0.2],
+                ),
+                data=["0", 0],
+                dtype=pd.CategoricalDtype(categories=["0", 0]),
+            ),
+            0,
+        ),
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2,
+                    starts=[0, 0.1],
+                    ends=[0.1, 0.2],
+                ),
+                data=["0", 0],
+                dtype=pd.CategoricalDtype(categories=["0", 0]),
+            ),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 2,
+                    starts=[0, 0.1],
+                    ends=[0.1, 0.2],
+                ),
+                data=["a", "a"],
+            ),
+            0,
+        ),
+    ],
+)
+def test_der_fewer_labels(truth, prediction, expected):
+    expected_warning = (
+        "After casting the input labels to string, "
+        "there are fewer unique labels than before. "
+        "Labels that have the same string representation "
+        "are treated as equal, even if they differ in type. "
+        "If this is not desired, "
+        "adjust the labels of the series accordingly."
+    )
+    with pytest.warns(UserWarning, match=expected_warning):
+        der = audmetric.diarization_error_rate(
+            truth,
+            prediction,
+        )
+    np.testing.assert_almost_equal(der, expected)
+
+
+@pytest.mark.parametrize(
     ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
 )
 @pytest.mark.parametrize(
