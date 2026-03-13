@@ -274,7 +274,12 @@ def test_der_fewer_labels(truth, prediction, expected):
     ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
 )
 @pytest.mark.parametrize(
-    ("truth, prediction, expected_der_individual, expected_der_overall"),
+    (
+        "truth, prediction, expected_der_individual, expected_conf_individual, "
+        "expected_fa_individual, expected_miss_individual, "
+        "expected_der_overall, expected_conf_overall, "
+        "expected_fa_overall, expected_miss_overall"
+    ),
     [
         (
             pd.Series(
@@ -294,7 +299,13 @@ def test_der_fewer_labels(truth, prediction, expected):
                 data=["a", "b", "c", "d"],
             ),
             0.0,
+            0.0,
+            0.0,
+            0.0,
             0.5,
+            0.5,
+            0.0,
+            0.0,
         ),
         (
             pd.Series(
@@ -314,7 +325,13 @@ def test_der_fewer_labels(truth, prediction, expected):
                 data=["a", "b", "c", "d", "a", "b"],
             ),
             0.1 / 0.5,
+            0.0 / 0.5,
+            0.1 / 0.5,
+            0.0 / 0.5,
             0.3 / 0.5,
+            0.2 / 0.5,
+            0.1 / 0.5,
+            0.0 / 0.5,
         ),
         # Categorical dtype
         (
@@ -337,7 +354,13 @@ def test_der_fewer_labels(truth, prediction, expected):
                 dtype=pd.CategoricalDtype(categories=["b", "c"]),
             ),
             0.0,
+            0.0,
+            0.0,
+            0.0,
             0.5,
+            0.5,
+            0.0,
+            0.0,
         ),
     ],
 )
@@ -345,7 +368,13 @@ def test_der_individual_file_mapping(
     truth,
     prediction,
     expected_der_individual,
+    expected_conf_individual,
+    expected_fa_individual,
+    expected_miss_individual,
     expected_der_overall,
+    expected_conf_overall,
+    expected_fa_overall,
+    expected_miss_overall,
     num_workers,
     multiprocessing,
 ):
@@ -357,6 +386,24 @@ def test_der_individual_file_mapping(
         multiprocessing=multiprocessing,
     )
     np.testing.assert_almost_equal(der_individual, expected_der_individual)
+    der_individual, der_details_individual = audmetric.diarization_error_rate_detailed(
+        truth,
+        prediction,
+        individual_file_mapping=True,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    np.testing.assert_almost_equal(der_individual, expected_der_individual)
+    np.testing.assert_almost_equal(
+        der_details_individual.conf_rate, expected_conf_individual
+    )
+    np.testing.assert_almost_equal(
+        der_details_individual.fa_rate, expected_fa_individual
+    )
+    np.testing.assert_almost_equal(
+        der_details_individual.miss_rate, expected_miss_individual
+    )
+
     der_overall = audmetric.diarization_error_rate(
         truth,
         prediction,
@@ -365,6 +412,17 @@ def test_der_individual_file_mapping(
         multiprocessing=multiprocessing,
     )
     np.testing.assert_almost_equal(der_overall, expected_der_overall)
+    der_overall, der_details_overall = audmetric.diarization_error_rate_detailed(
+        truth,
+        prediction,
+        individual_file_mapping=False,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    np.testing.assert_almost_equal(der_overall, expected_der_overall)
+    np.testing.assert_almost_equal(der_details_overall.conf_rate, expected_conf_overall)
+    np.testing.assert_almost_equal(der_details_overall.fa_rate, expected_fa_overall)
+    np.testing.assert_almost_equal(der_details_overall.miss_rate, expected_miss_overall)
 
 
 @pytest.mark.parametrize(
