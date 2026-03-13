@@ -386,7 +386,7 @@ def diarization_error_rate(
         >>> diarization_error_rate(truth, prediction)
         0.5
         >>> diarization_error_rate(truth, prediction, detailed_results=True)
-        0.5, 0.25, 0.25, 0.0
+        (0.5, 0.25, 0.25, 0.0)
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1486,7 +1486,7 @@ def identification_error_rate(
         >>> identification_error_rate(truth, prediction)
         0.5
         >>> identification_error_rate(truth, prediction, detailed_results=True)
-        0.5, 0.25, 0.25, 0.0
+        (0.5, 0.25, 0.25, 0.0)
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
