@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections
 from collections.abc import Callable
 from collections.abc import Sequence
-from dataclasses import dataclass
 import math
 from typing import TYPE_CHECKING
 import warnings
@@ -19,17 +18,11 @@ import audeer
 from audmetric.core.utils import END
 from audmetric.core.utils import FILE
 from audmetric.core.utils import START
+from audmetric.core.utils import ErrorRateDetails
 from audmetric.core.utils import assert_equal_length
 from audmetric.core.utils import infer_labels
 from audmetric.core.utils import is_segmented_index
 from audmetric.core.utils import scores_per_subgroup_and_class
-
-
-@dataclass
-class ErrorRateDetails:
-    conf_rate: float  # Confusion rate
-    fa_rate: float  # False alarm rate
-    miss_rate: float  # Miss rate
 
 
 def _total_seconds(td: pd.Timedelta) -> float:
@@ -430,7 +423,7 @@ def diarization_error_rate_detailed(
 
     Compared to :func:`audmetric.diarization_error_rate`,
     this function returns the diarization error rate as well as
-    the :class:`audmetric.ErrorRateDetails` containing
+    the :class:`audmetric.utils.ErrorRateDetails` containing
     the confusion rate, the false alarm rate, and the miss rate.
 
     This metric is computed the same way
@@ -459,7 +452,7 @@ def diarization_error_rate_detailed(
 
     Returns:
         diarization error rate and
-        :class:`audmetric.ErrorRateDetails` containing
+        :class:`audmetric.utils.ErrorRateDetails` containing
         ``confusion_rate``,
         ``false_alarm_rate``,
         ``miss_rate``
@@ -1615,7 +1608,7 @@ def identification_error_rate_detailed(
 
     Compared to :func:`audmetric.identification_error_rate`,
     this function returns the identification error rate as well as
-    the :class:`audmetric.ErrorRateDetails` containing
+    the :class:`audmetric.utils.ErrorRateDetails` containing
     the confusion rate, the false alarm rate, and the miss rate.
 
     The identification error rate should be used
@@ -1633,7 +1626,7 @@ def identification_error_rate_detailed(
 
     Returns:
         identification error rate and
-        :class:`audmetric.ErrorRateDetails` containing
+        :class:`audmetric.utils.ErrorRateDetails` containing
         ``confusion_rate``,
         ``false_alarm_rate``,
         ``miss_rate``

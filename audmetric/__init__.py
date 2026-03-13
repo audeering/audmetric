@@ -1,5 +1,4 @@
 from audmetric import utils
-from audmetric.core.api import ErrorRateDetails
 from audmetric.core.api import accuracy
 from audmetric.core.api import concordance_cc
 from audmetric.core.api import confusion_matrix

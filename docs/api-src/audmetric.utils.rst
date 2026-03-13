@@ -7,4 +7,5 @@ audmetric.utils
     :toctree:
     :nosignatures:
 
+    ErrorRateDetails
     infer_labels
