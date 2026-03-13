@@ -358,7 +358,7 @@ def diarization_error_rate(
 
     Returns:
         diarization error rate, optionally followed by the confusion rate,
-            the false alarm rate, and the miss rate
+        the false alarm rate, and the miss rate
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
@@ -1458,7 +1458,7 @@ def identification_error_rate(
 
     Returns:
         identification error rate, optionally followed by the confusion rate,
-            the false alarm rate, and the miss rate
+        the false alarm rate, and the miss rate
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
