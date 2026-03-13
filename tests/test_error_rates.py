@@ -196,17 +196,16 @@ def test_der(
         truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
     )
     np.testing.assert_almost_equal(der, expected_der)
-    der, conf_rate, fa_rate, miss_rate = audmetric.diarization_error_rate(
+    der, der_detailed = audmetric.diarization_error_rate_detailed(
         truth,
         prediction,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
-        detailed_results=True,
     )
     np.testing.assert_almost_equal(der, expected_der)
-    np.testing.assert_almost_equal(conf_rate, expected_conf)
-    np.testing.assert_almost_equal(fa_rate, expected_fa)
-    np.testing.assert_almost_equal(miss_rate, expected_miss)
+    np.testing.assert_almost_equal(der_detailed.confusion_rate, expected_conf)
+    np.testing.assert_almost_equal(der_detailed.false_alarm_rate, expected_fa)
+    np.testing.assert_almost_equal(der_detailed.miss_rate, expected_miss)
 
 
 @pytest.mark.parametrize(
@@ -569,17 +568,16 @@ def test_ier(
         truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
     )
     np.testing.assert_almost_equal(ier, expected_ier)
-    ier, conf_rate, fa_rate, miss_rate = audmetric.identification_error_rate(
+    ier, detailed_ier = audmetric.identification_error_rate_detailed(
         truth,
         prediction,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
-        detailed_results=True,
     )
     np.testing.assert_almost_equal(ier, expected_ier)
-    np.testing.assert_almost_equal(conf_rate, expected_conf)
-    np.testing.assert_almost_equal(fa_rate, expected_fa)
-    np.testing.assert_almost_equal(miss_rate, expected_miss)
+    np.testing.assert_almost_equal(detailed_ier.confusion_rate, expected_conf)
+    np.testing.assert_almost_equal(detailed_ier.false_alarm_rate, expected_fa)
+    np.testing.assert_almost_equal(detailed_ier.miss_rate, expected_miss)
 
 
 @pytest.mark.parametrize(

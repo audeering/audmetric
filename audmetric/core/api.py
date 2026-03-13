@@ -5,6 +5,7 @@ from collections.abc import Callable
 from collections.abc import Sequence
 import math
 from typing import TYPE_CHECKING
+from typing import NamedTuple
 import warnings
 
 import numpy as np
@@ -309,8 +310,7 @@ def diarization_error_rate(
     individual_file_mapping: bool = False,
     num_workers: int = 1,
     multiprocessing: bool = False,
-    detailed_results: bool = False,
-) -> float | tuple[float, float, float, float]:
+) -> float:
     r"""Diarization error rate.
 
     .. math::
@@ -352,13 +352,9 @@ def diarization_error_rate(
             If ``False``, all segments are taken into account to compute the mapping
         num_workers: number of threads or 1 for sequential processing
         multiprocessing: use multiprocessing instead of multithreading
-        detailed_results: also return the confusion rate, false alarm rate,
-            and the miss rate. If ``False`` only the diarization error rate result
-            is returned
 
     Returns:
-        diarization error rate, optionally followed by the confusion rate,
-        the false alarm rate, and the miss rate
+        diarization error rate
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
@@ -385,8 +381,107 @@ def diarization_error_rate(
         ... )
         >>> diarization_error_rate(truth, prediction)
         0.5
-        >>> diarization_error_rate(truth, prediction, detailed_results=True)
-        (0.5, 0.25, 0.25, 0.0)
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    der, _ = diarization_error_rate_detailed(
+        truth,
+        prediction,
+        individual_file_mapping=individual_file_mapping,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    return der
+
+
+def diarization_error_rate_detailed(
+    truth: pd.Series,
+    prediction: pd.Series,
+    *,
+    individual_file_mapping: bool = False,
+    num_workers: int = 1,
+    multiprocessing: bool = False,
+) -> NamedTuple:
+    r"""Detailed diarization error rate result components.
+
+    .. math::
+
+        \text{DER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}
+            {\text{total}}
+
+    where :math:`\text{confusion}` is the total confusion duration,
+    :math:`\text{false alarm}` is the total duration of predictions
+    without an overlapping ground truth,
+    :math:`\text{miss}` is the total duration of ground truth
+    without an overlapping prediction,
+    and :math:`\text{total}` is the total duration of ground truth segments.
+
+    The diarization error rate can used
+    when the labels are not known by the prediction model,
+    e.g. for the task of speaker diarization on unknown speakers.
+
+    Compared to :func:`audmetric.diarization_error_rate`,
+    this function returns the diarization error rate as well as
+    the confusion rate, the false alarm rate, and the miss rate
+    as a named tuple.
+
+    This metric is computed the same way
+    as :func:`audmetric.identification_error_rate_detailed`,
+    but first creates a one-to-one mapping between
+    truth and prediction labels.
+
+    This implementation uses the 'greedy' method
+    to compute the one-to-one mapping
+    between truth and predicted labels.
+    This method is faster than other implementations that optimize
+    the confusion term, but may slightly over-estimate the
+    diarization error rate.
+    :footcite:`Bredin2017`
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth labels with a segmented index conform to `audformat`_
+        prediction: predicted labels with a segmented index conform to `audformat`_
+        individual_file_mapping: whether to create the mapping
+            between truth and prediction labels individually for each file.
+            If ``False``, all segments are taken into account to compute the mapping
+        num_workers: number of threads or 1 for sequential processing
+        multiprocessing: use multiprocessing instead of multithreading
+
+    Returns:
+        diarization error rate and
+        named tuple containing
+        ``confusion_rate``,
+        ``false_alarm_rate``,
+        ``miss_rate``
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav", "f1.wav"],
+        ...         starts=[0, 0.1, 0.1],
+        ...         ends=[0.1, 0.15, 0.2],
+        ...     ),
+        ...     data=["0", "1", "0"],
+        ... )
+        >>> diarization_error_rate_detailed(truth, prediction)
+        (0.5, (0.25, 0.25, 0.0))
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -453,12 +548,11 @@ def diarization_error_rate(
     )
     mapped_prediction = prediction.replace(pred2truthlabel)
 
-    return identification_error_rate(
+    return identification_error_rate_detailed(
         truth,
         mapped_prediction,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
-        detailed_results=detailed_results,
     )
 
 
@@ -1424,8 +1518,7 @@ def identification_error_rate(
     *,
     num_workers: int = 1,
     multiprocessing: bool = False,
-    detailed_results: bool = False,
-) -> float | tuple[float, float, float, float]:
+) -> float:
     r"""Identification error rate.
 
     .. math::
@@ -1452,13 +1545,9 @@ def identification_error_rate(
         prediction: predicted labels with a segmented index conform to `audformat`_
         num_workers: number of threads or 1 for sequential processing
         multiprocessing: use multiprocessing instead of multithreading
-        detailed_results: also return the confusion rate, false alarm rate,
-            and the miss rate. If ``False`` only the identification error rate result
-            is returned
 
     Returns:
-        identification error rate, optionally followed by the confusion rate,
-        the false alarm rate, and the miss rate
+        identification error rate
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
@@ -1485,8 +1574,88 @@ def identification_error_rate(
         ... )
         >>> identification_error_rate(truth, prediction)
         0.5
-        >>> identification_error_rate(truth, prediction, detailed_results=True)
-        (0.5, 0.25, 0.25, 0.0)
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    ier, _ = identification_error_rate_detailed(
+        truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
+    )
+    return ier
+
+
+def identification_error_rate_detailed(
+    truth: pd.Series,
+    prediction: pd.Series,
+    *,
+    num_workers: int = 1,
+    multiprocessing: bool = False,
+) -> tuple[float, NamedTuple]:
+    r"""Detailed identification error rate result components.
+
+    .. math::
+
+        \text{IER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}
+            {\text{total}}
+
+    where :math:`\text{confusion}` is the total confusion duration,
+    :math:`\text{false alarm}` is the total duration of predictions
+    without an overlapping ground truth,
+    :math:`\text{miss}` is the total duration of ground truth
+    without an overlapping prediction,
+    and :math:`\text{total}` is the total duration of ground truth segments.
+    :footcite:`Bredin2017`
+
+    Compared to :func:`audmetric.identification_error_rate`,
+    this function returns the identification error rate as well as
+    the confusion rate, the false alarm rate, and the miss rate
+    as a named tuple.
+
+    The identification error rate should be used
+    when the labels are known by the prediction model.
+    If this isn't the case,
+    consider using :func:`audmetric.diarization_error_rate_detailed`.
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth labels with a segmented index conform to `audformat`_
+        prediction: predicted labels with a segmented index conform to `audformat`_
+        num_workers: number of threads or 1 for sequential processing
+        multiprocessing: use multiprocessing instead of multithreading
+
+    Returns:
+        identification error rate and
+        named tuple containing
+        ``confusion_rate``,
+        ``false_alarm_rate``,
+        ``miss_rate``
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav", "f1.wav"],
+        ...         starts=[0, 0.1, 0.1],
+        ...         ends=[0.1, 0.15, 0.2],
+        ...     ),
+        ...     data=["a", "b", "a"],
+        ... )
+        >>> identification_error_rate_detailed(truth, prediction)
+        (0.5, (0.25, 0.25, 0.0))
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1540,10 +1709,15 @@ def identification_error_rate(
         # In this case it is possible that there is no overlap between files
         # So we warn the user if there are no common files
         _check_common_files(truth, prediction)
-    if detailed_results:
-        return ier, conf_rate, fa_rate, miss_rate
-    else:
-        return ier
+    ier_details = collections.namedtuple(
+        "ier_details",
+        [
+            "confusion_rate",  # Confusion Rate
+            "false_alarm_rate",  # False Alarm Rate
+            "miss_rate",  # Miss Rate
+        ],
+    )
+    return ier, ier_details(conf_rate, fa_rate, miss_rate)
 
 
 def linkability(
