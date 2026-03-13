@@ -309,7 +309,8 @@ def diarization_error_rate(
     individual_file_mapping: bool = False,
     num_workers: int = 1,
     multiprocessing: bool = False,
-) -> float:
+    detailed_results: bool = False,
+) -> float | tuple[float, float, float, float]:
     r"""Diarization error rate.
 
     .. math::
@@ -351,8 +352,13 @@ def diarization_error_rate(
             If ``False``, all segments are taken into account to compute the mapping
         num_workers: number of threads or 1 for sequential processing
         multiprocessing: use multiprocessing instead of multithreading
+        detailed_results: also return the confusion rate, false alarm rate,
+            and the miss rate. If ``False`` only the diarization error rate result
+            is returned
+
     Returns:
-        diarization error rate
+        diarization error rate, optionally followed by the confusion rate,
+            the false alarm rate, and the miss rate
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
@@ -379,6 +385,8 @@ def diarization_error_rate(
         ... )
         >>> diarization_error_rate(truth, prediction)
         0.5
+        >>> diarization_error_rate(truth, prediction, detailed_results=True)
+        0.5, 0.25, 0.25, 0.0
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -450,6 +458,7 @@ def diarization_error_rate(
         mapped_prediction,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
+        detailed_results=detailed_results,
     )
 
 
@@ -1415,7 +1424,8 @@ def identification_error_rate(
     *,
     num_workers: int = 1,
     multiprocessing: bool = False,
-) -> float:
+    detailed_results: bool = False,
+) -> float | tuple[float, float, float, float]:
     r"""Identification error rate.
 
     .. math::
@@ -1442,9 +1452,13 @@ def identification_error_rate(
         prediction: predicted labels with a segmented index conform to `audformat`_
         num_workers: number of threads or 1 for sequential processing
         multiprocessing: use multiprocessing instead of multithreading
+        detailed_results: also return the confusion rate, false alarm rate,
+            and the miss rate. If ``False`` only the identification error rate result
+            is returned
 
     Returns:
-        identification error rate
+        identification error rate, optionally followed by the confusion rate,
+            the false alarm rate, and the miss rate
 
     Raises:
         ValueError: if ``truth`` or ``prediction``
@@ -1471,6 +1485,8 @@ def identification_error_rate(
         ... )
         >>> identification_error_rate(truth, prediction)
         0.5
+        >>> identification_error_rate(truth, prediction, detailed_results=True)
+        0.5, 0.25, 0.25, 0.0
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1512,13 +1528,22 @@ def identification_error_rate(
     numerator = total_confusion + total_false_alarm + total_misses
     if total_duration == 0.0:
         ier = 0.0 if numerator == 0.0 else 1.0
+        conf_rate = 0.0 if total_confusion == 0.0 else 1.0
+        fa_rate = 0.0 if total_false_alarm == 0.0 else 1.0
+        miss_rate = 0.0 if total_misses == 0.0 else 1.0
     else:
         ier = numerator / total_duration
+        conf_rate = total_confusion / total_duration
+        fa_rate = total_false_alarm / total_duration
+        miss_rate = total_misses / total_duration
     if ier > 1.0:
         # In this case it is possible that there is no overlap between files
         # So we warn the user if there are no common files
         _check_common_files(truth, prediction)
-    return ier
+    if detailed_results:
+        return ier, conf_rate, fa_rate, miss_rate
+    else:
+        return ier
 
 
 def linkability(
