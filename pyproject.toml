@@ -53,7 +53,7 @@ dev = [
     'audeer >=1.18.0',
     'audformat',
     'docutils',
-    'pandas',
+    'pandas <3.0.0',
     'pytest',
     'pytest-cov',
     'pytest-doctestplus',
