@@ -481,7 +481,7 @@ def diarization_error_rate_detailed(
         ...     data=["0", "1", "0"],
         ... )
         >>> diarization_error_rate_detailed(truth, prediction)
-        (0.5, (0.25, 0.25, 0.0))
+        (0.5, error_details(confusion_rate=0.25, false_alarm_rate=0.25, miss_rate=0.0))
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1655,7 +1655,7 @@ def identification_error_rate_detailed(
         ...     data=["a", "b", "a"],
         ... )
         >>> identification_error_rate_detailed(truth, prediction)
-        (0.5, (0.25, 0.25, 0.0))
+        (0.5, error_details(confusion_rate=0.25, false_alarm_rate=0.25, miss_rate=0.0))
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1709,15 +1709,15 @@ def identification_error_rate_detailed(
         # In this case it is possible that there is no overlap between files
         # So we warn the user if there are no common files
         _check_common_files(truth, prediction)
-    ier_details = collections.namedtuple(
-        "ier_details",
+    error_details = collections.namedtuple(
+        "error_details",
         [
             "confusion_rate",  # Confusion Rate
             "false_alarm_rate",  # False Alarm Rate
             "miss_rate",  # Miss Rate
         ],
     )
-    return ier, ier_details(conf_rate, fa_rate, miss_rate)
+    return ier, error_details(conf_rate, fa_rate, miss_rate)
 
 
 def linkability(
