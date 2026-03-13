@@ -453,8 +453,8 @@ def diarization_error_rate_detailed(
     Returns:
         diarization error rate and
         :class:`audmetric.utils.ErrorRateDetails` containing
-        ``confusion_rate``,
-        ``false_alarm_rate``,
+        ``conf_rate``,
+        ``fa_rate``,
         ``miss_rate``
 
     Raises:
@@ -1627,8 +1627,8 @@ def identification_error_rate_detailed(
     Returns:
         identification error rate and
         :class:`audmetric.utils.ErrorRateDetails` containing
-        ``confusion_rate``,
-        ``false_alarm_rate``,
+        ``conf_rate``,
+        ``fa_rate``,
         ``miss_rate``
 
     Raises:
