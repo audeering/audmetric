@@ -636,6 +636,9 @@ def test_ier(
     np.testing.assert_almost_equal(detailed_ier.conf_rate, expected_conf)
     np.testing.assert_almost_equal(detailed_ier.fa_rate, expected_fa)
     np.testing.assert_almost_equal(detailed_ier.miss_rate, expected_miss)
+    np.testing.assert_almost_equal(
+        ier, detailed_ier.conf_rate + detailed_ier.fa_rate + detailed_ier.miss_rate
+    )
 
 
 @pytest.mark.parametrize(
