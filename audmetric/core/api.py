@@ -402,7 +402,7 @@ def diarization_error_rate_detailed(
     individual_file_mapping: bool = False,
     num_workers: int = 1,
     multiprocessing: bool = False,
-) -> NamedTuple:
+) -> tuple[float, NamedTuple]:
     r"""Detailed diarization error rate result components.
 
     .. math::
