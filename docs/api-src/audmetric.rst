@@ -15,6 +15,7 @@ audmetric
     diarization_error_rate_detailed
     edit_distance
     equal_error_rate
+    ErrorRateDetails
     event_confusion_matrix
     event_error_rate
     event_fscore_per_class

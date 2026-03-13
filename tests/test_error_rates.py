@@ -203,8 +203,8 @@ def test_der(
         multiprocessing=multiprocessing,
     )
     np.testing.assert_almost_equal(der, expected_der)
-    np.testing.assert_almost_equal(der_detailed.confusion_rate, expected_conf)
-    np.testing.assert_almost_equal(der_detailed.false_alarm_rate, expected_fa)
+    np.testing.assert_almost_equal(der_detailed.conf_rate, expected_conf)
+    np.testing.assert_almost_equal(der_detailed.fa_rate, expected_fa)
     np.testing.assert_almost_equal(der_detailed.miss_rate, expected_miss)
 
 
@@ -575,8 +575,8 @@ def test_ier(
         multiprocessing=multiprocessing,
     )
     np.testing.assert_almost_equal(ier, expected_ier)
-    np.testing.assert_almost_equal(detailed_ier.confusion_rate, expected_conf)
-    np.testing.assert_almost_equal(detailed_ier.false_alarm_rate, expected_fa)
+    np.testing.assert_almost_equal(detailed_ier.conf_rate, expected_conf)
+    np.testing.assert_almost_equal(detailed_ier.fa_rate, expected_fa)
     np.testing.assert_almost_equal(detailed_ier.miss_rate, expected_miss)
 
 

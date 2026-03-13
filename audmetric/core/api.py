@@ -3,9 +3,9 @@ from __future__ import annotations
 import collections
 from collections.abc import Callable
 from collections.abc import Sequence
+from dataclasses import dataclass
 import math
 from typing import TYPE_CHECKING
-from typing import NamedTuple
 import warnings
 
 import numpy as np
@@ -23,6 +23,13 @@ from audmetric.core.utils import assert_equal_length
 from audmetric.core.utils import infer_labels
 from audmetric.core.utils import is_segmented_index
 from audmetric.core.utils import scores_per_subgroup_and_class
+
+
+@dataclass
+class ErrorRateDetails:
+    conf_rate: float  # Confusion rate
+    fa_rate: float  # False alarm rate
+    miss_rate: float  # Miss rate
 
 
 def _total_seconds(td: pd.Timedelta) -> float:
@@ -402,7 +409,7 @@ def diarization_error_rate_detailed(
     individual_file_mapping: bool = False,
     num_workers: int = 1,
     multiprocessing: bool = False,
-) -> tuple[float, NamedTuple]:
+) -> tuple[float, ErrorRateDetails]:
     r"""Detailed diarization error rate result components.
 
     .. math::
@@ -423,8 +430,8 @@ def diarization_error_rate_detailed(
 
     Compared to :func:`audmetric.diarization_error_rate`,
     this function returns the diarization error rate as well as
-    the confusion rate, the false alarm rate, and the miss rate
-    as a named tuple.
+    the :class:`audmetric.ErrorRateDetails` containing
+    the confusion rate, the false alarm rate, and the miss rate.
 
     This metric is computed the same way
     as :func:`audmetric.identification_error_rate_detailed`,
@@ -452,7 +459,7 @@ def diarization_error_rate_detailed(
 
     Returns:
         diarization error rate and
-        named tuple containing
+        :class:`audmetric.ErrorRateDetails` containing
         ``confusion_rate``,
         ``false_alarm_rate``,
         ``miss_rate``
@@ -481,7 +488,7 @@ def diarization_error_rate_detailed(
         ...     data=["0", "1", "0"],
         ... )
         >>> diarization_error_rate_detailed(truth, prediction)
-        (0.5, error_details(confusion_rate=0.25, false_alarm_rate=0.25, miss_rate=0.0))
+        (0.5, ErrorRateDetails(conf_rate=0.25, fa_rate=0.25, miss_rate=0.0))
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1590,7 +1597,7 @@ def identification_error_rate_detailed(
     *,
     num_workers: int = 1,
     multiprocessing: bool = False,
-) -> tuple[float, NamedTuple]:
+) -> tuple[float, ErrorRateDetails]:
     r"""Detailed identification error rate result components.
 
     .. math::
@@ -1608,8 +1615,8 @@ def identification_error_rate_detailed(
 
     Compared to :func:`audmetric.identification_error_rate`,
     this function returns the identification error rate as well as
-    the confusion rate, the false alarm rate, and the miss rate
-    as a named tuple.
+    the :class:`audmetric.ErrorRateDetails` containing
+    the confusion rate, the false alarm rate, and the miss rate.
 
     The identification error rate should be used
     when the labels are known by the prediction model.
@@ -1626,7 +1633,7 @@ def identification_error_rate_detailed(
 
     Returns:
         identification error rate and
-        named tuple containing
+        :class:`audmetric.ErrorRateDetails` containing
         ``confusion_rate``,
         ``false_alarm_rate``,
         ``miss_rate``
@@ -1655,7 +1662,7 @@ def identification_error_rate_detailed(
         ...     data=["a", "b", "a"],
         ... )
         >>> identification_error_rate_detailed(truth, prediction)
-        (0.5, error_details(confusion_rate=0.25, false_alarm_rate=0.25, miss_rate=0.0))
+        (0.5, ErrorRateDetails(conf_rate=0.25, fa_rate=0.25, miss_rate=0.0))
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -1709,15 +1716,7 @@ def identification_error_rate_detailed(
         # In this case it is possible that there is no overlap between files
         # So we warn the user if there are no common files
         _check_common_files(truth, prediction)
-    error_details = collections.namedtuple(
-        "error_details",
-        [
-            "confusion_rate",  # Confusion Rate
-            "false_alarm_rate",  # False Alarm Rate
-            "miss_rate",  # Miss Rate
-        ],
-    )
-    return ier, error_details(conf_rate, fa_rate, miss_rate)
+    return ier, ErrorRateDetails(conf_rate, fa_rate, miss_rate)
 
 
 def linkability(
