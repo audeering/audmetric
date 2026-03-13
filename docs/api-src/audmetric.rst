@@ -12,6 +12,7 @@ audmetric
     confusion_matrix
     detection_error_tradeoff
     diarization_error_rate
+    diarization_error_rate_detailed
     edit_distance
     equal_error_rate
     event_confusion_matrix
@@ -21,6 +22,7 @@ audmetric
     event_recall_per_class
     event_unweighted_average_fscore
     identification_error_rate
+    identification_error_rate_detailed
     linkability
     mean_absolute_error
     mean_squared_error
