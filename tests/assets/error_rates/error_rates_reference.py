@@ -39,7 +39,9 @@ def _pad_timedelta_csv(path):
         content = f.read()
     content = re.sub(
         r"(\d{2}:\d{2}:\d{2}\.\d{1,8})(?=,|\n|$)",
-        lambda m: m.group(1).split(".")[0] + "." + m.group(1).split(".")[1].ljust(9, "0"),
+        lambda m: m.group(1).split(".")[0]
+        + "."
+        + m.group(1).split(".")[1].ljust(9, "0"),
         content,
     )
     with open(path, "w") as f:
