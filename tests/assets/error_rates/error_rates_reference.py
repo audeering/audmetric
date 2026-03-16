@@ -1,10 +1,10 @@
 # /// script
-# requires-python = ">=3.12"
+# requires-python = ">=3.10"
 # dependencies = [
 #   "audeer",
 #   "audformat",
 #   "numpy",
-#   "pandas >=3.0",
+#   "pandas",
 #   "pyannote.metrics",
 #   "typing_extensions",
 # ]
