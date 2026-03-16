@@ -1709,9 +1709,12 @@ def identification_error_rate_detailed(
     numerator = total_confusion + total_false_alarm + total_misses
     if total_duration == 0.0:
         ier = 0.0 if numerator == 0.0 else 1.0
-        conf_rate = 0.0 if total_confusion == 0.0 else 1.0
+        # In case the total duration of ground truth segments is 0,
+        # it is impossible to have any confusions/misses
+        # so we set them to 0.0
+        conf_rate = 0.0
+        miss_rate = 0.0
         fa_rate = 0.0 if total_false_alarm == 0.0 else 1.0
-        miss_rate = 0.0 if total_misses == 0.0 else 1.0
     else:
         ier = numerator / total_duration
         conf_rate = total_confusion / total_duration
