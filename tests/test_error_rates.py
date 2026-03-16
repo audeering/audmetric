@@ -206,6 +206,10 @@ def test_der(
     np.testing.assert_almost_equal(der_detailed.conf_rate, expected_conf)
     np.testing.assert_almost_equal(der_detailed.fa_rate, expected_fa)
     np.testing.assert_almost_equal(der_detailed.miss_rate, expected_miss)
+    np.testing.assert_almost_equal(
+        der,
+        der_detailed.conf_rate + der_detailed.fa_rate + der_detailed.miss_rate,
+    )
 
 
 @pytest.mark.parametrize(
@@ -403,6 +407,12 @@ def test_der_individual_file_mapping(
     np.testing.assert_almost_equal(
         der_details_individual.miss_rate, expected_miss_individual
     )
+    np.testing.assert_almost_equal(
+        der_individual,
+        der_details_individual.conf_rate
+        + der_details_individual.fa_rate
+        + der_details_individual.miss_rate,
+    )
 
     der_overall = audmetric.diarization_error_rate(
         truth,
@@ -423,6 +433,12 @@ def test_der_individual_file_mapping(
     np.testing.assert_almost_equal(der_details_overall.conf_rate, expected_conf_overall)
     np.testing.assert_almost_equal(der_details_overall.fa_rate, expected_fa_overall)
     np.testing.assert_almost_equal(der_details_overall.miss_rate, expected_miss_overall)
+    np.testing.assert_almost_equal(
+        der_overall,
+        der_details_overall.conf_rate
+        + der_details_overall.fa_rate
+        + der_details_overall.miss_rate,
+    )
 
 
 @pytest.mark.parametrize(
