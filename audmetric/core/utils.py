@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from collections.abc import Hashable
 from collections.abc import Sequence
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -140,15 +139,3 @@ def scores_per_subgroup_and_class(
             zero_division=zero_division,
         )
     return score
-
-
-@dataclass
-class ErrorRateDetails:
-    r"""Detailed result components for error rates."""
-
-    conf_rate: float
-    r"""Confusion rate"""
-    fa_rate: float
-    r"""False alarm rate"""
-    miss_rate: float
-    r"""Miss rate"""

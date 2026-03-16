@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections
 from collections.abc import Callable
 from collections.abc import Sequence
+from dataclasses import dataclass
 import math
 from typing import TYPE_CHECKING
 import warnings
@@ -18,7 +19,6 @@ import audeer
 from audmetric.core.utils import END
 from audmetric.core.utils import FILE
 from audmetric.core.utils import START
-from audmetric.core.utils import ErrorRateDetails
 from audmetric.core.utils import assert_equal_length
 from audmetric.core.utils import infer_labels
 from audmetric.core.utils import is_segmented_index
@@ -35,6 +35,18 @@ def _total_seconds(td: pd.Timedelta) -> float:
 
     """
     return td / np.timedelta64(1, "s")
+
+
+@dataclass
+class ErrorRateDetails:
+    r"""Detailed result components for error rates."""
+
+    conf_rate: float
+    r"""Confusion rate"""
+    fa_rate: float
+    r"""False alarm rate"""
+    miss_rate: float
+    r"""Miss rate"""
 
 
 def accuracy(
