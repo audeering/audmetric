@@ -24,6 +24,18 @@ from audmetric.core.utils import is_segmented_index
 from audmetric.core.utils import scores_per_subgroup_and_class
 
 
+def _total_seconds(td: pd.Timedelta) -> float:
+    r"""Total seconds including nanoseconds.
+
+    In pandas >= 3.0, ``Timedelta.total_seconds()``
+    only combines days, seconds, and microseconds,
+    silently dropping nanoseconds.
+    This function preserves nanosecond precision.
+
+    """
+    return td / np.timedelta64(1, "s")
+
+
 def accuracy(
     truth: Sequence[object],
     prediction: Sequence[object],
@@ -733,8 +745,8 @@ def event_confusion_matrix(
         for i, ((_, start_truth, end_truth), label_truth) in enumerate(
             file_truth.items()
         ):
-            start_truth = start_truth.total_seconds()
-            end_truth = end_truth.total_seconds()
+            start_truth = _total_seconds(start_truth)
+            end_truth = _total_seconds(end_truth)
             for j, ((_, start_pred, end_pred), label_pred) in enumerate(
                 file_pred.items()
             ):
@@ -742,8 +754,8 @@ def event_confusion_matrix(
                 if pred_correct[j]:
                     continue
 
-                start_pred = start_pred.total_seconds()
-                end_pred = end_pred.total_seconds()
+                start_pred = _total_seconds(start_pred)
+                end_pred = _total_seconds(end_pred)
 
                 # This predicted segment and all following ones cannot match
                 # if the true start time is exceeded by more than the allowed tolerance
@@ -778,16 +790,16 @@ def event_confusion_matrix(
         preds_incorrect_match = np.zeros(n_pred)
         # Find overlapping segments with incorrect labels
         for i in truth_unmatched:
-            start_truth = file_truth.index.get_level_values(START)[i].total_seconds()
-            end_truth = file_truth.index.get_level_values(END)[i].total_seconds()
+            start_truth = _total_seconds(file_truth.index.get_level_values(START)[i])
+            end_truth = _total_seconds(file_truth.index.get_level_values(END)[i])
             label_truth = file_truth.iloc[i]
             for j in pred_unmatched:
                 # Skip predicted segments
                 # if they've already been counted as a label mismatch
                 if preds_incorrect_match[j]:
                     continue
-                start_pred = file_pred.index.get_level_values(START)[j].total_seconds()
-                end_pred = file_pred.index.get_level_values(END)[j].total_seconds()
+                start_pred = _total_seconds(file_pred.index.get_level_values(START)[j])
+                end_pred = _total_seconds(file_pred.index.get_level_values(END)[j])
 
                 # This predicted segment and all following ones cannot match
                 # if the true start time is exceeded by more than the allowed tolerance
@@ -2513,7 +2525,7 @@ def _file_ier(
     ):
         if len(truth_labels) == 0 and len(prediction_labels) == 0:
             continue
-        duration = (end - start).total_seconds()
+        duration = _total_seconds(end - start)
         # Overlap between truth and predicted labels in this window
         correct_labels = [lab for lab in truth_labels if lab in prediction_labels]
         # Unmatched truth labels in this window
@@ -2563,7 +2575,7 @@ def _overlap_duration(
     other_end: pd.Timedelta,
 ) -> float:
     r"""Duration of overlap between two time windows in seconds."""
-    return max(0.0, (min(end, other_end) - max(start, other_start)).total_seconds())
+    return max(0.0, _total_seconds(min(end, other_end) - max(start, other_start)))
 
 
 def _segment_boundaries(segments: pd.Series) -> pd.Index:
