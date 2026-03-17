@@ -17,7 +17,7 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
     ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
 )
 @pytest.mark.parametrize(
-    ("truth, prediction, expected_der"),
+    ("truth, prediction, expected_der, expected_conf, expected_fa, expected_miss"),
     [
         # Empty series
         (
@@ -28,11 +28,17 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
                 index=audformat.segmented_index(),
             ),
             0.0,
+            0.0,
+            0.0,
+            0.0,
         ),
         # Series with incorrect index passed
         pytest.param(
             pd.Series(),
             pd.Series(),
+            0.0,
+            0.0,
+            0.0,
             0.0,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
@@ -55,6 +61,9 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
                 data=["b"],
             ),
             0.0,
+            0.0,
+            0.0,
+            0.0,
         ),
         # Partial overlap
         (
@@ -75,6 +84,9 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
                 data=["c", "c", "d", "d"],
             ),
             0.06 / 0.4,
+            0.0,
+            0.02 / 0.4,
+            0.04 / 0.4,
         ),
         # Partial overlap with multiclass
         (
@@ -95,6 +107,9 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
                 data=["c", "d", "c", "c", "d", "d", "c"],
             ),
             0.42 / 2.95,
+            0.02 / 2.95,
+            0.05 / 2.95,
+            0.35 / 2.95,
         ),
         # Confusions, misses and false alarms
         (
@@ -115,6 +130,9 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
                 data=["d", "d", "c", "c", "c", "c"],
             ),
             2.82 / 4.25,
+            0.08 / 4.25,
+            1.0 / 4.25,
+            1.74 / 4.25,
         ),
         # Prediction with an extra label on one segment
         (
@@ -135,6 +153,9 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
                 data=["a", "b", "c"],
             ),
             0.5,
+            0.0,
+            0.5,
+            0.0,
         ),
         # Prediction with two extra labels on one segment
         (
@@ -155,14 +176,40 @@ REFERENCE_DIR = os.path.join(audeer.script_dir(), "assets", "error_rates")
                 data=["a", "b", "c", "d"],
             ),
             1.0,
+            0.0,
+            1.0,
+            0.0,
         ),
     ],
 )
-def test_der(truth, prediction, expected_der, num_workers, multiprocessing):
+def test_der(
+    truth,
+    prediction,
+    expected_der,
+    expected_conf,
+    expected_fa,
+    expected_miss,
+    num_workers,
+    multiprocessing,
+):
     der = audmetric.diarization_error_rate(
         truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
     )
     np.testing.assert_almost_equal(der, expected_der)
+    der, der_detailed = audmetric.diarization_error_rate_detailed(
+        truth,
+        prediction,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    np.testing.assert_almost_equal(der, expected_der)
+    np.testing.assert_almost_equal(der_detailed.conf_rate, expected_conf)
+    np.testing.assert_almost_equal(der_detailed.fa_rate, expected_fa)
+    np.testing.assert_almost_equal(der_detailed.miss_rate, expected_miss)
+    np.testing.assert_almost_equal(
+        der,
+        der_detailed.conf_rate + der_detailed.fa_rate + der_detailed.miss_rate,
+    )
 
 
 @pytest.mark.parametrize(
@@ -231,7 +278,12 @@ def test_der_fewer_labels(truth, prediction, expected):
     ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
 )
 @pytest.mark.parametrize(
-    ("truth, prediction, expected_der_individual, expected_der_overall"),
+    (
+        "truth, prediction, expected_der_individual, expected_conf_individual, "
+        "expected_fa_individual, expected_miss_individual, "
+        "expected_der_overall, expected_conf_overall, "
+        "expected_fa_overall, expected_miss_overall"
+    ),
     [
         (
             pd.Series(
@@ -251,7 +303,13 @@ def test_der_fewer_labels(truth, prediction, expected):
                 data=["a", "b", "c", "d"],
             ),
             0.0,
+            0.0,
+            0.0,
+            0.0,
             0.5,
+            0.5,
+            0.0,
+            0.0,
         ),
         (
             pd.Series(
@@ -271,7 +329,13 @@ def test_der_fewer_labels(truth, prediction, expected):
                 data=["a", "b", "c", "d", "a", "b"],
             ),
             0.1 / 0.5,
+            0.0 / 0.5,
+            0.1 / 0.5,
+            0.0 / 0.5,
             0.3 / 0.5,
+            0.2 / 0.5,
+            0.1 / 0.5,
+            0.0 / 0.5,
         ),
         # Categorical dtype
         (
@@ -294,7 +358,13 @@ def test_der_fewer_labels(truth, prediction, expected):
                 dtype=pd.CategoricalDtype(categories=["b", "c"]),
             ),
             0.0,
+            0.0,
+            0.0,
+            0.0,
             0.5,
+            0.5,
+            0.0,
+            0.0,
         ),
     ],
 )
@@ -302,7 +372,13 @@ def test_der_individual_file_mapping(
     truth,
     prediction,
     expected_der_individual,
+    expected_conf_individual,
+    expected_fa_individual,
+    expected_miss_individual,
     expected_der_overall,
+    expected_conf_overall,
+    expected_fa_overall,
+    expected_miss_overall,
     num_workers,
     multiprocessing,
 ):
@@ -314,6 +390,30 @@ def test_der_individual_file_mapping(
         multiprocessing=multiprocessing,
     )
     np.testing.assert_almost_equal(der_individual, expected_der_individual)
+    der_individual, der_details_individual = audmetric.diarization_error_rate_detailed(
+        truth,
+        prediction,
+        individual_file_mapping=True,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    np.testing.assert_almost_equal(der_individual, expected_der_individual)
+    np.testing.assert_almost_equal(
+        der_details_individual.conf_rate, expected_conf_individual
+    )
+    np.testing.assert_almost_equal(
+        der_details_individual.fa_rate, expected_fa_individual
+    )
+    np.testing.assert_almost_equal(
+        der_details_individual.miss_rate, expected_miss_individual
+    )
+    np.testing.assert_almost_equal(
+        der_individual,
+        der_details_individual.conf_rate
+        + der_details_individual.fa_rate
+        + der_details_individual.miss_rate,
+    )
+
     der_overall = audmetric.diarization_error_rate(
         truth,
         prediction,
@@ -322,13 +422,30 @@ def test_der_individual_file_mapping(
         multiprocessing=multiprocessing,
     )
     np.testing.assert_almost_equal(der_overall, expected_der_overall)
+    der_overall, der_details_overall = audmetric.diarization_error_rate_detailed(
+        truth,
+        prediction,
+        individual_file_mapping=False,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    np.testing.assert_almost_equal(der_overall, expected_der_overall)
+    np.testing.assert_almost_equal(der_details_overall.conf_rate, expected_conf_overall)
+    np.testing.assert_almost_equal(der_details_overall.fa_rate, expected_fa_overall)
+    np.testing.assert_almost_equal(der_details_overall.miss_rate, expected_miss_overall)
+    np.testing.assert_almost_equal(
+        der_overall,
+        der_details_overall.conf_rate
+        + der_details_overall.fa_rate
+        + der_details_overall.miss_rate,
+    )
 
 
 @pytest.mark.parametrize(
     ("num_workers", "multiprocessing"), [(1, False), (2, True), (2, False)]
 )
 @pytest.mark.parametrize(
-    ("truth, prediction, expected_ier"),
+    ("truth, prediction, expected_ier, expected_conf, expected_fa, expected_miss"),
     [
         # Empty series
         (
@@ -339,11 +456,17 @@ def test_der_individual_file_mapping(
                 index=audformat.segmented_index(),
             ),
             0.0,
+            0.0,
+            0.0,
+            0.0,
         ),
         # Series with incorrect index passed
         pytest.param(
             pd.Series(),
             pd.Series(),
+            0.0,
+            0.0,
+            0.0,
             0.0,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
@@ -361,6 +484,9 @@ def test_der_individual_file_mapping(
                 data=["a"],
             ),
             1.0,
+            0.0,
+            1.0,
+            0.0,
         ),
         # No overlap
         (
@@ -381,6 +507,9 @@ def test_der_individual_file_mapping(
                 data=["b"],
             ),
             1.0,
+            1.0,
+            0.0,
+            0.0,
         ),
         # Perfect overlap
         (
@@ -400,6 +529,9 @@ def test_der_individual_file_mapping(
                 ),
                 data=["a"] * 4,
             ),
+            0.0,
+            0.0,
+            0.0,
             0.0,
         ),
         # Partial overlap
@@ -421,6 +553,9 @@ def test_der_individual_file_mapping(
                 data=["speech"] * 4,
             ),
             0.06 / 0.4,
+            0.0,
+            0.02 / 0.4,
+            0.04 / 0.4,
         ),
         # Partial overlap with gaps
         (
@@ -441,6 +576,9 @@ def test_der_individual_file_mapping(
                 data=["speech"] * 3,
             ),
             0.04 / 0.3,
+            0.0,
+            0.02 / 0.3,
+            0.02 / 0.3,
         ),
         # Partial overlap with multiclass
         (
@@ -461,6 +599,9 @@ def test_der_individual_file_mapping(
                 data=["a", "b", "a", "a", "b", "b", "a"],
             ),
             0.42 / 2.95,
+            0.02 / 2.95,
+            0.05 / 2.95,
+            0.35 / 2.95,
         ),
         # Confusions, misses and false alarms
         (
@@ -481,14 +622,39 @@ def test_der_individual_file_mapping(
                 data=["b", "b", "a", "a", "a", "a"],
             ),
             2.82 / 4.25,
+            0.08 / 4.25,
+            1.0 / 4.25,
+            1.74 / 4.25,
         ),
     ],
 )
-def test_ier(truth, prediction, expected_ier, num_workers, multiprocessing):
+def test_ier(
+    truth,
+    prediction,
+    expected_ier,
+    expected_conf,
+    expected_fa,
+    expected_miss,
+    num_workers,
+    multiprocessing,
+):
     ier = audmetric.identification_error_rate(
         truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
     )
     np.testing.assert_almost_equal(ier, expected_ier)
+    ier, detailed_ier = audmetric.identification_error_rate_detailed(
+        truth,
+        prediction,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    np.testing.assert_almost_equal(ier, expected_ier)
+    np.testing.assert_almost_equal(detailed_ier.conf_rate, expected_conf)
+    np.testing.assert_almost_equal(detailed_ier.fa_rate, expected_fa)
+    np.testing.assert_almost_equal(detailed_ier.miss_rate, expected_miss)
+    np.testing.assert_almost_equal(
+        ier, detailed_ier.conf_rate + detailed_ier.fa_rate + detailed_ier.miss_rate
+    )
 
 
 @pytest.mark.parametrize(

@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections
 from collections.abc import Callable
 from collections.abc import Sequence
+from dataclasses import dataclass
 import math
 from typing import TYPE_CHECKING
 import warnings
@@ -34,6 +35,18 @@ def _total_seconds(td: pd.Timedelta) -> float:
 
     """
     return td / np.timedelta64(1, "s")
+
+
+@dataclass
+class ErrorRateDetails:
+    r"""Detailed result components for error rates."""
+
+    conf_rate: float
+    r"""Confusion rate"""
+    fa_rate: float
+    r"""False alarm rate"""
+    miss_rate: float
+    r"""Miss rate"""
 
 
 def accuracy(
@@ -351,6 +364,7 @@ def diarization_error_rate(
             If ``False``, all segments are taken into account to compute the mapping
         num_workers: number of threads or 1 for sequential processing
         multiprocessing: use multiprocessing instead of multithreading
+
     Returns:
         diarization error rate
 
@@ -379,6 +393,107 @@ def diarization_error_rate(
         ... )
         >>> diarization_error_rate(truth, prediction)
         0.5
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
+    der, _ = diarization_error_rate_detailed(
+        truth,
+        prediction,
+        individual_file_mapping=individual_file_mapping,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+    return der
+
+
+def diarization_error_rate_detailed(
+    truth: pd.Series,
+    prediction: pd.Series,
+    *,
+    individual_file_mapping: bool = False,
+    num_workers: int = 1,
+    multiprocessing: bool = False,
+) -> tuple[float, ErrorRateDetails]:
+    r"""Detailed diarization error rate result components.
+
+    .. math::
+
+        \text{DER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}
+            {\text{total}}
+
+    where :math:`\text{confusion}` is the total confusion duration,
+    :math:`\text{false alarm}` is the total duration of predictions
+    without an overlapping ground truth,
+    :math:`\text{miss}` is the total duration of ground truth
+    without an overlapping prediction,
+    and :math:`\text{total}` is the total duration of ground truth segments.
+
+    The diarization error rate can used
+    when the labels are not known by the prediction model,
+    e.g. for the task of speaker diarization on unknown speakers.
+
+    Compared to :func:`audmetric.diarization_error_rate`,
+    this function returns the diarization error rate as well as
+    the :class:`audmetric.ErrorRateDetails` containing
+    the confusion rate, the false alarm rate, and the miss rate.
+
+    This metric is computed the same way
+    as :func:`audmetric.identification_error_rate_detailed`,
+    but first creates a one-to-one mapping between
+    truth and prediction labels.
+
+    This implementation uses the 'greedy' method
+    to compute the one-to-one mapping
+    between truth and predicted labels.
+    This method is faster than other implementations that optimize
+    the confusion term, but may slightly over-estimate the
+    diarization error rate.
+    :footcite:`Bredin2017`
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth labels with a segmented index conform to `audformat`_
+        prediction: predicted labels with a segmented index conform to `audformat`_
+        individual_file_mapping: whether to create the mapping
+            between truth and prediction labels individually for each file.
+            If ``False``, all segments are taken into account to compute the mapping
+        num_workers: number of threads or 1 for sequential processing
+        multiprocessing: use multiprocessing instead of multithreading
+
+    Returns:
+        diarization error rate and
+        :class:`audmetric.ErrorRateDetails` containing
+        ``conf_rate``,
+        ``fa_rate``,
+        ``miss_rate``
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav", "f1.wav"],
+        ...         starts=[0, 0.1, 0.1],
+        ...         ends=[0.1, 0.15, 0.2],
+        ...     ),
+        ...     data=["0", "1", "0"],
+        ... )
+        >>> diarization_error_rate_detailed(truth, prediction)
+        (0.5, ErrorRateDetails(conf_rate=0.25, fa_rate=0.25, miss_rate=0.0))
 
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
@@ -445,7 +560,7 @@ def diarization_error_rate(
     )
     mapped_prediction = prediction.replace(pred2truthlabel)
 
-    return identification_error_rate(
+    return identification_error_rate_detailed(
         truth,
         mapped_prediction,
         num_workers=num_workers,
@@ -1475,6 +1590,88 @@ def identification_error_rate(
     .. _audformat: https://audeering.github.io/audformat/data-format.html
 
     """
+    ier, _ = identification_error_rate_detailed(
+        truth, prediction, num_workers=num_workers, multiprocessing=multiprocessing
+    )
+    return ier
+
+
+def identification_error_rate_detailed(
+    truth: pd.Series,
+    prediction: pd.Series,
+    *,
+    num_workers: int = 1,
+    multiprocessing: bool = False,
+) -> tuple[float, ErrorRateDetails]:
+    r"""Detailed identification error rate result components.
+
+    .. math::
+
+        \text{IER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}
+            {\text{total}}
+
+    where :math:`\text{confusion}` is the total confusion duration,
+    :math:`\text{false alarm}` is the total duration of predictions
+    without an overlapping ground truth,
+    :math:`\text{miss}` is the total duration of ground truth
+    without an overlapping prediction,
+    and :math:`\text{total}` is the total duration of ground truth segments.
+    :footcite:`Bredin2017`
+
+    Compared to :func:`audmetric.identification_error_rate`,
+    this function returns the identification error rate as well as
+    the :class:`audmetric.ErrorRateDetails` containing
+    the confusion rate, the false alarm rate, and the miss rate.
+
+    The identification error rate should be used
+    when the labels are known by the prediction model.
+    If this isn't the case,
+    consider using :func:`audmetric.diarization_error_rate_detailed`.
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth labels with a segmented index conform to `audformat`_
+        prediction: predicted labels with a segmented index conform to `audformat`_
+        num_workers: number of threads or 1 for sequential processing
+        multiprocessing: use multiprocessing instead of multithreading
+
+    Returns:
+        identification error rate and
+        :class:`audmetric.ErrorRateDetails` containing
+        ``conf_rate``,
+        ``fa_rate``,
+        ``miss_rate``
+
+    Raises:
+        ValueError: if ``truth`` or ``prediction``
+            do not have a segmented index conform to `audformat`_
+
+    Examples:
+        >>> import pandas as pd
+        >>> import audformat
+        >>> truth = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav"],
+        ...         starts=[0.0, 0.1],
+        ...         ends=[0.1, 0.2],
+        ...     ),
+        ...     data=["a", "b"],
+        ... )
+        >>> prediction = pd.Series(
+        ...     index=audformat.segmented_index(
+        ...         files=["f1.wav", "f1.wav", "f1.wav"],
+        ...         starts=[0, 0.1, 0.1],
+        ...         ends=[0.1, 0.15, 0.2],
+        ...     ),
+        ...     data=["a", "b", "a"],
+        ... )
+        >>> identification_error_rate_detailed(truth, prediction)
+        (0.5, ErrorRateDetails(conf_rate=0.25, fa_rate=0.25, miss_rate=0.0))
+
+    .. _audformat: https://audeering.github.io/audformat/data-format.html
+
+    """
     if not is_segmented_index(truth) or not is_segmented_index(prediction):
         raise ValueError(
             "The truth and prediction "
@@ -1512,13 +1709,22 @@ def identification_error_rate(
     numerator = total_confusion + total_false_alarm + total_misses
     if total_duration == 0.0:
         ier = 0.0 if numerator == 0.0 else 1.0
+        # In case the total duration of ground truth segments is 0,
+        # it is impossible to have any confusions/misses
+        # so we set them to 0.0
+        conf_rate = 0.0
+        miss_rate = 0.0
+        fa_rate = 0.0 if total_false_alarm == 0.0 else 1.0
     else:
         ier = numerator / total_duration
+        conf_rate = total_confusion / total_duration
+        fa_rate = total_false_alarm / total_duration
+        miss_rate = total_misses / total_duration
     if ier > 1.0:
         # In this case it is possible that there is no overlap between files
         # So we warn the user if there are no common files
         _check_common_files(truth, prediction)
-    return ier
+    return ier, ErrorRateDetails(conf_rate, fa_rate, miss_rate)
 
 
 def linkability(
