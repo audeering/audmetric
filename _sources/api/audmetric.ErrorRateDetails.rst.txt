@@ -1,0 +1,20 @@
+﻿ErrorRateDetails
+================
+
+.. currentmodule:: audmetric
+
+.. autoclass:: ErrorRateDetails
+
+
+conf\_rate
+----------
+.. autoattribute:: ErrorRateDetails.conf_rate
+    
+fa\_rate
+--------
+.. autoattribute:: ErrorRateDetails.fa_rate
+    
+miss\_rate
+----------
+.. autoattribute:: ErrorRateDetails.miss_rate
+    

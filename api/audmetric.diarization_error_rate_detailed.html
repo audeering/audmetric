@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>diarization_error_rate() &mdash; Documentation</title>
+  <title>diarization_error_rate_detailed() &mdash; Documentation</title>
   
 
   
@@ -34,8 +34,8 @@
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="diarization_error_rate_detailed()" href="audmetric.diarization_error_rate_detailed.html" />
-    <link rel="prev" title="detection_error_tradeoff()" href="audmetric.detection_error_tradeoff.html" />
+    <link rel="next" title="edit_distance()" href="audmetric.edit_distance.html" />
+    <link rel="prev" title="diarization_error_rate()" href="audmetric.diarization_error_rate.html" />
     
   
 
@@ -103,8 +103,8 @@
 <li class="toctree-l2"><a class="reference internal" href="audmetric.concordance_cc.html">concordance_cc()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.confusion_matrix.html">confusion_matrix()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.detection_error_tradeoff.html">detection_error_tradeoff()</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">diarization_error_rate()</a></li>
-<li class="toctree-l2"><a class="reference internal" href="audmetric.diarization_error_rate_detailed.html">diarization_error_rate_detailed()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmetric.diarization_error_rate.html">diarization_error_rate()</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">diarization_error_rate_detailed()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.edit_distance.html">edit_distance()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.equal_error_rate.html">equal_error_rate()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmetric.ErrorRateDetails.html">ErrorRateDetails</a></li>
@@ -165,7 +165,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="audmetric.html">audmetric</a> &raquo;</li>
-      <li>diarization_error_rate()</li>
+      <li>diarization_error_rate_detailed()</li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/audeering/audmetric/" class="fa fa-github"> GitHub</a>
       </li>
@@ -175,12 +175,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="diarization-error-rate">
-<h1>diarization_error_rate()<a class="headerlink" href="#diarization-error-rate" title="Link to this heading">¶</a></h1>
+  <section id="diarization-error-rate-detailed">
+<h1>diarization_error_rate_detailed()<a class="headerlink" href="#diarization-error-rate-detailed" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="audmetric.diarization_error_rate">
-<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">diarization_error_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">individual_file_mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocessing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#diarization_error_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.diarization_error_rate" title="Link to this definition">¶</a></dt>
-<dd><p>Diarization error rate.</p>
+<dt class="sig sig-object py" id="audmetric.diarization_error_rate_detailed">
+<span class="sig-prename descclassname"><span class="pre">audmetric.</span></span><span class="sig-name descname"><span class="pre">diarization_error_rate_detailed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">individual_file_mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocessing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmetric/core/api.html#diarization_error_rate_detailed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmetric.diarization_error_rate_detailed" title="Link to this definition">¶</a></dt>
+<dd><p>Detailed diarization error rate result components.</p>
 <div class="math">
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>DER</mtext><mo>=</mo><mfrac><mrow><mtext>confusion</mtext><mo>+</mo><mtext>false alarm</mtext><mo>+</mo><mtext>miss</mtext></mrow><mtext>total</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{DER} = \frac{\text{confusion}+\text{false alarm}+\text{miss}}
     {\text{total}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">DER</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">total</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">confusion</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord text"><span class="mord">false alarm</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord text"><span class="mord">miss</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div><p>where <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>confusion</mtext></mrow><annotation encoding="application/x-tex">\text{confusion}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">confusion</span></span></span></span></span></span> is the total confusion duration,
@@ -192,8 +192,12 @@ and <span class="math"><span class="katex"><span class="katex-mathml"><math xmln
 <p>The diarization error rate can used
 when the labels are not known by the prediction model,
 e.g. for the task of speaker diarization on unknown speakers.</p>
+<p>Compared to <a class="reference internal" href="audmetric.diarization_error_rate.html#audmetric.diarization_error_rate" title="audmetric.diarization_error_rate"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmetric.diarization_error_rate()</span></code></a>,
+this function returns the diarization error rate as well as
+the <a class="reference internal" href="audmetric.ErrorRateDetails.html#audmetric.ErrorRateDetails" title="audmetric.ErrorRateDetails"><code class="xref py py-class docutils literal notranslate"><span class="pre">audmetric.ErrorRateDetails</span></code></a> containing
+the confusion rate, the false alarm rate, and the miss rate.</p>
 <p>This metric is computed the same way
-as <a class="reference internal" href="audmetric.identification_error_rate.html#audmetric.identification_error_rate" title="audmetric.identification_error_rate"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmetric.identification_error_rate()</span></code></a>,
+as <a class="reference internal" href="audmetric.identification_error_rate_detailed.html#audmetric.identification_error_rate_detailed" title="audmetric.identification_error_rate_detailed"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmetric.identification_error_rate_detailed()</span></code></a>,
 but first creates a one-to-one mapping between
 truth and prediction labels.</p>
 <p>This implementation uses the ‘greedy’ method
@@ -224,10 +228,14 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <a class="reference internal" href="audmetric.ErrorRateDetails.html#audmetric.ErrorRateDetails" title="audmetric.core.api.ErrorRateDetails"><code class="xref py py-class docutils literal notranslate"><span class="pre">ErrorRateDetails</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>diarization error rate</p>
+<dd class="field-odd"><p>diarization error rate and
+<a class="reference internal" href="audmetric.ErrorRateDetails.html#audmetric.ErrorRateDetails" title="audmetric.ErrorRateDetails"><code class="xref py py-class docutils literal notranslate"><span class="pre">audmetric.ErrorRateDetails</span></code></a> containing
+<code class="docutils literal notranslate"><span class="pre">conf_rate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">fa_rate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">miss_rate</span></code></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – if <code class="docutils literal notranslate"><span class="pre">truth</span></code> or <code class="docutils literal notranslate"><span class="pre">prediction</span></code>
@@ -253,8 +261,8 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="gp">... </span>    <span class="p">),</span>
 <span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">],</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">diarization_error_rate</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
-<span class="go">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">diarization_error_rate_detailed</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+<span class="go">(0.5, ErrorRateDetails(conf_rate=0.25, fa_rate=0.25, miss_rate=0.0))</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -269,10 +277,10 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="audmetric.diarization_error_rate_detailed.html" class="btn btn-neutral float-right" title="diarization_error_rate_detailed()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="audmetric.edit_distance.html" class="btn btn-neutral float-right" title="edit_distance()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="audmetric.detection_error_tradeoff.html" class="btn btn-neutral float-left" title="detection_error_tradeoff()" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="audmetric.diarization_error_rate.html" class="btn btn-neutral float-left" title="diarization_error_rate()" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
