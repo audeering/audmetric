@@ -435,7 +435,7 @@ def diarization_error_rate_detailed(
 
     Compared to :func:`audmetric.diarization_error_rate`,
     this function returns the diarization error rate as well as
-    the :class:`audmetric.utils.ErrorRateDetails` containing
+    the :class:`audmetric.ErrorRateDetails` containing
     the confusion rate, the false alarm rate, and the miss rate.
 
     This metric is computed the same way
@@ -464,7 +464,7 @@ def diarization_error_rate_detailed(
 
     Returns:
         diarization error rate and
-        :class:`audmetric.utils.ErrorRateDetails` containing
+        :class:`audmetric.ErrorRateDetails` containing
         ``conf_rate``,
         ``fa_rate``,
         ``miss_rate``
@@ -1620,7 +1620,7 @@ def identification_error_rate_detailed(
 
     Compared to :func:`audmetric.identification_error_rate`,
     this function returns the identification error rate as well as
-    the :class:`audmetric.utils.ErrorRateDetails` containing
+    the :class:`audmetric.ErrorRateDetails` containing
     the confusion rate, the false alarm rate, and the miss rate.
 
     The identification error rate should be used
@@ -1638,7 +1638,7 @@ def identification_error_rate_detailed(
 
     Returns:
         identification error rate and
-        :class:`audmetric.utils.ErrorRateDetails` containing
+        :class:`audmetric.ErrorRateDetails` containing
         ``conf_rate``,
         ``fa_rate``,
         ``miss_rate``
