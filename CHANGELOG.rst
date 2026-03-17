@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.0 (2026/03/17)
+--------------------------
+
+* Added: ``audmetric.diarization_error_rate_detailed()``
+* Added: ``audmetric.identification_error_rate_detailed()``
+* Added: ``audmetric.ErrorRateDetails``
+* Fixed: ensure correct timing precision in ``pandas>=3.0``
+
+
 Version 1.3.1 (2026/01/07)
 --------------------------
 
