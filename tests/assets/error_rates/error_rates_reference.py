@@ -12,6 +12,7 @@
 
 import os
 import random
+import re
 
 import numpy as np
 import pandas as pd
@@ -22,6 +23,29 @@ from pyannote.metrics.identification import IdentificationErrorRate
 
 import audeer
 import audformat
+
+
+def _pad_timedelta_csv(path):
+    """Pad fractional seconds in timedelta strings to 9 digits.
+
+    In pandas >= 3.0, ``pd.Timedelta("0 days 00:00:01.123456")``
+    is parsed as 1123456 nanoseconds instead of 1.123456 seconds,
+    see https://github.com/pandas-dev/pandas/issues/60940.
+    By padding to 9 digits, the values are parsed correctly
+    in all pandas versions.
+
+    """
+    with open(path) as f:
+        content = f.read()
+    content = re.sub(
+        r"(\d{2}:\d{2}:\d{2}\.\d{1,8})(?=,|\n|$)",
+        lambda m: m.group(1).split(".")[0]
+        + "."
+        + m.group(1).split(".")[1].ljust(9, "0"),
+        content,
+    )
+    with open(path, "w") as f:
+        f.write(content)
 
 
 def generate_random_segments(
@@ -101,7 +125,9 @@ def generate_der(result_dir):
         segment_dir = os.path.join(result_dir, str(i))
         audeer.mkdir(segment_dir)
         truth.to_csv(os.path.join(segment_dir, "truth.csv"))
+        _pad_timedelta_csv(os.path.join(segment_dir, "truth.csv"))
         prediction.to_csv(os.path.join(segment_dir, "prediction.csv"))
+        _pad_timedelta_csv(os.path.join(segment_dir, "prediction.csv"))
 
         truth_annotation = annotation_from_series(truth)
         pred_annotation = annotation_from_series(prediction)
@@ -149,7 +175,9 @@ def generate_ier(result_dir):
         segment_dir = os.path.join(result_dir, str(i))
         audeer.mkdir(segment_dir)
         truth.to_csv(os.path.join(segment_dir, "truth.csv"))
+        _pad_timedelta_csv(os.path.join(segment_dir, "truth.csv"))
         prediction.to_csv(os.path.join(segment_dir, "prediction.csv"))
+        _pad_timedelta_csv(os.path.join(segment_dir, "prediction.csv"))
 
         truth_annotation = annotation_from_series(truth)
         pred_annotation = annotation_from_series(prediction)
