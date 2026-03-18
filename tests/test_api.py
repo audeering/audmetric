@@ -1071,9 +1071,7 @@ def test_word_error_rate_truth(truth, prediction, wer):
 )
 def test_word_error_rate_corpus_level(truth, prediction, norm, wer):
     np.testing.assert_almost_equal(
-        audmetric.word_error_rate(
-            truth, prediction, corpus_level=True, norm=norm
-        ),
+        audmetric.word_error_rate(truth, prediction, corpus_level=True, norm=norm),
         wer,
     )
 
