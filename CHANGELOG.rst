@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.1 (2026/03/18)
+--------------------------
+
+* Added: ``corpus_level`` argument to ``audmetric.word_error_rate()``
+
+
 Version 1.4.0 (2026/03/17)
 --------------------------
 
