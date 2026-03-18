@@ -1027,6 +1027,72 @@ def test_word_error_rate_truth(truth, prediction, wer):
     )
 
 
+@pytest.mark.parametrize(
+    "truth,prediction,norm,wer",
+    [
+        ([[]], [[]], "truth", 0),
+        ([["lorem"]], [[]], "truth", 1.0),
+        ([[]], [["lorem"]], "truth", 1.0),
+        ([["lorem"]], [["lorem"]], "truth", 0),
+        ([["lorem", "ipsum"]], [["lorm", "ipsum"]], "truth", 0.5),
+        # corpus-level pools errors: (1 + 2) / (2 + 4) = 0.5
+        (
+            [["lorem", "ipsum"], ["north", "wind", "and", "sun"]],
+            [["lorm", "ipsum"], ["north", "wind"]],
+            "truth",
+            0.5,
+        ),
+        # differs from sample-level: sample=(1/1 + 0/4)/2=0.5, corpus=1/5=0.2
+        (
+            [["a"], ["b", "c", "d", "e"]],
+            [["x"], ["b", "c", "d", "e"]],
+            "truth",
+            0.2,
+        ),
+        # single empty reference: n=0, total_norm guarded to 1
+        ([[None]], [["lorem"]], "truth", 1.0),
+        ([[None]], [["lorem", "ipsum"]], "truth", 2.0),
+        # empty reference contributes 0 to denominator: (1 + 0) / (0 + 2) = 0.5
+        (
+            [[], ["a", "b"]],
+            [["x"], ["a", "b"]],
+            "truth",
+            0.5,
+        ),
+        # corpus-level with norm="longest"
+        (
+            [["a"], ["b", "c", "d", "e"]],
+            [["x"], ["b", "c", "d", "e"]],
+            "longest",
+            0.2,
+        ),
+        ([["hello", "world"]], [["xyz", "moon", "abc"]], "longest", 1.0),
+        pytest.param(
+            [["lorem"], []],
+            [[]],
+            "truth",
+            0.0,
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+    ],
+)
+def test_word_error_rate_corpus_level(truth, prediction, norm, wer):
+    np.testing.assert_almost_equal(
+        audmetric.word_error_rate(truth, prediction, corpus_level=True, norm=norm),
+        wer,
+    )
+
+
+def test_word_error_rate_corpus_level_single_sample():
+    """Corpus-level WER equals sample-level WER for a single sample."""
+    truth = [["hello", "world", "foo"]]
+    prediction = [["hello", "bar", "baz"]]
+    np.testing.assert_almost_equal(
+        audmetric.word_error_rate(truth, prediction, corpus_level=True),
+        audmetric.word_error_rate(truth, prediction),
+    )
+
+
 def test_word_error_rate_invalid_norm():
     """Test that word_error_rate raises ValueError for invalid norm argument."""
     with pytest.raises(

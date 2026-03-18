@@ -2361,6 +2361,7 @@ def word_error_rate(
     truth: Sequence[Sequence[str]],
     prediction: Sequence[Sequence[str]],
     *,
+    corpus_level: bool = False,
     norm: str = "truth",
 ) -> float:
     r"""Word error rate based on edit distance.
@@ -2395,9 +2396,25 @@ def word_error_rate(
 
             n = \max(\text{len}(t), \text{len}(p))
 
+    If ``corpus_level`` is ``True``,
+    the word error rate is computed at the corpus level
+    by pooling all edit distances and normalization factors:
+
+        .. math::
+
+            \text{WER} = \frac{\sum_i \text{edit\_distance}(t_i, p_i)}
+            {\sum_i n_i}
+
+    This means longer samples carry more weight
+    than shorter ones.
+
     Args:
         truth: ground truth strings
         prediction: predicted strings
+        corpus_level: if ``True``,
+            compute corpus-level WER
+            by pooling all errors and normalization factors
+            instead of averaging per-sample WER
         norm: normalization method, either "truth" or "longest".
             "truth" normalizes by truth length,
             "longest" normalizes by max length of truth and prediction
@@ -2410,10 +2427,12 @@ def word_error_rate(
         ValueError: if ``norm`` is not one of ``"truth"``, ``"longest"``
 
     Examples:
-        >>> truth = [["lorem", "ipsum"], ["north", "wind", "and", "sun"]]
-        >>> prediction = [["lorm", "ipsum"], ["north", "wind"]]
+        >>> truth = [["lorem"], ["north", "wind", "and", "sun"]]
+        >>> prediction = [["lorm"], ["north", "wind"]]
         >>> word_error_rate(truth, prediction)
-        0.5
+        0.75
+        >>> word_error_rate(truth, prediction, corpus_level=True)
+        0.6
         >>> truth = [["hello", "world"]]
         >>> prediction = [["xyz", "moon", "abc"]]
         >>> word_error_rate(truth, prediction)
@@ -2427,6 +2446,8 @@ def word_error_rate(
     if norm not in ["truth", "longest"]:
         raise ValueError(f"'norm' must be one of 'truth', 'longest', got '{norm}'")
 
+    total_errors = 0.0
+    total_norm = 0.0
     wer = 0.0
 
     for t, p in zip(truth, prediction):
@@ -2441,9 +2462,18 @@ def word_error_rate(
         else:
             n = len(t)
 
-        n = n if n > 1 else 1
+        dist = edit_distance(t, p)
 
-        wer += edit_distance(t, p) / n
+        if corpus_level:
+            total_errors += dist
+            total_norm += n
+        else:
+            n = n if n > 1 else 1
+            wer += dist / n
+
+    if corpus_level:
+        total_norm = total_norm if total_norm > 0 else 1
+        return float(total_errors / total_norm)
 
     num_samples = len(truth) if len(truth) > 1 else 1
 
