@@ -1049,9 +1049,16 @@ def test_word_error_rate_truth(truth, prediction, wer):
             "truth",
             0.2,
         ),
-        # empty reference contributes insertions to numerator, 1 to denominator
+        # single empty reference: n=0, total_norm guarded to 1
         ([[None]], [["lorem"]], "truth", 1.0),
         ([[None]], [["lorem", "ipsum"]], "truth", 2.0),
+        # empty reference contributes 0 to denominator: (1 + 0) / (0 + 2) = 0.5
+        (
+            [[], ["a", "b"]],
+            [["x"], ["a", "b"]],
+            "truth",
+            0.5,
+        ),
         # corpus-level with norm="longest"
         (
             [["a"], ["b", "c", "d", "e"]],
