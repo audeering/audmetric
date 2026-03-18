@@ -1076,6 +1076,16 @@ def test_word_error_rate_corpus_level(truth, prediction, norm, wer):
     )
 
 
+def test_word_error_rate_corpus_level_single_sample():
+    """Corpus-level WER equals sample-level WER for a single sample."""
+    truth = [["hello", "world", "foo"]]
+    prediction = [["hello", "bar", "baz"]]
+    np.testing.assert_almost_equal(
+        audmetric.word_error_rate(truth, prediction, corpus_level=True),
+        audmetric.word_error_rate(truth, prediction),
+    )
+
+
 def test_word_error_rate_invalid_norm():
     """Test that word_error_rate raises ValueError for invalid norm argument."""
     with pytest.raises(
