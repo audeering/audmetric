@@ -2462,14 +2462,13 @@ def word_error_rate(
         else:
             n = len(t)
 
-        n = n if n > 1 else 1
-
         dist = edit_distance(t, p)
 
         if corpus_level:
             total_errors += dist
             total_norm += n
         else:
+            n = n if n > 1 else 1
             wer += dist / n
 
     if corpus_level:
