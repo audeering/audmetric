@@ -285,6 +285,59 @@ def test_der_fewer_labels(truth, prediction, expected):
         "expected_fa_overall, expected_miss_overall"
     ),
     [
+        # Empty prediction for individual file mapping
+        (
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 4,
+                    starts=[0, 0.1, 0.2, 0.3],
+                    ends=[0.1, 0.2, 0.3, 0.4],
+                ),
+                data=["a", "a", "b", "b"],
+            ),
+            pd.Series(index=audformat.segmented_index()),
+            1.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            0.0,
+            0.0,
+            1.0,
+        ),
+        # Empty prediction for individual file mapping
+        (
+            pd.Series(index=audformat.segmented_index()),
+            pd.Series(
+                index=audformat.segmented_index(
+                    files=["f1.wav"] * 4,
+                    starts=[0, 0.1, 0.2, 0.3],
+                    ends=[0.1, 0.2, 0.3, 0.4],
+                ),
+                data=["a", "a", "b", "b"],
+            ),
+            1.0,
+            0.0,
+            1.0,
+            0.0,
+            1.0,
+            0.0,
+            1.0,
+            0.0,
+        ),
+        # Empty truth and empty prediction for individual file mapping
+        (
+            pd.Series(index=audformat.segmented_index()),
+            pd.Series(index=audformat.segmented_index()),
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ),
         (
             pd.Series(
                 index=audformat.segmented_index(
