@@ -305,7 +305,7 @@ def test_der_fewer_labels(truth, prediction, expected):
             0.0,
             1.0,
         ),
-        # Empty prediction for individual file mapping
+        # Empty truth for individual file mapping
         (
             pd.Series(index=audformat.segmented_index()),
             pd.Series(
