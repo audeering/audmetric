@@ -530,7 +530,7 @@ def diarization_error_rate_detailed(
 
     # No need to map the prediction and truth
     # labels at all if one of the two is empty
-    if len(prediction) > 0 and len(truth) > 0:
+    if not prediction.empty and truth.empty > 0:
         # Map prediction and truth labels to unique names
         # to avoid confusion when there is an overlap
         unique_pred_mapper = {label: f"p{i}" for i, label in enumerate(pred_labels)}
