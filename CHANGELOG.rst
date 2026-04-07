@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.2 (2026/04/07)
+--------------------------
+
+* Fixed: ``audmetric.diarization_error_rate_detailed()``
+  and ``audmetric.diarization_error_rate()``
+  for zero-length truth and prediction
+
+
 Version 1.4.1 (2026/03/18)
 --------------------------
 
