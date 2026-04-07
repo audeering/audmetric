@@ -528,26 +528,29 @@ def diarization_error_rate_detailed(
             category=UserWarning,
         )
 
-    # Map prediction and truth labels to unique names
-    # to avoid confusion when there is an overlap
-    unique_pred_mapper = {label: f"p{i}" for i, label in enumerate(pred_labels)}
-    prediction = prediction.map(unique_pred_mapper)
-    unique_truth_mapper = {label: f"t{i}" for i, label in enumerate(truth_labels)}
-    truth = truth.map(unique_truth_mapper)
+    # Only need to map the prediction and truth
+    # labels if both series contain segments
+    if len(prediction) and len(truth):
+        # Map prediction and truth labels to unique names
+        # to avoid confusion when there is an overlap
+        unique_pred_mapper = {label: f"p{i}" for i, label in enumerate(pred_labels)}
+        prediction = prediction.map(unique_pred_mapper)
+        unique_truth_mapper = {label: f"t{i}" for i, label in enumerate(truth_labels)}
+        truth = truth.map(unique_truth_mapper)
 
-    # If mapping should be computed individually for each file,
-    # add a unique prefix to each label based on the file
-    if individual_file_mapping:
-        files = set(prediction.index.get_level_values(FILE).unique()).union(
-            truth.index.get_level_values(FILE).unique()
-        )
-        unique_file_prefix = {file: f"f{i}" for i, file in enumerate(files)}
-        prediction_file_ids = prediction.reset_index()[FILE].map(unique_file_prefix)
-        prediction_file_ids.index = prediction.index
-        prediction = prediction_file_ids + prediction
-        truth_file_ids = truth.reset_index()[FILE].map(unique_file_prefix)
-        truth_file_ids.index = truth.index
-        truth = truth_file_ids + truth
+        # If mapping should be computed individually for each file,
+        # add a unique prefix to each label based on the file
+        if individual_file_mapping:
+            files = set(prediction.index.get_level_values(FILE).unique()).union(
+                truth.index.get_level_values(FILE).unique()
+            )
+            unique_file_prefix = {file: f"f{i}" for i, file in enumerate(files)}
+            prediction_file_ids = prediction.reset_index()[FILE].map(unique_file_prefix)
+            prediction_file_ids.index = prediction.index
+            prediction = prediction_file_ids + prediction
+            truth_file_ids = truth.reset_index()[FILE].map(unique_file_prefix)
+            truth_file_ids.index = truth.index
+            truth = truth_file_ids + truth
 
     # Now map from prediction label to truth label,
     # leaving prediction labels without a match as is
@@ -2676,7 +2679,8 @@ def _diarization_mapper(
         # and we can combine the result by updating the dictionary
         mapping = {}
         for file_mapping in file_mappings:
-            mapping.update(file_mapping)
+            if file_mapping is not None:
+                mapping.update(file_mapping)
 
     else:
         cooccurrence = _cooccurrence(
