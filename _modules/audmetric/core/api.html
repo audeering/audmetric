@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v1.4.1
+                v1.4.2
               </div>
             
           
@@ -690,26 +690,29 @@
             <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="c1"># Map prediction and truth labels to unique names</span>
-    <span class="c1"># to avoid confusion when there is an overlap</span>
-    <span class="n">unique_pred_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;p</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pred_labels</span><span class="p">)}</span>
-    <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_pred_mapper</span><span class="p">)</span>
-    <span class="n">unique_truth_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;t</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">truth_labels</span><span class="p">)}</span>
-    <span class="n">truth</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_truth_mapper</span><span class="p">)</span>
+    <span class="c1"># Only need to map the prediction and truth</span>
+    <span class="c1"># labels if both series contain segments</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">truth</span><span class="p">):</span>
+        <span class="c1"># Map prediction and truth labels to unique names</span>
+        <span class="c1"># to avoid confusion when there is an overlap</span>
+        <span class="n">unique_pred_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;p</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pred_labels</span><span class="p">)}</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_pred_mapper</span><span class="p">)</span>
+        <span class="n">unique_truth_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;t</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">truth_labels</span><span class="p">)}</span>
+        <span class="n">truth</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_truth_mapper</span><span class="p">)</span>
 
-    <span class="c1"># If mapping should be computed individually for each file,</span>
-    <span class="c1"># add a unique prefix to each label based on the file</span>
-    <span class="k">if</span> <span class="n">individual_file_mapping</span><span class="p">:</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
-            <span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="n">unique_file_prefix</span> <span class="o">=</span> <span class="p">{</span><span class="n">file</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;f</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">)}</span>
-        <span class="n">prediction_file_ids</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">FILE</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_file_prefix</span><span class="p">)</span>
-        <span class="n">prediction_file_ids</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">index</span>
-        <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction_file_ids</span> <span class="o">+</span> <span class="n">prediction</span>
-        <span class="n">truth_file_ids</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">FILE</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_file_prefix</span><span class="p">)</span>
-        <span class="n">truth_file_ids</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">index</span>
-        <span class="n">truth</span> <span class="o">=</span> <span class="n">truth_file_ids</span> <span class="o">+</span> <span class="n">truth</span>
+        <span class="c1"># If mapping should be computed individually for each file,</span>
+        <span class="c1"># add a unique prefix to each label based on the file</span>
+        <span class="k">if</span> <span class="n">individual_file_mapping</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
+                <span class="n">truth</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">FILE</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">unique_file_prefix</span> <span class="o">=</span> <span class="p">{</span><span class="n">file</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;f</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">)}</span>
+            <span class="n">prediction_file_ids</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">FILE</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_file_prefix</span><span class="p">)</span>
+            <span class="n">prediction_file_ids</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">prediction_file_ids</span> <span class="o">+</span> <span class="n">prediction</span>
+            <span class="n">truth_file_ids</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">FILE</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">unique_file_prefix</span><span class="p">)</span>
+            <span class="n">truth_file_ids</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">truth</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">truth</span> <span class="o">=</span> <span class="n">truth_file_ids</span> <span class="o">+</span> <span class="n">truth</span>
 
     <span class="c1"># Now map from prediction label to truth label,</span>
     <span class="c1"># leaving prediction labels without a match as is</span>
@@ -2908,7 +2911,8 @@
         <span class="c1"># and we can combine the result by updating the dictionary</span>
         <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">file_mapping</span> <span class="ow">in</span> <span class="n">file_mappings</span><span class="p">:</span>
-            <span class="n">mapping</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">file_mapping</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_mapping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mapping</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">file_mapping</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cooccurrence</span> <span class="o">=</span> <span class="n">_cooccurrence</span><span class="p">(</span>
@@ -3101,7 +3105,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/03/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
