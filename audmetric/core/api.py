@@ -528,9 +528,9 @@ def diarization_error_rate_detailed(
             category=UserWarning,
         )
 
-    # No need to map the prediction and truth
-    # labels at all if one of the two is empty
-    if len(prediction) or len(truth):
+    # Only need to map the prediction and truth
+    # labels if both series contain segments
+    if len(prediction) and len(truth):
         # Map prediction and truth labels to unique names
         # to avoid confusion when there is an overlap
         unique_pred_mapper = {label: f"p{i}" for i, label in enumerate(pred_labels)}
