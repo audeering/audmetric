@@ -7,8 +7,6 @@ audmetric
 **audmetric** includes several equations
 to estimate the performance of a machine learning prediction algorithm.
 
-DEBUG
-
 Some of the metrics are also available in sklearn_,
 but we wanted to have a package
 which depends only on numpy_.
