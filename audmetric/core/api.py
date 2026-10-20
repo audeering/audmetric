@@ -1831,6 +1831,26 @@ def linkability(
     return float(d_sys)
 
 
+def _regression_difference(truth, prediction):
+    truth = np.array(truth)
+    prediction = np.array(prediction)
+    if np.issubdtype(truth.dtype, np.integer) and np.issubdtype(
+        prediction.dtype, np.integer
+    ):
+        # Larger integers must be subtracted exactly before conversion, as
+        # converting the inputs can erase small differences above 2**53.
+        if max(truth.dtype.itemsize, prediction.dtype.itemsize) >= 8 and any(
+            int(values.min(initial=0)) < -(2**53) or int(values.max(initial=0)) > 2**53
+            for values in (truth, prediction)
+        ):
+            return np.asarray(
+                truth.astype(object) - prediction.astype(object), dtype=np.float64
+            )
+        truth = truth.astype(np.float64)
+        prediction = prediction.astype(np.float64)
+    return truth - prediction
+
+
 def mean_absolute_error(
     truth: Sequence[float],
     prediction: Sequence[float],
@@ -1859,10 +1879,8 @@ def mean_absolute_error(
     """
     assert_equal_length(truth, prediction)
 
-    prediction = np.array(prediction)
-    truth = np.array(truth)
-
-    return float(np.abs(truth - prediction).mean(axis=0))
+    difference = _regression_difference(truth, prediction)
+    return float(np.abs(difference).mean(axis=0))
 
 
 def mean_squared_error(
@@ -1893,10 +1911,8 @@ def mean_squared_error(
     """
     assert_equal_length(truth, prediction)
 
-    prediction = np.array(prediction)
-    truth = np.array(truth)
-
-    return float(np.square(truth - prediction).mean(axis=0))
+    difference = _regression_difference(truth, prediction)
+    return float(np.square(difference).mean(axis=0))
 
 
 def pearson_cc(
