@@ -149,6 +149,12 @@ def concordance_cc(
     if not isinstance(prediction, np.ndarray):
         prediction = np.array(list(prediction))
 
+    # Accumulate half-precision inputs without overflowing their sums or count.
+    if truth.dtype == np.float16:
+        truth = truth.astype(np.float32)
+    if prediction.dtype == np.float16:
+        prediction = prediction.astype(np.float32)
+
     if ignore_nan:
         mask = ~(np.isnan(truth) | np.isnan(prediction))
         truth = truth[mask]
