@@ -30,6 +30,7 @@ audmetric
     pearson_cc
     fscore_per_class
     precision_per_class
+    r_value
     recall_per_class
     unweighted_average_bias
     unweighted_average_fscore
