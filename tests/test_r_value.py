@@ -25,6 +25,10 @@ def r_value_reference(n_truth, n_prediction, n_hit):
         ([0.9, 0.1, 0.5], [0.5, 0.9, 0.1], 0.02, 1.0),
         # Within tolerance
         ([0.1, 0.5, 0.9], [0.115, 0.485, 0.915], 0.02, 1.0),
+        # Exactly at tolerance,
+        # affected by floating point precision
+        ([0.1, 0.5, 0.9], [0.12, 0.48, 0.92], 0.02, 1.0),
+        ([100, 200], [120, 180], 20, 1.0),
         # Outside tolerance
         ([0.1, 0.5, 0.9], [0.13, 0.5, 0.9], 0.02, r_value_reference(3, 3, 2)),
         # Larger tolerance

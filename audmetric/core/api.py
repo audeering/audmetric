@@ -2022,6 +2022,9 @@ def r_value(
     A predicted boundary counts as a hit
     if it lies within ``tolerance``
     of a ground truth boundary.
+    A distance equal to ``tolerance``
+    up to floating point precision
+    is counted as a hit as well.
     Each ground truth boundary
     can be hit by at most one predicted boundary,
     and vice versa.
@@ -2091,7 +2094,8 @@ def r_value(
         # which yields the maximum number of hits
         i = j = 0
         while i < len(t) and j < len(p):
-            if abs(t[i] - p[j]) <= tolerance:
+            distance = abs(t[i] - p[j])
+            if distance <= tolerance or math.isclose(distance, tolerance):
                 n_hit += 1
                 i += 1
                 j += 1
