@@ -1986,6 +1986,130 @@ def precision_per_class(
     return {label: float(r) for label, r in zip(labels, precision)}
 
 
+def r_value(
+    truth: Sequence[float] | Sequence[Sequence[float]],
+    prediction: Sequence[float] | Sequence[Sequence[float]],
+    *,
+    tolerance: float = 0.02,
+) -> float:
+    r"""R-value for boundary detection.
+
+    The R-value is a compound measure
+    for the quality of segment boundary detection,
+    e.g. phone or word segmentation.\ :footcite:`Raesaenen2009`
+    It combines the hit rate :math:`\text{HR}`
+    and the over-segmentation :math:`\text{OS}`
+    into a single score:
+
+    .. math::
+
+        \text{HR} &= \frac{N_\text{hit}}{N_\text{truth}} \\
+        \text{OS} &= \frac{N_\text{prediction}}{N_\text{truth}} - 1 \\
+        r_1 &= \sqrt{(1 - \text{HR})^2 + \text{OS}^2} \\
+        r_2 &= \frac{-\text{OS} + \text{HR} - 1}{\sqrt{2}} \\
+        R &= 1 - \frac{|r_1| + |r_2|}{2}
+
+    :math:`r_1` is the distance to the target point
+    (:math:`\text{HR} = 1`, :math:`\text{OS} = 0`),
+    and :math:`r_2` the distance to the line
+    :math:`\text{HR} = 1 + \text{OS}`,
+    which penalizes simply adding more boundaries
+    to increase the hit rate.
+    An R-value of :math:`1` denotes a perfect segmentation,
+    whereas it can become negative
+    for heavy over-segmentation.
+
+    A predicted boundary counts as a hit
+    if it lies within ``tolerance``
+    of a ground truth boundary.
+    Each ground truth boundary
+    can be hit by at most one predicted boundary,
+    and vice versa.
+    If a sequence of sequences is provided,
+    e.g. one sequence of boundaries per file,
+    hits and boundaries are counted over all sequences
+    before computing the R-value.
+
+    .. footbibliography::
+
+    Args:
+        truth: ground truth boundary positions,
+            e.g. in seconds,
+            or a sequence of those
+        prediction: predicted boundary positions,
+            or a sequence of those
+        tolerance: maximum absolute distance
+            between a predicted and a ground truth boundary
+            to count as a hit,
+            in the same unit as the boundary positions
+
+    Returns:
+        R-value
+
+    Raises:
+        ValueError: if ``truth`` and ``prediction``
+            contain a different number of sequences
+        ValueError: if ``truth`` contains no boundaries
+        ValueError: if ``tolerance`` is negative
+
+    Examples:
+        >>> r_value([0.1, 0.5, 0.9], [0.1, 0.5, 0.9])
+        1.0
+        >>> round(r_value([0.1, 0.5, 0.9], [0.11, 0.5]), 4)
+        0.7643
+        >>> round(r_value([0.1, 0.5, 0.9], [0.1, 0.3, 0.5, 0.7, 0.9]), 4)
+        0.431
+        >>> round(r_value([[0.1, 0.5], [0.2]], [[0.1, 0.5], [0.4]]), 4)
+        0.7155
+
+    """
+    if tolerance < 0:
+        raise ValueError(f"'tolerance' has to be non-negative, got {tolerance}.")
+
+    def is_nested(x):
+        return len(x) > 0 and all(
+            isinstance(e, Sequence | np.ndarray) and not isinstance(e, str) for e in x
+        )
+
+    truth = audeer.to_list(truth)
+    prediction = audeer.to_list(prediction)
+    if is_nested(truth) or is_nested(prediction):
+        assert_equal_length(truth, prediction)
+    else:
+        truth = [truth]
+        prediction = [prediction]
+
+    n_truth = 0
+    n_prediction = 0
+    n_hit = 0
+    for t, p in zip(truth, prediction):
+        t = np.sort(np.asarray(t, dtype=float))
+        p = np.sort(np.asarray(p, dtype=float))
+        n_truth += len(t)
+        n_prediction += len(p)
+        # One-to-one matching of sorted boundaries,
+        # which yields the maximum number of hits
+        i = j = 0
+        while i < len(t) and j < len(p):
+            if abs(t[i] - p[j]) <= tolerance:
+                n_hit += 1
+                i += 1
+                j += 1
+            elif p[j] < t[i]:
+                j += 1
+            else:
+                i += 1
+
+    if n_truth == 0:
+        raise ValueError("'truth' has to contain at least one boundary.")
+
+    hr = n_hit / n_truth
+    os = n_prediction / n_truth - 1
+    r1 = math.sqrt((1 - hr) ** 2 + os**2)
+    r2 = (-os + hr - 1) / math.sqrt(2)
+    return float(1 - (abs(r1) + abs(r2)) / 2)
+
+
 def recall_per_class(
     truth: Sequence[object],
     prediction: Sequence[object],

@@ -22,6 +22,7 @@ from audmetric.core.api import mean_absolute_error
 from audmetric.core.api import mean_squared_error
 from audmetric.core.api import pearson_cc
 from audmetric.core.api import precision_per_class
+from audmetric.core.api import r_value
 from audmetric.core.api import recall_per_class
 from audmetric.core.api import unweighted_average_bias
 from audmetric.core.api import unweighted_average_fscore
